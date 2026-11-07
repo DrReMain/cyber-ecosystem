@@ -201,6 +201,13 @@ function multisetMinus(a: string[], b: string[]): string[] {
 - **playwright 并行 worker=种子池互污**(11-08 report 片实锤):默认 workers=半核,fidelity 种子成员共享 birth year+sex 的 cohort 键——两测并行=两池并存(活池轮询抓到 22 行 bench),冻结 78/86 被挤成 79/87,**零报错纯漂移**;处方=config `workers: 1`(已落 playwright.config.ts)+种子测试 finally 清完再下一种。
 - **百分位=活算 z-CDF,池含本人记录**(11-08 report 片实锤):`percentileFor`(report/biz.go)=round(100·Φ((score−μ)/σ)),μ/σ=同年同姓**全部**有效 authoritative 记录的 avg/stddev_samp(被测者自己的记录也入池);cohortFloor=10/ceil=50(含本人→每能力 ≥9 外排行);**三个面读活算**:digest 逐能力百分位、cognitive renderedDims(一源能力缺 cohort 答案=整维 sink 不画轴)、锁面 single(GetReport unlocked=false 走 computeFor);unlocked single 与 trend 点才读冻结 snapshot。工程池=整数十行、命中目标分位且离 .5 舍入边 ≥0.08(浮噪不翻)。
 - **报告族状态面种子法**(11-08 report 片):cognitive 解锁面=entitlement 单行(scope_kind='report_type',scope_ref='cognitive',status='active')——kernel ReportAccessVerdict 码权擢升策略;**ByScope 读=.Only(),同 scope 第二行=ent NotOneErr→500 非 merge**。career 闭面=report_policy 行 pin(family='career',policy='closed')+finally 还原保存值(读行用 `-t -A -c`);shipped 默认 career=open/cognitive=membership(D-AB),pin=复刻原型「后台开关关」的自身假定。
+- **种子 throw=池泄漏**(11-08 pay 片实锤,池互污第二例):种子调用在 try 外时,SQL throw(撞约束/列错)→finally cleanup 永不跑→cohort 行跨测试存活,后续所有百分位面静默漂移(22 行池把 78 挤成 79,全套件 27 面连带红);处方=**种子调用一律入 try**(cleanup 是幂等 DELETE,半种状态也清得干净)+泄漏排查按 cohort 计数(`JOIN profile` 数 birth_year+sex 池行数,正常=每码 11)。
+- **match_session 单活跃=partial unique(user_id WHERE status='active')**(11-08 pay 片实锤):多场并存=旧场先 UPDATE status='switched'(切换重抽的词,枚举仅 active/switched/expired,**无 completed**——完成不是状态);digest 的 sessions 聚合无 status 滤,两场都进。
+- **session anchor=created_at DESC First,并列时刻听存储 whim**(11-08 pay 片实锤):同一场内多行记录 created_at 全同→anchor 选取不定→快照 miss→活算漂移(前 35% 变 40%);处方=场内记录秒级错开(末步最晚),历史行分钟精度不受影响。
+- **真钟-liveness 边界**(11-08 pay 片实锤):钉钟只骗客户端 Date.now;**服务端读真钟**——member_until/MemberWindow/HasActiveMembership 是服务端 liveness,oracle 坐标(2026-09)的窗口终点(10-15/10-16)在本机真钟(11-08)已过→null 降级。处方=涉及服务端 liveness 的窗口种**真钟未来**日期,日期行差=坐标 gap 入台账;同字面日期要「既未来又过去」(P7 态②③)时各测试分别钉钟。
+- **钉钟拨过窗口另一侧=SSR/CSR 双钟差**(11-08 pay 片实锤):SSR 按真钟渲染态②、hydration 按钉钟渲染态③→树重建+window capture 吐「未知错误」toast(capture 无 opts=默认弹,4s 瞬态);处方=collectFace 加 linger(等瞬态走完,oracle 只收稳定面),不剥 DOM。
+- **innerText 的 flex 分行律**(11-08 pay 片实锤):flex 容器的直接子项各占一行(flex item=块级);「文字+badge 同行」=外层 span 去 flex、badge 内联+**字面空格文本节点**(`{" "}`),P7 的「专属会员 · 月卡 更划算」与 member 卡「已解锁 1 份报告 永久保留」皆此律。
+- **P7 稿与 flags 注入型 oracle 采集**(11-08 pay 片):oracle=仓内三态稿时,gen-fixtures 走 file://+evaluate show(i) 切态+.tabs 评审壳剥离;页面渲染期读 localStorage 的状态(pay-result 的 flags.lastOrder)注入后**必须去掉 preset 参数再 reload**(reset() 会 re-merge 覆盖,纯 load() 恢复完整存储含登录态过 guard)。
 - 写文件一律绝对路径+落完即 ls:并行 tool 调用 cwd 快照可能不一致(实测落进幽灵嵌套路径)。
 - 退出码重定向到文件后单独取,禁管道尾(`|tail;$?` 恒 0)。
 - `pnpm exec node` 被本环境策略拒绝:提取一律走 Playwright spec 形态(本档三件套即是)。

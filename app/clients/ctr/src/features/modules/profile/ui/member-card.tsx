@@ -69,24 +69,27 @@ export function ProfileMemberCard({
       <div className="text-ink-tertiary mt-2 text-[11.5px] leading-[1.75]">
         {active ? m.profile_member_desc_active() : m.profile_member_desc_pitch()}
       </div>
-      <div className="mt-[11px] flex items-center justify-between">
+      <div className="mt-2.75 flex items-center justify-between">
         {active ? (
           unlockedCount !== null ? (
-            <span className="flex items-center gap-1.5 text-[11.5px] text-[#6EE7B7]">
-              <span>{m.profile_member_unlocked({ count: String(unlockedCount) })}</span>
-              <span className="rounded-full bg-[rgba(34,197,94,0.15)] px-2 py-0.5 text-[9.5px] font-semibold">
+            // The prototype prints the count and its kept note as one
+            // line, space-separated — inline siblings, never flex rows
+            // (flex children each own an innerText line).
+            <span className="text-[11.5px] text-[#6EE7B7]">
+              {m.profile_member_unlocked({ count: String(unlockedCount) })}{" "}
+              <span className="bg-status-ok-bg rounded-full px-2 py-0.5 text-[9.5px] font-semibold">
                 {m.profile_member_kept()}
               </span>
             </span>
           ) : null
         ) : (
           <span>
-            <span className="text-[19px] leading-none font-black text-[#FDE047]">¥{priceYuan}</span>
+            <span className="text-grade-s text-[19px] leading-none font-black">¥{priceYuan}</span>
             <span className="text-ink-tertiary text-[11px]">{m.profile_member_per_month()}</span>
           </span>
         )}
         <button
-          className="shrink-0 cursor-pointer rounded-[10px] bg-[#7C3AED] px-[14px] py-[7px] text-[12px] font-bold text-white active:opacity-60"
+          className="bg-ambient-purple shrink-0 cursor-pointer rounded-[10px] px-3.5 py-1.75 text-[12px] font-bold text-white active:opacity-60"
           onClick={onPay}
           type="button"
         >

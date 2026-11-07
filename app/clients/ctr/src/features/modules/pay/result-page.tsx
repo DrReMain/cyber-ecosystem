@@ -9,12 +9,11 @@ import { Button } from "react-aria-components";
 import type { AmbientOrb } from "#/features/app/ambient/ambient-backdrop";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { localDateOf, localDateTimeOf } from "#/features/app/date";
-import { fenToYuan } from "#/features/app/fen";
+import { fenToYuanExact } from "#/features/app/fen";
 import { StateScreen } from "#/features/app/states/state-screen";
 import { sessionQuery } from "#/features/auth/session.fn";
 import { m } from "#/paraglide/messages";
 import { ORDER_SCOPE_TRIAL, ORDER_STATE_CLOSED, ORDER_STATE_PAID } from "./order";
-import { PayFilingFooter } from "./ui/filing-footer";
 
 // The prototype's single state blob: one 250px orb whose color states the
 // verdict before any copy is read (green paid, purple member, red failed,
@@ -189,7 +188,10 @@ function retrySearchOf(
 
 // The drawn face, one component: the verdict art, the success receipt,
 // the failure/cancel notes, and the button pair — every conditional flat,
-// the parent only decides which face exists.
+// the parent only decides which face exists. The filing footer stays on
+// the wall (the compliance block belongs to the moment before the payer
+// commits — the P7 draft's own foot); the receipt ends on the
+// server-truth note alone, the prototype's pay-result own shape.
 function ResultFace({
   onHome,
   onMember,
@@ -225,7 +227,7 @@ function ResultFace({
             <ReceiptRow label={m.pay_result_row_order()} value={order.orderNo ?? "—"} />
             <ReceiptRow
               label={m.pay_result_row_amount()}
-              value={order.amountFen !== undefined ? `¥${fenToYuan(order.amountFen)}` : "—"}
+              value={order.amountFen !== undefined ? `¥${fenToYuanExact(order.amountFen)}` : "—"}
             />
             <ReceiptRow label={m.pay_result_row_channel()} value={channelLabelOf(order.channel)} />
             <ReceiptRow label={m.pay_result_row_time()} value={timeCellOf(order)} />
@@ -233,7 +235,7 @@ function ResultFace({
         ) : null}
 
         {verdict.kind === "fail" ? (
-          <div className="rounded-card bg-surface-card border border-[rgba(245,158,11,0.45)] p-3.5 text-[11.5px] leading-[1.85] text-[#FCD34D]">
+          <div className="rounded-card bg-surface-card text-status-pending border border-[rgba(245,158,11,0.45)] p-3.5 text-[11.5px] leading-[1.85]">
             {m.pay_result_tip_fail()}
           </div>
         ) : null}
@@ -246,28 +248,28 @@ function ResultFace({
 
         {success ? (
           <Button
-            className="bg-cta-primary shadow-cta-primary w-full rounded-[12px] py-[14px] text-[15px] font-bold text-white active:opacity-80"
+            className="bg-cta-primary shadow-cta-primary w-full rounded-[12px] py-3.5 text-[15px] font-bold text-white active:opacity-80"
             onPress={onView}
           >
             {verdict.kind === "member" ? m.pay_result_btn_view_member() : m.pay_result_btn_view()}
           </Button>
         ) : (
           <Button
-            className="bg-cta-practice shadow-cta-practice w-full rounded-[12px] py-[14px] text-[15px] font-bold text-white active:opacity-80"
+            className="bg-cta-practice shadow-cta-practice w-full rounded-[12px] py-3.5 text-[15px] font-bold text-white active:opacity-80"
             onPress={onRetry}
           >
             {m.pay_result_btn_retry()}
           </Button>
         )}
         <Button
-          className="bg-surface-input text-ink-secondary w-full rounded-[12px] border-[1.5px] border-[#4B5563] py-[14px] text-[15px] font-medium active:opacity-80"
+          className="bg-surface-input text-ink-secondary border-ambient-slate w-full rounded-[12px] border-[1.5px] py-3.5 text-[15px] font-medium active:opacity-80"
           onPress={onHome}
         >
           {m.pay_result_btn_home()}
         </Button>
         {verdict.kind === "member" ? (
           <Button
-            className="bg-surface-input text-ink-secondary w-full rounded-[12px] border-[1.5px] border-[#4B5563] py-[14px] text-[15px] font-medium active:opacity-80"
+            className="bg-surface-input text-ink-secondary border-ambient-slate w-full rounded-[12px] border-[1.5px] py-3.5 text-[15px] font-medium active:opacity-80"
             onPress={onMember}
           >
             {m.pay_result_btn_member()}
@@ -277,7 +279,6 @@ function ResultFace({
         <div className="text-ink-tertiary text-center text-[10.5px] leading-[1.7]">
           {m.pay_result_note()}
         </div>
-        <PayFilingFooter />
       </div>
     </AmbientLayout>
   );

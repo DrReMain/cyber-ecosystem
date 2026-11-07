@@ -26,12 +26,15 @@ export function OptionCard({
         <span className="text-ink text-[15px] font-extrabold">
           {name}
           {bestBadge !== undefined ? (
-            <span className="ml-1.5 rounded-full border border-[rgba(168,85,247,0.4)] bg-[rgba(168,85,247,0.2)] px-2 py-px text-[9.5px] font-semibold text-[#C4B5FD]">
-              {bestBadge}
-            </span>
+            <>
+              {/* The draft's own literal: a space between the name and
+               * the badge — innerText reads it as one line. */} <span className="text-status-soon ml-1.5 rounded-full border border-[rgba(168,85,247,0.4)] bg-[rgba(168,85,247,0.2)] px-2 py-px text-[9.5px] font-semibold">
+                {bestBadge}
+              </span>
+            </>
           ) : null}
         </span>
-        <span className="text-[20px] font-black text-[#FDE047] tabular-nums">{price}</span>
+        <span className="text-grade-s text-[20px] font-black tabular-nums">{price}</span>
       </div>
       <p className="text-ink-muted mt-1 text-left text-[10.5px] leading-[1.7]">{desc}</p>
     </div>

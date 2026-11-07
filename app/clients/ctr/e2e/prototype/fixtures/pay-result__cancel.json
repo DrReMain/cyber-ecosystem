@@ -1,0 +1,16 @@
+{
+  "page": "pay-result",
+  "preset": "ready",
+  "source": "pay-result.html?preset=ready&r=cancel",
+  "title": "ctr · 支付结果",
+  "lines": [
+    "🚫",
+    "已取消支付",
+    "未付款，未解锁任何内容",
+    "已取消，未产生订单。随时可以重新购买。",
+    "重新支付",
+    "返回首页",
+    "解锁结果以服务端记录为准，重复支付不会重复发放"
+  ],
+  "placeholders": []
+}

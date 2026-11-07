@@ -27,6 +27,17 @@ const FPS_STEPS = [
   { ability: "skillReleaseAccuracy", test_code: "skill_trajectory" },
 ];
 
+// The moba lineup off the same source (match_config render_order
+// 1-4: resourceAllocation, decisionEfficiency, reactionSpeed,
+// skillReleaseAccuracy) with the catalog's own code picks — the
+// member-overview preset's second session rides it.
+const MOBA_STEPS = [
+  { ability: "resourceAllocation", test_code: "character_counter" },
+  { ability: "decisionEfficiency", test_code: "offense_defense" },
+  { ability: "reactionSpeed", test_code: "red_dot" },
+  { ability: "skillReleaseAccuracy", test_code: "skill_trajectory" },
+];
+
 // The cohort pools behind the tested preset's live percentiles. The
 // engine benches each best against the pool of same-birth-year-same-sex
 // authoritative records (the member's own record joins its own pool)
@@ -120,20 +131,37 @@ export function seedBareMember(
   return { account, userId };
 }
 
-/** Seeds the esports profile row on a bare member. The two shapes the
- * presets froze: "ready" (the complete member) and "profile-missing"
- * (nickname and a two-game preference, no birth — exactly the wizard's
- * subject). Sex rides the real storage word, never the prototype's
- * display glyph. */
-export function seedProfile(tag: string, userId: string, shape: "ready" | "profile-missing"): void {
-  const games = shape === "ready" ? "('王者荣耀','英雄联盟','CS2')" : "('王者荣耀','CS2')";
+/** Seeds the esports profile row on a bare member. The shapes the presets
+ * froze: "ready" (the complete member), "profile-missing" (nickname and a
+ * two-game preference, no birth — exactly the wizard's subject), and
+ * "underage" (birth 2013-04 — the pay wall's own refusal subject at the
+ * pinned 2026-09 clock, 13 by year+month). Sex rides the real storage
+ * word, never the prototype's display glyph. */
+export function seedProfile(
+  tag: string,
+  userId: string,
+  shape: "ready" | "profile-missing" | "underage",
+): void {
+  const games =
+    shape === "profile-missing"
+      ? "('王者荣耀','CS2')"
+      : shape === "underage"
+        ? "('和平精英')"
+        : "('王者荣耀','英雄联盟','CS2')";
   // Birth year 2004, not the prototype's 2008: the cohort key is birth
   // year + sex, and the shared dev pool carries a legacy 2008 male
   // calibration batch (another lane's residue, left in place) that a 2008
   // member would absorb — the frozen percentile needs a hermetic pool.
   // 2004-06 is 22 at the fixture's own moment, so the stored 18-22 band
-  // stays honest, and no oracle line quotes the birth.
-  const birth = shape === "ready" ? "2004, 6, 'male', '18-22'" : "NULL, NULL, 'male', NULL";
+  // stays honest, and no oracle line quotes the birth. The underage shape
+  // carries the prototype's own 2013-04 — its cohort key meets no pool
+  // (the wall face reads no percentile at all).
+  const birth =
+    shape === "ready"
+      ? "2004, 6, 'male', '18-22'"
+      : shape === "underage"
+        ? "2013, 4, 'male', '12-14'"
+        : "NULL, NULL, 'male', NULL";
   sql(
     "esports",
     `INSERT INTO profile (id, created_at, updated_at, tenant_id, user_id, nickname, birth_year, birth_month, sex, age_band, games)
@@ -150,7 +178,7 @@ export function seedProfile(tag: string, userId: string, shape: "ready" | "profi
 /** The one-call member: system rows plus the profile shape. */
 export function seedMember(
   tag: string,
-  shape: "ready" | "profile-missing" = "ready",
+  shape: "ready" | "profile-missing" | "underage" = "ready",
   creds: { phone?: string; wechat?: string } = {},
 ): { account: string; userId: string } {
   const { account, userId } = seedBareMember(tag, creds);
@@ -236,6 +264,111 @@ export function seedScoredSession(tag: string, userId: string): { anchorId: stri
   return { anchorId };
 }
 
+/** Seeds the member's standing membership window — the app-side shape of
+ * the prototype presets' member.status: one 'membership' entitlement row
+ * whose expires_at is the preset's endTime. An active window and an
+ * expired one are the same row shape (status stays 'active' — expiry is
+ * a read-time fact of the timestamp, never a status flip; only an
+ * operator terminate writes that word), so the caller's expires_at picks
+ * the face. */
+export function seedMemberWindow(tag: string, userId: string, expiresAt: string): void {
+  sql(
+    "esports",
+    `INSERT INTO entitlement (id, created_at, updated_at, tenant_id, user_id, scope_kind, scope_ref, expires_at, status, source)
+     VALUES ('${tag}w', now(), now(), 'default', '${userId}', 'membership', NULL, '${expiresAt}', 'active', 'e2e-seed');`,
+  );
+}
+
+/** Seeds one member-window trial unlock — the row the digest's
+ * all-time unlock count reads (scope 'trial', source 'membership': the
+ * marker the E8 settle hook writes when a member opens a report inside
+ * the window). The member-overview preset's「已解锁 1 份报告」line rides
+ * exactly one. */
+export function seedMembershipUnlock(tag: string, userId: string, recordId: string): void {
+  sql(
+    "esports",
+    `INSERT INTO entitlement (id, created_at, updated_at, tenant_id, user_id, scope_kind, scope_ref, status, source)
+     VALUES ('${tag}k', now(), now(), 'default', '${userId}', 'trial', '${recordId}', 'active', 'membership');`,
+  );
+}
+
+/** The member-overview preset's second session: the moba lineup scored
+ * at the prototype's own pcts [66, 58, 74, 62] (RA, DE, RS, SRA), each
+ * record's score the prototype's own 0.9×pct+5 semantics so the merged
+ * cross-genre bests land on the oracle's literals (RA 64, DE 57 — RS and
+ * SRA stay under the fps session's). The snapshot freezes the moba
+ * composite 65 — the overview stats'「前 35%」reads the latest session's
+ * own verdict. Created 30s after the fps session: the history lines show
+ * the same minute, but the latest-scored tie-break stays deterministic. */
+export function seedMobaSession(tag: string, userId: string): void {
+  const sessionId = `${tag}s2`;
+  // One active session per member is the model's own law (a partial
+  // unique on status='active'): a second genre arrives through the
+  // switch flow's word — the fps session turns 'switched', the moba
+  // session takes the active seat. The digest reads both rows the same
+  // (its sessions aggregate carries no status filter).
+  const scores = [64, 57, 71, 60];
+  const grades = ["B", "C", "B", "B"];
+  const pcts = [66, 58, 74, 62];
+  // Seconds apart, same as the fps session: the session-anchor pick is
+  // latest-by-created_at, and a four-way tie leaves the pick to the
+  // storage's whim — the last step must own the latest timestamp so the
+  // anchor is the record the snapshot froze on. All four stay inside the
+  // same minute the history line prints.
+  const times = ["09:12:30", "09:13:50", "09:15:20", "09:16:40"];
+  const records = MOBA_STEPS.map((step, i) => {
+    const at = `2026-09-09 ${times[i]}+08`;
+    return `('${tag}m${i + 1}', '${at}', '${at}', 'default', '${step.test_code}', '${userId}', 1, '${sessionId}',
+            '${at}', '${at}', '{}', ${scores[i]}, ${scores[i]}, '${grades[i]}', true, NULL)`;
+  });
+  const abilities = MOBA_STEPS.map(
+    (step, i) =>
+      `{"Ability":"${step.ability}","GameCode":"${step.test_code}","Best":${scores[i]},"Attempts":[${scores[i]}],"BestGrade":null,"Percentile":${pcts[i]},"PrevSession":null,"HistoryBest":null}`,
+  );
+  sql(
+    "esports",
+    `UPDATE match_session SET status = 'switched' WHERE id = '${tag}s';
+     INSERT INTO match_session (id, created_at, updated_at, tenant_id, user_id, genre, difficulty, seed, steps, retest_budget, status)
+     VALUES ('${sessionId}', '2026-09-09 09:12:30+08', '2026-09-09 09:12:30+08', 'default', '${userId}', 'moba', 'experience', 1,
+             '${JSON.stringify(MOBA_STEPS)}'::jsonb, 3, 'active');
+     INSERT INTO test_record (id, created_at, updated_at, tenant_id, test_code, user_id, attempt_no, session_id, started_at, ended_at, raw_detail, raw_score, authoritative_score, grade, valid, invalid_reason)
+     VALUES ${records.join(",")};
+     INSERT INTO report_snapshot (id, created_at, updated_at, tenant_id, record_id, user_id, tier, composite_percentile, abilities, cohort_basis)
+     VALUES ('${tag}sn2', now(), now(), 'default', '${tag}m4', '${userId}', 'B', 65, '[${abilities.join(",")}]'::jsonb, 'same-age-same-sex');`,
+  );
+}
+
+/** Seeds one pay_order row — the receipt page's whole truth (the wall's
+ * refusal faces need no order at all). state is the stored word the
+ * verdict maps straight onto (paid+scope → the success face by scope,
+ * closed → cancel, pending → the honest failure: nothing settled); the
+ * sku_code pair keeps the row faithful to what each face bought. The
+ * pinned clock's own moment (2026-09-15 21:30) rides paid_at so the
+ * receipt's time line matches the oracle's literal. */
+export function seedPayOrder(
+  tag: string,
+  userId: string,
+  o: {
+    no: string;
+    state: "pending" | "paid" | "closed";
+    scopeKind: "trial" | "period";
+    scopeRef?: string;
+    amountFen: number;
+    paid?: boolean;
+  },
+): string {
+  const orderNo = `PAY20260915${o.no}`;
+  sql(
+    "esports",
+    `INSERT INTO pay_order (id, created_at, updated_at, tenant_id, order_no, user_id, sku_code, scope_kind, scope_ref, provider, channel, amount_fen, state, credential_kind, credential_value, expires_at, paid_at)
+     VALUES ('${tag}o${o.no}', '2026-09-15 21:28:00+08', '2026-09-15 21:28:00+08', 'default', '${orderNo}', '${userId}',
+             '${o.scopeKind === "period" ? "member_month" : "trial_report"}', '${o.scopeKind}',
+             ${o.scopeRef === undefined ? "NULL" : `'${o.scopeRef}'`}, 'mock', 'wechat_jsapi', ${o.amountFen}, '${o.state}',
+             'qr_code', 'e2e-seed', '2026-09-15 23:28:00+08', ${o.paid === true ? "'2026-09-15 21:30:00+08'" : "NULL"});`,
+  );
+  return orderNo;
+}
+
 /** Seeds one report-family unlock grant — the app-side shape of the
  * prototype's unlocked.cognitive flag (the unlocked-single preset): an
  * active report_type entitlement, which the kernel's verdict lets
@@ -281,9 +414,10 @@ export function cleanup(tag: string): void {
   );
   sql(
     "esports",
-    `DELETE FROM report_snapshot WHERE id = '${tag}sn';
-     DELETE FROM test_record WHERE id LIKE '${tag}r%' OR id LIKE '${tag}c%' OR user_id LIKE '${tag}c%';
-     DELETE FROM match_session WHERE id = '${tag}s';
+    `DELETE FROM pay_order WHERE user_id = '${tag}u';
+     DELETE FROM report_snapshot WHERE id LIKE '${tag}sn%';
+     DELETE FROM test_record WHERE id LIKE '${tag}r%' OR id LIKE '${tag}m%' OR id LIKE '${tag}c%' OR user_id LIKE '${tag}c%';
+     DELETE FROM match_session WHERE id LIKE '${tag}s%';
      DELETE FROM entitlement WHERE user_id = '${tag}u';
      DELETE FROM profile WHERE id LIKE '${tag}%' OR user_id LIKE '${tag}%';`,
   );
@@ -328,6 +462,7 @@ export async function loginAndOpen(
 export async function collectFace(
   page: Page,
   settleFor: string,
+  lingerMs = 400,
 ): Promise<{ raw: string; placeholders: string[] }> {
   await page.waitForFunction(
     // biome-ignore lint/performance/useDomNodeTextContent: innerText is the deliberate visibility oracle — the wait polls the same face the assert below reads; textContent would admit hidden nodes and settle early on markers a visitor cannot see.
@@ -335,7 +470,7 @@ export async function collectFace(
     settleFor,
     { timeout: 15_000 },
   );
-  await page.waitForTimeout(400);
+  await page.waitForTimeout(lingerMs);
   return page.evaluate(() => {
     // Dev chrome never crosses to production faces, so it leaves the
     // oracle comparison too — the same strip the fixture side applies to
