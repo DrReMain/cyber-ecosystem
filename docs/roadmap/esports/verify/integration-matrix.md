@@ -19,7 +19,7 @@
 
 | 号 | 态 | 造法 | 消费套 |
 |---|---|---|---|
-| `wt<base36>` 一次性号 | member 人口,零业务态 | system RPC 造号 | C1/X2 提交腿 |
+| `wt<base36>` 一次性号 | member 人口,零业务态 | SQL 直插三表(user+credential+membership;D-BG 后 CreateUser 无 population 入参) | C1/X2 提交腿 |
 | R-rich | 有锚评估记录 | 造号+fixture SQL 直插(test_record+cohort 样本+match_session;样本行不共享) | X1/X3/C2/C1-7 |
 | R-minor | 未成年(birth<付费年龄线) | 造号+直插 birth | X1-5/C1-2(u13 闸)/C3 |
 | R-multi | 双凭证(phone+wechat) | 造号+双绑定 | C4(换账号钮) |

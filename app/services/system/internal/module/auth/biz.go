@@ -762,12 +762,12 @@ func (uc *AuthUC) mergeable(ctx context.Context, poor *user.User) error {
 	return nil
 }
 
-// resolveByCredential answers whether a login spelling that missed the
-// account handle still names an account: any bound credential identifier
-// resolves kind-agnostically. Nil, nil = no credential row knows the
-// spelling (or its user vanished — a settled miss); a non-nil error is
-// infrastructure and stays loud.
 func (uc *AuthUC) resolveByCredential(ctx context.Context, account string) (*user.User, error) {
+	// Answers whether a login spelling that missed the account handle still
+	// names an account: any bound credential identifier resolves
+	// kind-agnostically. Nil, nil = no credential row knows the spelling
+	// (or its user vanished — a settled miss); a non-nil error is
+	// infrastructure and stays loud.
 	cred, err := uc.userRP.FindCredentialByIdentifier(ctx, account)
 	if errorspb.IsInfraErrorDbNotFound(err) {
 		return nil, nil

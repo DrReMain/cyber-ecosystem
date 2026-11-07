@@ -1745,12 +1745,12 @@ func (x *Auth_Provider_WeChat) GetSecret() string {
 
 type Auth_Provider_Sms struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
-	AccessKeyId     string                 `protobuf:"bytes,1,opt,name=access_key_id,json=accessKeyId,proto3" json:"access_key_id,omitempty"`             // Aliyun RAM key; a credentialed row selects the dysmsapi backend, otherwise the mock backend
+	AccessKeyId     string                 `protobuf:"bytes,1,opt,name=access_key_id,json=accessKeyId,proto3" json:"access_key_id,omitempty"`             // Aliyun RAM key; consumed only by the dysmsapi backend
 	AccessKeySecret string                 `protobuf:"bytes,2,opt,name=access_key_secret,json=accessKeySecret,proto3" json:"access_key_secret,omitempty"` // deploy-plane fact; empty with a non-empty id is a boot error
 	SignName        string                 `protobuf:"bytes,3,opt,name=sign_name,json=signName,proto3" json:"sign_name,omitempty"`                        // channel-assigned signature
 	TemplateCode    string                 `protobuf:"bytes,4,opt,name=template_code,json=templateCode,proto3" json:"template_code,omitempty"`            // channel-assigned template; its own placeholder vocabulary names the params
 	Endpoint        string                 `protobuf:"bytes,5,opt,name=endpoint,proto3" json:"endpoint,omitempty"`                                        // RPC endpoint; empty = the kind's default (tests override here)
-	Backend         string                 `protobuf:"bytes,6,opt,name=backend,proto3" json:"backend,omitempty"`                                          // explicit channel choice: "dysmsapi" (credentials required, else boot fails) | "mock" (record, never dial); empty = pick by credentials
+	Backend         string                 `protobuf:"bytes,6,opt,name=backend,proto3" json:"backend,omitempty"`                                          // required channel choice: "dysmsapi" (credential pair required, else boot fails) | "mock" (record, never dial); empty or unknown fails the boot
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }

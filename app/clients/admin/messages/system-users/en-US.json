@@ -32,8 +32,6 @@
   "system_users_form_account_required": "Account is required",
   "system_users_form_account_hint": "The account is the login identity and cannot change",
   "system_users_form_password": "Initial password",
-  "system_users_form_population": "User type",
-  "system_users_ph_population": "Optional; empty = default",
   "system_users_form_dept": "Department",
   "system_users_form_avatar": "Avatar",
   "system_users_form_avatar_upload": "Upload avatar",

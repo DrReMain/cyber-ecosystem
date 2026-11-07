@@ -191,7 +191,7 @@ type EntitlementRP interface {
 	// The history-telling twin above: the most recent non-terminated
 	// window's end, past or future; nil = never a member.
 	LastMembershipUntil(ctx context.Context, userID string) (*time.Time, error)
-	HasAnyScope(ctx context.Context, userID, scopeKind string) (bool, error)      // any row of the kind, ref-agnostic
+	HasAnyScope(ctx context.Context, userID, scopeKind string) (bool, error) // any row of the kind, ref-agnostic
 	// Membership rows for the lifecycle faces: every member's whole history
 	// when ids is nil, the named members' rows otherwise — the operator
 	// plane folds statuses in the use case, so the read stays one shape.

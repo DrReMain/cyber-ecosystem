@@ -149,16 +149,12 @@ func (x *User) GetWechatBound() *wrapperspb.BoolValue {
 
 // create
 type CreateUserRequest struct {
-	state    protoimpl.MessageState `protogen:"open.v1"`
-	Account  *string                `protobuf:"bytes,1,opt,name=account,proto3,oneof" json:"account,omitempty"`
-	Password *string                `protobuf:"bytes,2,opt,name=password,proto3,oneof" json:"password,omitempty"`
-	DeptId   *string                `protobuf:"bytes,3,opt,name=dept_id,json=deptId,proto3,oneof" json:"dept_id,omitempty"`
-	Roles    []string               `protobuf:"bytes,4,rep,name=roles,proto3" json:"roles,omitempty"`
-	Avatar   *string                `protobuf:"bytes,5,opt,name=avatar,proto3,oneof" json:"avatar,omitempty"`
-	// Seat population for the identity's birth seat; empty = the default user
-	// population. Validated against the registry — a seat is never born on a
-	// code that does not exist.
-	Population    *string `protobuf:"bytes,6,opt,name=population,proto3,oneof" json:"population,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Account       *string                `protobuf:"bytes,1,opt,name=account,proto3,oneof" json:"account,omitempty"`
+	Password      *string                `protobuf:"bytes,2,opt,name=password,proto3,oneof" json:"password,omitempty"`
+	DeptId        *string                `protobuf:"bytes,3,opt,name=dept_id,json=deptId,proto3,oneof" json:"dept_id,omitempty"`
+	Roles         []string               `protobuf:"bytes,4,rep,name=roles,proto3" json:"roles,omitempty"`
+	Avatar        *string                `protobuf:"bytes,5,opt,name=avatar,proto3,oneof" json:"avatar,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -224,13 +220,6 @@ func (x *CreateUserRequest) GetRoles() []string {
 func (x *CreateUserRequest) GetAvatar() string {
 	if x != nil && x.Avatar != nil {
 		return *x.Avatar
-	}
-	return ""
-}
-
-func (x *CreateUserRequest) GetPopulation() string {
-	if x != nil && x.Population != nil {
-		return *x.Population
 	}
 	return ""
 }
@@ -1181,7 +1170,7 @@ const file_cyber_system_v1_user_proto_rawDesc = "" +
 	"\x06avatar\x18\b \x01(\v2\x1c.google.protobuf.StringValueR\x06avatar\x12?\n" +
 	"\fphone_masked\x18\t \x01(\v2\x1c.google.protobuf.StringValueR\vphoneMasked\x12=\n" +
 	"\fwechat_bound\x18\n" +
-	" \x01(\v2\x1a.google.protobuf.BoolValueR\vwechatBound\"\xd7\x02\n" +
+	" \x01(\v2\x1a.google.protobuf.BoolValueR\vwechatBound\"\x9a\x02\n" +
 	"\x11CreateUserRequest\x12,\n" +
 	"\aaccount\x18\x01 \x01(\tB\r\xbaH\n" +
 	"\xc8\x01\x01r\x05\x10\x01\x18\x80\x01H\x00R\aaccount\x88\x01\x01\x12.\n" +
@@ -1189,17 +1178,13 @@ const file_cyber_system_v1_user_proto_rawDesc = "" +
 	"\xc8\x01\x01r\x05\x10\x01\x18\x80\x01H\x01R\bpassword\x88\x01\x01\x12&\n" +
 	"\adept_id\x18\x03 \x01(\tB\b\xbaH\x05r\x03\x98\x01\x14H\x02R\x06deptId\x88\x01\x01\x12(\n" +
 	"\x05roles\x18\x04 \x03(\tB\x12\xbaH\x0f\x92\x01\f\x10@\x18\x01\"\x06r\x04\x10\x01\x18@R\x05roles\x12%\n" +
-	"\x06avatar\x18\x05 \x01(\tB\b\xbaH\x05r\x03\x98\x01\x14H\x03R\x06avatar\x88\x01\x01\x12,\n" +
-	"\n" +
-	"population\x18\x06 \x01(\tB\a\xbaH\x04r\x02\x18\x14H\x04R\n" +
-	"population\x88\x01\x01B\n" +
+	"\x06avatar\x18\x05 \x01(\tB\b\xbaH\x05r\x03\x98\x01\x14H\x03R\x06avatar\x88\x01\x01B\n" +
 	"\n" +
 	"\b_accountB\v\n" +
 	"\t_passwordB\n" +
 	"\n" +
 	"\b_dept_idB\t\n" +
-	"\a_avatarB\r\n" +
-	"\v_population\"B\n" +
+	"\a_avatar\"B\n" +
 	"\x12CreateUserResponse\x12,\n" +
 	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\"\xba\x02\n" +
 	"\x11UpdateUserRequest\x12\x1b\n" +

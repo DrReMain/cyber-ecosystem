@@ -45,7 +45,7 @@ func (s *UserService) RegisterConnect(srv *connecttransport.Server) {
 // Handler -------------------------------------------------------------------------------------------------------------
 
 func (s *UserService) CreateUser(ctx context.Context, in *systempb.CreateUserRequest) (*systempb.CreateUserResponse, error) {
-	created, err := s.userUC.Create(ctx, in.Account, in.Password, in.DeptId, in.Avatar, in.GetPopulation(), in.Roles)
+	created, err := s.userUC.Create(ctx, in.Account, in.Password, in.DeptId, in.Avatar, in.Roles)
 	if err != nil {
 		return nil, err
 	}

@@ -73,8 +73,8 @@ export function BankDrawer({ test, onClose }: Readonly<BankDrawerProps>) {
       onClose={onClose}
       open
       placement="right"
-      title={`${m.esports_tests_bank_title()} · ${test.name ?? test.code ?? ""}`}
       size="large"
+      title={`${m.esports_tests_bank_title()} · ${test.name ?? test.code ?? ""}`}
     >
       {/* A drawer is a light stage — the plain Table serves it; the heavy
           DataTable (card, toolbar, column settings) stays on main list

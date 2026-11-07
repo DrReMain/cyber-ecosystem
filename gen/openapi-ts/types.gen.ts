@@ -2932,12 +2932,6 @@ export type CyberSystemV1CreateUserRequest = {
     deptId?: string;
     roles?: Array<string>;
     avatar?: string;
-    /**
-     * Seat population for the identity's birth seat; empty = the default user
-     * population. Validated against the registry — a seat is never born on a
-     * code that does not exist.
-     */
-    population?: string;
 };
 
 export type CyberSystemV1CreateUserResponse = {

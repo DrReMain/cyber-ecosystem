@@ -199,7 +199,7 @@ func TestTenantIsolationLiveE2E(t *testing.T) {
 	// refusals below come from isolation, not broken fixtures.
 	roleUC := rolemod.NewRoleUC(logger, pf, rolemod.NewRoleRP(logger, pf), nil, nil, nil)
 	fileUC := filemod.NewFileUC(logger, pf, filemod.NewFileRP(logger, pf), nil, tenHooks{})
-	userUC := usermod.NewUserUC(logger, pf, usermod.NewUserRP(logger, pf), nil, nil, nil)
+	userUC := usermod.NewUserUC(logger, pf, usermod.NewUserRP(logger, pf), nil, nil)
 	if _, err = roleUC.Get(ctxB, roleB.ID); err != nil {
 		t.Fatalf("positive control role: %v", err)
 	}

@@ -16,7 +16,6 @@ import (
 
 	"cyber-ecosystem/app/services/system/internal/module/dept"
 	"cyber-ecosystem/app/services/system/internal/module/file"
-	"cyber-ecosystem/app/services/system/internal/module/population"
 	"cyber-ecosystem/app/services/system/internal/shared"
 )
 
@@ -114,37 +113,26 @@ type UserRP interface {
 
 type UserUC struct {
 	shared.UC
-	userRP       UserRP
-	deptRP       dept.DeptRP
-	fileRP       file.FileRP
-	populationRP population.PopulationRP
+	userRP UserRP
+	deptRP dept.DeptRP
+	fileRP file.FileRP
 }
 
-func NewUserUC(logger *slog.Logger, tm shared.Transaction, userRP UserRP, deptRP dept.DeptRP, fileRP file.FileRP, populationRP population.PopulationRP) *UserUC {
+func NewUserUC(logger *slog.Logger, tm shared.Transaction, userRP UserRP, deptRP dept.DeptRP, fileRP file.FileRP) *UserUC {
 	return &UserUC{
-		UC:           shared.NewUC(logger.With("module", "module/user"), tm),
-		userRP:       userRP,
-		deptRP:       deptRP,
-		fileRP:       fileRP,
-		populationRP: populationRP,
+		UC:     shared.NewUC(logger.With("module", "module/user"), tm),
+		userRP: userRP,
+		deptRP: deptRP,
+		fileRP: fileRP,
 	}
 }
 
 // Method --------------------------------------------------------------------------------------------------------------
 
-func (uc *UserUC) Create(ctx context.Context, account, password, deptID, avatar *string, population string, roles []string) (out *User, err error) {
-	seatPopulation, seatPop, err := uc.resolveSeatPopulation(ctx, population)
-	if err != nil {
-		return nil, err
-	}
+func (uc *UserUC) Create(ctx context.Context, account, password, deptID, avatar *string, roles []string) (out *User, err error) {
 	roleIDs, err := uc.resolveRoles(ctx, roles)
 	if err != nil {
 		return nil, err
-	}
-	// Member-plane seats are engine-denied; a role binding on one is
-	// rejected here.
-	if seatPop != nil && seatPop.Plane == security.PlaneMember && len(roles) > 0 {
-		return nil, errorspb.ErrorGeneralErrorInvalidArgument("").WithCause(fmt.Errorf("role bindings are forbidden on the member-plane population %q", seatPopulation))
 	}
 	// An existing account gains a seat in the creating admin's tenant
 	// instead of a new row; profile params apply only to identity creation.
@@ -172,8 +160,11 @@ func (uc *UserUC) Create(ctx context.Context, account, password, deptID, avatar 
 		out = existing
 	}
 	// The seat lands in the creating admin's tenant; an identity born here
-	// is never seatless.
-	seat := &Seat{TenantID: security.TenantFromCtx(ctx), Population: seatPopulation}
+	// is never seatless. Birth always seats the default population: this
+	// face is the IAM entrance for operator accounts, and a second backend
+	// population is not a declared scenario — member-plane identities arrive
+	// through provider exchange or business import, never here.
+	seat := &Seat{TenantID: security.TenantFromCtx(ctx), Population: security.DefaultPopulation}
 	birthLost := false
 	err = uc.Tm.InTx(ctx, func(ctx context.Context) error {
 		if birth {
@@ -200,7 +191,7 @@ func (uc *UserUC) Create(ctx context.Context, account, password, deptID, avatar 
 	if err != nil {
 		// The winner exists now, so the same ask lands as its seat.
 		if birthLost {
-			return uc.Create(ctx, account, password, deptID, avatar, population, roles)
+			return uc.Create(ctx, account, password, deptID, avatar, roles)
 		}
 		return nil, err
 	}
@@ -443,20 +434,6 @@ func (uc *UserUC) ensureAvatar(ctx context.Context, avatar *string) error {
 		return systempb.ErrorSystemFileInvalidState("")
 	}
 	return nil
-}
-
-func (uc *UserUC) resolveSeatPopulation(ctx context.Context, population string) (string, *population.Population, error) {
-	if population == "" {
-		return security.DefaultPopulation, nil, nil
-	}
-	p, err := uc.populationRP.FindByCode(ctx, population)
-	if err != nil {
-		if errorspb.IsInfraErrorDbNotFound(err) {
-			return "", nil, systempb.ErrorSystemPopulationNotFound("")
-		}
-		return "", nil, err
-	}
-	return population, p, nil
 }
 
 func (uc *UserUC) resolveRoles(ctx context.Context, codes []string) ([]string, error) {

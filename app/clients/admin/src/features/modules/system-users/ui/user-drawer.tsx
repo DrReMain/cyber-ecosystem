@@ -1,5 +1,4 @@
 import type { File as UploadedFile } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/file_pb";
-import type { Population } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/population_pb";
 import type { Role } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/role_pb";
 import type { User } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/user_pb";
 import { Link } from "@tanstack/react-router";
@@ -9,7 +8,6 @@ import {
   Form,
   Input,
   Popconfirm,
-  Select,
   Space,
   TreeSelect,
   Typography,
@@ -40,7 +38,6 @@ interface UserDrawerProps {
   mode: "create" | "edit";
   user: User | null;
   roles: Role[];
-  populations: Population[];
   deptTree: DeptNode[];
   catalog: OperationCatalog;
   selected: string[];
@@ -63,7 +60,7 @@ export function UserDrawer({
   mode,
   user,
   roles,
-  populations,
+
   deptTree,
   catalog,
   selected,
@@ -80,7 +77,7 @@ export function UserDrawer({
   onSave,
   onResetPassword,
 }: Readonly<UserDrawerProps>) {
-  const [form] = Form.useForm<{ account: string; population?: string; deptId?: string }>();
+  const [form] = Form.useForm<{ account: string; deptId?: string }>();
   const [password, setPassword] = useState(generatePassword);
   const [avatarId, setAvatarId] = useState<string | undefined>(user?.avatar);
   const previewUrl = useFileUrl(avatarId);
@@ -95,7 +92,6 @@ export function UserDrawer({
       onSave({
         account: values.account,
         password,
-        population: mode === "create" ? values.population : undefined,
         deptId: values.deptId,
         roles: selected,
         avatar: avatarId,
@@ -175,18 +171,6 @@ export function UserDrawer({
                 {m.system_users_password_regen()}
               </Button>
             </div>
-          </Form.Item>
-        )}
-        {mode === "create" && (
-          <Form.Item label={m.system_users_form_population()} name="population">
-            <Select
-              allowClear
-              options={populations.map((p) => ({
-                value: p.code ?? "",
-                label: `${p.name ?? ""} (${p.code ?? ""})`,
-              }))}
-              placeholder={m.system_users_ph_population()}
-            />
           </Form.Item>
         )}
         <Form.Item label={m.system_users_form_avatar()}>

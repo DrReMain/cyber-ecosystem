@@ -32,8 +32,6 @@
   "system_users_form_account_required": "الحساب مطلوب",
   "system_users_form_account_hint": "الحساب هو هوية تسجيل الدخول ولا يمكن تغييره",
   "system_users_form_password": "كلمة المرور الأولية",
-  "system_users_form_population": "نوع المستخدم",
-  "system_users_ph_population": "اختياري؛ فارغ = الافتراضي",
   "system_users_form_dept": "القسم",
   "system_users_form_avatar": "الصورة الرمزية",
   "system_users_form_avatar_upload": "رفع الصورة",

@@ -8410,12 +8410,6 @@ components:
                         type: string
                 avatar:
                     type: string
-                population:
-                    type: string
-                    description: |-
-                        Seat population for the identity's birth seat; empty = the default user
-                         population. Validated against the registry — a seat is never born on a
-                         code that does not exist.
             description: create
         cyber.system.v1.CreateUserResponse:
             type: object

@@ -159,10 +159,6 @@ message CreateUserRequest {
     }
   }];
   optional string avatar = 5 [(buf.validate.field).string.len = 20];
-  // Seat population for the identity's birth seat; empty = the default user
-  // population. Validated against the registry — a seat is never born on a
-  // code that does not exist.
-  optional string population = 6 [(buf.validate.field).string.max_len = 20];
 }
 
 message CreateUserResponse {

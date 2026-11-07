@@ -100,8 +100,7 @@ func wireApp(confServer *conf.Server, data *conf.Data, catalog *conf.Catalog, co
 	resourceService := resource.NewResourceService(logger, resourceUC)
 	userRP := user.NewUserRP(logger, platformPlatform)
 	fileRP := file.NewFileRP(logger, platformPlatform)
-	populationRP := population.NewPopulationRP(logger, platformPlatform)
-	userUC := user.NewUserUC(logger, platformPlatform, userRP, deptRP, fileRP, populationRP)
+	userUC := user.NewUserUC(logger, platformPlatform, userRP, deptRP, fileRP)
 	userService := user.NewUserService(logger, userUC)
 	transferService := transfer.NewTransferService(logger)
 	wechatProvider := auth.NewWechatProvider()
@@ -133,6 +132,7 @@ func wireApp(confServer *conf.Server, data *conf.Data, catalog *conf.Catalog, co
 		return nil, nil, err
 	}
 	tenantRP := tenant.NewTenantRP(logger, platformPlatform)
+	populationRP := population.NewPopulationRP(logger, platformPlatform)
 	authUC, err := auth.NewAuthUC(logger, platformPlatform, confAuth, v, userRP, authzRP, tenantRP, populationRP, tokenRP)
 	if err != nil {
 		cleanup4()
