@@ -33,6 +33,10 @@ const WX_CODE = "e2e-wx-code";
 const WX_NICKNAME_RAW = "🎮e2e微信少年郎12345";
 const WX_NICKNAME_CLEAN = "e2e微信少年郎1234";
 const WX_AVATAR = "https://qlogo.cn/e2e-pw-avatar.png";
+// A fixed argon2id digest of e2ePass123, minted once and baked here — the
+// runner stays crypto-free while each run's member owns its own rows.
+const E2E_PASS_HASH =
+  "$argon2id$v=19$m=19456,t=2,p=1$w6L7UyzA9kyDLA7KebFy6A$u4PIiRgKuFGB/GjpSrKUQ8AaQbehtvlVlboIAUbf4Bg";
 
 async function api(path: string, body: unknown, cookie?: string) {
   const res = await fetch(`${SYSTEM_HTTP}${path}`, {
@@ -319,21 +323,20 @@ test("bind-phone on an occupied number stops at the conflict card, no code sent"
     "system",
     `INSERT INTO membership (id, created_at, updated_at, user_id, tenant_id, population) VALUES ('${bUser}m', now(), now(), '${bUser}', 'default', 'member');`,
   );
-  // The caller: an admin-provisioned password member driving the real UI.
-  const adminToken = (
-    await api("/api/v1/system/auth/login", {
-      account: "admin",
-      password: "admin123456",
-      population: "user",
-    })
-  ).json.sessionToken as string;
+  // The caller: a password member driving the real UI. D-BG closed the IAM
+  // birth face to operator accounts, so the member is born the way the
+  // business track births members now — rows, not RPC: the account handle
+  // with its member seat, the password a fixed argon2id literal. The
+  // statements ride stdin, never -c: the digest's $…$ segments are shell
+  // variables waiting to happen inside a double-quoted -c string.
   const account = `e2ecfa${stamp}`;
-  const created = await api(
-    "/api/v1/system/users",
-    { account, password: "e2ePass123", population: "member" },
-    `session_token=${adminToken}`,
+  execSync(
+    "docker exec -i cyber-ecosystem-postgresql-1 psql -U postgres -d system -v ON_ERROR_STOP=1",
+    {
+      input: `INSERT INTO "user" (id, created_at, updated_at, account, password_hash, enabled) VALUES ('e2ecfau${stamp}', now(), now(), '${account}', '${E2E_PASS_HASH}', true);
+            INSERT INTO membership (id, created_at, updated_at, user_id, tenant_id, population) VALUES ('e2ecfam${stamp}', now(), now(), 'e2ecfau${stamp}', 'default', 'member');`,
+    },
   );
-  expect(created.status, `member provision: ${JSON.stringify(created.json)}`).toBe(200);
   try {
     await page.goto("/login");
     await page.waitForLoadState("networkidle");

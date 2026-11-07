@@ -2,12 +2,13 @@ import { timestampFromMs } from "@bufbuild/protobuf/wkt";
 import { describe, expect, it } from "vitest";
 import { resumeDescVars } from "./resume";
 
-// The same local-date derivation the card renders, rebuilt here so the
-// expectation stays true in any timezone.
+// The same local-stamp derivation the card renders (to the minute, the
+// prototype's start-moment word), rebuilt here so the expectation stays
+// true in any timezone.
 const localStamp = (ms: number): string => {
   const d = new Date(ms);
   const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 };
 
 const DAY = 86_400_000;

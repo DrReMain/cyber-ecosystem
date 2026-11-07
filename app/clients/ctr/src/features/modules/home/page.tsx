@@ -60,7 +60,10 @@ function StatsSection({ digest }: Readonly<{ digest: WireDigest | null }>) {
   return (
     <StatsCard
       covered={digest.abilities.length}
-      reactionBest={digest.abilities.find((a) => a.ability === "reactionSpeed")?.bestScore}
+      // The prototype's history best benches the percentile (its stats row
+      // reads the record's pct, never the raw score) — same word the
+      // profile overview's ability rows already speak.
+      reactionBest={digest.abilities.find((a) => a.ability === "reactionSpeed")?.bestPercentile}
       total={digest.sessionsTotal}
     />
   );

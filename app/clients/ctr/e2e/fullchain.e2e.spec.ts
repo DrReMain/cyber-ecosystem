@@ -21,6 +21,10 @@ const SYSTEM_HTTP = "http://localhost:11001";
 const ESPORTS_HTTP = "http://localhost:11003";
 const PG_EXEC = "docker exec cyber-ecosystem-postgresql-1 psql -U postgres -d esports";
 const REACTION_RIVALS = ["dual_zone", "number_stars", "target_recognition"];
+// A fixed argon2id digest of e2ePass123, minted once and baked here — the
+// runner stays crypto-free while each run's member owns its own rows.
+const E2E_PASS_HASH =
+  "$argon2id$v=19$m=19456,t=2,p=1$w6L7UyzA9kyDLA7KebFy6A$u4PIiRgKuFGB/GjpSrKUQ8AaQbehtvlVlboIAUbf4Bg";
 
 async function api(baseUrl: string, path: string, body: unknown, cookie?: string) {
   const res = await fetch(`${baseUrl}${path}`, {
@@ -50,15 +54,21 @@ test("login → wizard → match → 4 games → done → report → code unlock
   // --- provision: fresh member + narrowed reaction pool -------------------
   const adminToken = await loginToken("admin", "admin123456", "user");
   expect(adminToken.length).toBeGreaterThan(0);
-  const account = `e2e${Date.now().toString(36)}`;
+  const stamp = Date.now().toString(36);
+  const account = `e2e${stamp}`;
   const password = "e2ePass123";
-  const created = await api(
-    SYSTEM_HTTP,
-    "/api/v1/system/users",
-    { account, password, population: "member" },
-    `session_token=${adminToken}`,
+  // D-BG closed the IAM birth face to operator accounts, so the member is
+  // born the way the business track births members now — rows, not RPC:
+  // the account handle with its member seat. The statements ride stdin,
+  // never -c: the digest's $…$ segments are shell variables waiting to
+  // happen inside a double-quoted -c string.
+  execSync(
+    "docker exec -i cyber-ecosystem-postgresql-1 psql -U postgres -d system -v ON_ERROR_STOP=1",
+    {
+      input: `INSERT INTO "user" (id, created_at, updated_at, account, password_hash, enabled) VALUES ('e2eu${stamp}', now(), now(), '${account}', '${E2E_PASS_HASH}', true);
+            INSERT INTO membership (id, created_at, updated_at, user_id, tenant_id, population) VALUES ('e2em${stamp}', now(), now(), 'e2eu${stamp}', 'default', 'member');`,
+    },
   );
-  expect(created.status, `member provision: ${JSON.stringify(created.json)}`).toBe(200);
 
   const restore = REACTION_RIVALS.map((code) => `'${code}'`).join(",");
   execSync(`${PG_EXEC} -c "UPDATE test SET category='moba' WHERE code IN (${restore});"`);
@@ -200,8 +210,19 @@ test("login → wizard → match → 4 games → done → report → code unlock
     await expect(page.getByText(/\/\s*4/).first()).toBeVisible();
 
     // --- single report ------------------------------------------------------
-    await page.getByRole("button", { name: "查看能力报告" }).click();
-    await page.waitForURL(/\/report\/(?!session)/, { timeout: 15_000 });
+    // B-6 moved the report entry off the done face (prototype law: the
+    // report lives in the center/history, not this page's CTAs), so the
+    // chain walks there the way a member would from history: the anchor
+    // record's own URL, resolved from the run's rows.
+    const userId = `e2eu${stamp}`;
+    const anchorId = execSync(
+      `docker exec cyber-ecosystem-postgresql-1 psql -U postgres -d esports -t -A -c "SELECT id FROM test_record WHERE user_id='${userId}' AND authoritative_score IS NOT NULL ORDER BY created_at DESC LIMIT 1;"`,
+    )
+      .toString()
+      .trim();
+    expect(anchorId.length).toBeGreaterThan(0);
+    await page.goto(`/report/${anchorId}`);
+    await page.waitForLoadState("load");
     await expect(page.getByText("能力测评报告")).toBeVisible();
     // E5-e honest faces: the free seat rides the one authoritative row, the
     // curve-pending majority renders absent (missing dims never fake a

@@ -192,6 +192,8 @@ function multisetMinus(a: string[], b: string[]): string[] {
 - `querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(...)` 显式泛型,否则 tsc 报 Element 无 placeholder。
 - innerText 是刻意选的 oracle(可见性语义),已带豁免;textContent 会吞隐藏节点与脚本体,不可换。
 - 提取剥离评审壳:`.vchip/.ckbtn/#__ck/.envsw`;底部 tabbar 是产品件保留。placeholder 走独立通道(innerText 不含),只收可见输入框。
+- **app 侧对称剥离 dev 壳**(11-08 home 片立):TailwindIndicator(`[data-dev-chrome]`,收起态渲染断点名 "xl")与 TanStack Devtools 开关按钮会污染 oracle——收集时同剥,与原型侧 REVIEW_CHROME 同法;login 红组因此 4→3(xl 噪声清除)。
+- **含 `$` 的 SQL(argon2id 哈希 `$argon2id$v=19$…`)必须走 stdin(`docker exec -i … -c` 禁)**:双引号 -c 里 `$argon2id` 等被 shell 当变量展开吃成空串,登录报 password mismatch(11-08 实锤)。
 - 写文件一律绝对路径+落完即 ls:并行 tool 调用 cwd 快照可能不一致(实测落进幽灵嵌套路径)。
 - 退出码重定向到文件后单独取,禁管道尾(`|tail;$?` 恒 0)。
 - `pnpm exec node` 被本环境策略拒绝:提取一律走 Playwright spec 形态(本档三件套即是)。

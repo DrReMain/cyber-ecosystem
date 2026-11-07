@@ -9,7 +9,8 @@ export type WireStamp = Timestamp | string | undefined;
 
 /* The resume card's desc vars: the progress counts plus the age face —
  * the prototype's inclusive day count (started today reads 已过 1 天) and
- * a local-date stamp. */
+ * a local stamp to the minute (the prototype names the start moment, not
+ * just its date). */
 export function resumeDescVars(createdAt: WireStamp, done: number, total: number) {
   let created: number;
   if (typeof createdAt === "string") {
@@ -25,6 +26,6 @@ export function resumeDescVars(createdAt: WireStamp, done: number, total: number
   const days = Math.max(1, Math.floor((Date.now() - created) / 86_400_000) + 1);
   const d = new Date(created);
   const pad = (n: number) => String(n).padStart(2, "0");
-  const date = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-  return { done, total, date, days };
+  const stamp = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return { done, total, date: stamp, days };
 }

@@ -28,16 +28,31 @@ test("login text matches the prototype snapshot (line-for-line)", async ({ page 
   await page.goto("/login");
   await page.waitForLoadState("load");
   await page.waitForTimeout(400);
-  const { raw, placeholders } = await page.evaluate(() => ({
-    // biome-ignore lint/performance/useDomNodeTextContent: innerText is the deliberate oracle — visibility-respecting text is what fidelity asserts; textContent would admit hidden nodes and script bodies.
-    raw: document.body.innerText,
-    placeholders: [
-      ...document.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>("input, textarea"),
-    ]
-      .filter((el) => el.getClientRects().length > 0)
-      .map((el) => el.placeholder)
-      .filter(Boolean),
-  }));
+  const { raw, placeholders } = await page.evaluate(() => {
+    // Dev chrome never crosses to production faces, so it leaves the
+    // oracle comparison too — the same strip the fixture side applies to
+    // the prototype's own reviewer gear (REVIEW_CHROME): the breakpoint
+    // pill declares itself (data-dev-chrome) and the devtools toggle
+    // carries its own fixed label.
+    document.querySelectorAll("[data-dev-chrome]").forEach((n) => {
+      n.remove();
+    });
+    for (const b of document.querySelectorAll("button")) {
+      if (b.textContent?.includes("TanStack Devtools")) {
+        b.remove();
+      }
+    }
+    return {
+      // biome-ignore lint/performance/useDomNodeTextContent: innerText is the deliberate oracle — visibility-respecting text is what fidelity asserts; textContent would admit hidden nodes and script bodies.
+      raw: document.body.innerText,
+      placeholders: [
+        ...document.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>("input, textarea"),
+      ]
+        .filter((el) => el.getClientRects().length > 0)
+        .map((el) => el.placeholder)
+        .filter(Boolean),
+    };
+  });
   const actual = normalizeLines(raw);
 
   const missing = multisetMinus(fixture.lines, actual);
