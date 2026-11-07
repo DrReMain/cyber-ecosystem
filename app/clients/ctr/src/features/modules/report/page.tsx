@@ -264,7 +264,11 @@ export function ReportPage() {
           title={m.report_title()}
         />
         <CompositeCard composite={model.composite} tier={model.tier} />
-        <AbilityRadar axes={model.axes} mainCount={model.mainCount} subCount={model.subCount} />
+        {model.axes.length > 0 ? (
+          <AbilityRadar axes={model.axes} mainCount={model.mainCount} subCount={model.subCount} />
+        ) : (
+          <PendingRatingCard />
+        )}
         <div className="text-ink-tertiary px-0.5 text-[11px] leading-relaxed">
           {m.report_dims({ tested: model.tested, total: model.total })}
           {model.tested < model.total ? ` · ${m.report_dims_more()}` : ""}
@@ -279,7 +283,7 @@ export function ReportPage() {
           priceYuan={model.memberYuan}
           unlocked={model.unlocked}
         />
-        {!model.unlocked ? (
+        {!model.unlocked && model.mainCount > 0 ? (
           <UnlockCard
             count={model.mainCount}
             onPay={() =>
@@ -291,11 +295,11 @@ export function ReportPage() {
             priceYuan={model.trialYuan}
           />
         ) : null}
-        <div className="px-2 text-center text-[10px] leading-[1.6] text-[#F87171]">
+        <div className="text-danger-text px-2 text-center text-[10px] leading-[1.6]">
           {m.report_minor_note()}
         </div>
         <button
-          className="bg-cta-practice shadow-cta-practice rounded-control w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80"
+          className="bg-cta-practice shadow-cta-practice rounded-control w-full px-4 py-3.5 text-[15px] font-bold text-white active:opacity-80"
           onClick={() => void navigate({ to: "/profile" })}
           type="button"
         >
@@ -304,5 +308,21 @@ export function ReportPage() {
         <FilingFooter />
       </div>
     </AmbientLayout>
+  );
+}
+
+/** The curve-pending record's administrative face: the attempt is scored
+ * raw, but no ability line is authoritative yet (its family's calibration
+ * curve is not finalized), so the measured-axes list is empty — the radar
+ * never renders a zero-axis shape and the unlock sells nothing over it.
+ * This card says the honest state where the radar would have been. */
+function PendingRatingCard() {
+  return (
+    <div className="border-line bg-surface-card shadow-card rounded-card border px-4 py-3.5 backdrop-blur-md">
+      <div className="text-ink text-[13.5px] font-bold">{m.report_pending_title()}</div>
+      <div className="text-ink-tertiary mt-1.5 text-[11.5px] leading-relaxed">
+        {m.report_pending_desc()}
+      </div>
+    </div>
   );
 }

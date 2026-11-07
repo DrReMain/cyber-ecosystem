@@ -17,6 +17,8 @@
   "report_radar_no_subs": "No secondary abilities for this type — untested abilities get no made-up score.",
   "report_dims": "{tested} / {total} dimensions measured",
   "report_dims_more": "Testing another type fills in more ability dimensions",
+  "report_pending_title": "Ability ratings pending",
+  "report_pending_desc": "This attempt is scored, but its ability ratings have not been generated yet; the one-shot unlock is not available for it.",
   "report_row_sub": "Secondary",
   "report_row_score": "{score} pts",
   "report_row_beat": "Above {pct}%",

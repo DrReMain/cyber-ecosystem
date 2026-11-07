@@ -17,6 +17,8 @@
   "report_radar_no_subs": "该类型无副能力 —— 未测的能力不虚构分数。",
   "report_dims": "已测 {tested} / {total} 维",
   "report_dims_more": "测另一类型可补齐更多能力维度",
+  "report_pending_title": "能力评级待生成",
+  "report_pending_desc": "本次测试已完成计分，能力评级尚待生成，暂不支持单次解锁。",
   "report_row_sub": "副能力",
   "report_row_score": "{score} 分",
   "report_row_beat": "超过 {pct}%",
