@@ -62,7 +62,7 @@ export function FeedbackTicketsPage() {
   return (
     <div className="flex flex-col gap-4 p-4">
       <div>
-        <Typography.Title className="!mb-0" level={4}>
+        <Typography.Title className="mb-0!" level={4}>
           {m.esports_feedback_tickets_title()}
         </Typography.Title>
         <Typography.Text className="text-xs" type="secondary">

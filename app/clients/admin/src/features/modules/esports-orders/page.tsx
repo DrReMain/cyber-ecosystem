@@ -59,7 +59,7 @@ export function EsportsOrdersPage() {
   return (
     <div className="flex flex-col gap-4 p-4">
       <div>
-        <Typography.Title className="!mb-0" level={4}>
+        <Typography.Title className="mb-0!" level={4}>
           {m.esports_orders_title()}
         </Typography.Title>
         <Typography.Text className="text-xs" type="secondary">
