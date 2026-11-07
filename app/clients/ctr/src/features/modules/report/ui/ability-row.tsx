@@ -34,7 +34,7 @@ function SeatChip({
   }
   if (free && !unlocked) {
     return (
-      <span className="rounded-full bg-[rgba(234,179,8,0.18)] px-2 py-0.5 text-[10px] font-extrabold text-[#FDE047]">
+      <span className="text-grade-s rounded-full bg-[rgba(234,179,8,0.18)] px-2 py-0.5 text-[10px] font-extrabold">
         {m.report_free_tag()}
       </span>
     );
@@ -82,17 +82,17 @@ export function AbilityRow({
         <SeatChip free={free} isSub={isSub} pct={pct} tier={tier} unlocked={unlocked} />
       </div>
       <div className="mt-2 flex items-center gap-2.5">
+        {/* The identity block is wordless in the prototype — a gradient
+            plate, never a two-character abbreviation. */}
         <div
           aria-hidden
-          className={`shadow-inset-ring flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-[11px] font-bold text-white ${gradient}`}
-        >
-          {abilityCn.slice(0, 2)}
-        </div>
+          className={`shadow-inset-ring h-10 w-10 shrink-0 rounded-xl ${gradient}`}
+        />
         <div className="min-w-0 flex-1">
           {pct !== null ? (
-            <div className="h-[6px] w-full overflow-hidden rounded-full bg-[#111827]">
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#111827]">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-[#22D3EE] to-[#22C55E]"
+                className="h-full rounded-full bg-linear-to-r from-[#22D3EE] to-[#22C55E]"
                 style={{ width: `${Math.min(100, Math.max(2, pct))}%` }}
               />
             </div>

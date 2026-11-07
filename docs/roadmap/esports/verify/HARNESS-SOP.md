@@ -198,6 +198,9 @@ function multisetMinus(a: string[], b: string[]): string[] {
 - **cohort 匹配键=birth year+sex(月与 age_band 不参与;report/data.go Cohort)**(11-08 实锤):共享 dev 池里同年同性别的历史行会入池——冻结百分位的 spec 必须选无碰撞的出生年(本机有他人 2008 male 校准批 wtfixuser1-9,把冻结 78 挤成 93;种子年改 2004-06,band 列原样存 18-22 仍诚实,oracle 无出生行故面零变化)。
 - **时钟喂给的枚举行须钉时钟**:年龄步年份下拉(1966-2020)来自原型硬编码 nowY=2026,app 读真实时钟 `new Date()`——跨年即整列漂移;测试 `page.clock.install` 钉 2026(resume 片已立的同法)。
 - gen-fixtures 机制注(11-08 profile 片):PAGES 条目支持 `#key` 显式 fixture 后缀(同 preset 多态页如 password ?m= 三态命名);fixture 的 source 字段归一为相对 `page.html?query`(双机再生成零 diff)。
+- **playwright 并行 worker=种子池互污**(11-08 report 片实锤):默认 workers=半核,fidelity 种子成员共享 birth year+sex 的 cohort 键——两测并行=两池并存(活池轮询抓到 22 行 bench),冻结 78/86 被挤成 79/87,**零报错纯漂移**;处方=config `workers: 1`(已落 playwright.config.ts)+种子测试 finally 清完再下一种。
+- **百分位=活算 z-CDF,池含本人记录**(11-08 report 片实锤):`percentileFor`(report/biz.go)=round(100·Φ((score−μ)/σ)),μ/σ=同年同姓**全部**有效 authoritative 记录的 avg/stddev_samp(被测者自己的记录也入池);cohortFloor=10/ceil=50(含本人→每能力 ≥9 外排行);**三个面读活算**:digest 逐能力百分位、cognitive renderedDims(一源能力缺 cohort 答案=整维 sink 不画轴)、锁面 single(GetReport unlocked=false 走 computeFor);unlocked single 与 trend 点才读冻结 snapshot。工程池=整数十行、命中目标分位且离 .5 舍入边 ≥0.08(浮噪不翻)。
+- **报告族状态面种子法**(11-08 report 片):cognitive 解锁面=entitlement 单行(scope_kind='report_type',scope_ref='cognitive',status='active')——kernel ReportAccessVerdict 码权擢升策略;**ByScope 读=.Only(),同 scope 第二行=ent NotOneErr→500 非 merge**。career 闭面=report_policy 行 pin(family='career',policy='closed')+finally 还原保存值(读行用 `-t -A -c`);shipped 默认 career=open/cognitive=membership(D-AB),pin=复刻原型「后台开关关」的自身假定。
 - 写文件一律绝对路径+落完即 ls:并行 tool 调用 cwd 快照可能不一致(实测落进幽灵嵌套路径)。
 - 退出码重定向到文件后单独取,禁管道尾(`|tail;$?` 恒 0)。
 - `pnpm exec node` 被本环境策略拒绝:提取一律走 Playwright spec 形态(本档三件套即是)。

@@ -19,7 +19,11 @@ const REVIEW_CHROME = ".vchip, .ckbtn, #__ck, .envsw";
 // password's three faces share one shell: the m= param picks the copy, and
 // an explicit #key suffix keeps three fixtures apart where the preset alone
 // would collide; the forget face's rebuild lives at /login/forgot (G2's
-// pre-login-context split).
+// pre-login-context split). The report family rides the same member-data
+// states: tested-fps (single/center/trend — one scored fps session), and
+// cognitive at unlocked-single — tested-fps plus the purchased cognitive
+// unlock, the preset whose app-side shape is a report_type grant. Career's
+// page is state-less copy; ready logs it in without seeding records.
 const PAGES = [
   "login",
   "home?preset=ready",
@@ -32,6 +36,11 @@ const PAGES = [
   "password?preset=ready&m=set#set",
   "password?preset=ready&m=change#change",
   "password?preset=ready&m=forget#forget",
+  "report-single?preset=tested-fps",
+  "report-center?preset=tested-fps",
+  "report-cognitive?preset=unlocked-single",
+  "report-trend?preset=tested-fps",
+  "report-career?preset=ready",
 ];
 
 test.skip(!process.env.GEN_FIXTURES, "fixture regeneration is opt-in (GEN_FIXTURES=1)");

@@ -75,19 +75,6 @@ export function TrendPage() {
           />
         ) : (
           <>
-            <div className="flex items-center justify-end px-0.5">
-              <span
-                className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${
-                  r.advancedAccess.allowed
-                    ? "border-[#22D3EE]/40 text-[#22D3EE]"
-                    : "border-line text-ink-tertiary"
-                }`}
-              >
-                {r.advancedAccess.allowed
-                  ? m.report_trend_advanced_on()
-                  : m.report_trend_advanced_off()}
-              </span>
-            </div>
             {/* The summary banner rides the prototype's own law: the count
                 line states itself, and a history mixing the two genres
                 earns the not-directly-comparable warning (decision ②) —
@@ -97,7 +84,7 @@ export function TrendPage() {
                 {m.report_trend_sessions({ n: r.sessionsTotal, k: r.abilities.length })}
               </div>
               {mixedGenres ? (
-                <div className="mt-1 text-[11.5px] leading-[1.85] text-[#FCD34D]">
+                <div className="text-status-pending mt-1 text-[11.5px] leading-[1.85]">
                   {m.report_trend_mixed()}
                 </div>
               ) : null}
@@ -107,13 +94,68 @@ export function TrendPage() {
                 <span className="text-ink text-[13px] font-bold">
                   {m.report_trend_base_title()}
                 </span>
-                <span className="text-status-ok rounded-full bg-[rgba(34,197,94,0.15)] px-2 py-0.5 text-[10px] font-bold">
+                <span className="text-status-ok bg-status-ok-bg rounded-full px-2 py-0.5 text-[10px] font-bold">
                   {m.report_trend_base_tag()}
                 </span>
               </div>
               {r.abilities.map((s) => (
                 <TrendChart key={s.ability} series={s} />
               ))}
+            </div>
+            {/* The advanced module (prototype's own two states): the
+                member card lists what the tier buys; a locked visitor
+                gets the one-line pitch, the membership CTA, and the
+                peek at what membership includes. The CTA's pay leg is
+                the PAY family's own slice; this face carries the
+                presence and the copy. */}
+            <div className="bg-surface-card shadow-card rounded-card border-ability-skill/50 border px-4 py-3.5">
+              {r.advancedAccess.allowed ? (
+                <>
+                  <div className="mb-1 flex items-center justify-between">
+                    <span className="text-ink text-[13px] font-bold">
+                      {m.report_trend_advanced_title()}
+                    </span>
+                    <span className="text-status-soon rounded-full bg-[rgba(124,58,237,0.15)] px-2 py-0.5 text-[10px] font-bold">
+                      {m.report_trend_advanced_member()}
+                    </span>
+                  </div>
+                  <div className="text-ink-tertiary text-[12.5px] leading-[1.9]">
+                    <div>· {m.report_trend_advanced_compare()}</div>
+                    <div>· {m.report_trend_advanced_plan()}</div>
+                    <div>· {m.report_trend_advanced_percentile()}</div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center">
+                    <div className="min-w-0 flex-1">
+                      <div className="text-ink text-[13.5px] font-extrabold">
+                        {m.report_trend_advanced_title()}
+                      </div>
+                      <div className="text-ink-tertiary mt-1 text-[11.5px] leading-[1.65]">
+                        {m.report_trend_advanced_desc()}
+                      </div>
+                    </div>
+                    <span className="text-status-soon rounded-full bg-[rgba(124,58,237,0.15)] px-2 py-0.5 text-[10px] font-bold">
+                      {m.report_trend_advanced_member()}
+                    </span>
+                  </div>
+                  <button
+                    className="rounded-control mt-3.5 w-full bg-linear-to-r from-[#7C3AED] to-[#A855F7] px-4 py-3 text-[15px] font-bold text-white active:opacity-80"
+                    onClick={() => void navigate({ to: "/pay", search: { from: "/report/trend" } })}
+                    type="button"
+                  >
+                    {m.report_trend_advanced_cta()}
+                  </button>
+                  <button
+                    className="rounded-control border-line text-ink-secondary mt-2 block w-full border px-4 py-2.5 text-[13px] font-bold active:opacity-70"
+                    onClick={() => void navigate({ to: "/member" })}
+                    type="button"
+                  >
+                    {m.report_trend_advanced_peek()}
+                  </button>
+                </>
+              )}
             </div>
           </>
         )}

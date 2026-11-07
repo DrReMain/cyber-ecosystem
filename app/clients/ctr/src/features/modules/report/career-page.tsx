@@ -68,11 +68,15 @@ export function CareerPage() {
             <div className="text-ink-tertiary text-[12px] leading-relaxed">
               {m.report_career_closed_future()}
             </div>
+            <div className="mt-4">
+              <span className="text-ink-tertiary rounded-full bg-[rgba(107,114,128,0.15)] px-2 py-0.5 text-[10px] font-bold">
+                {m.report_center_status_closed()}
+              </span>
+            </div>
+            {/* The note is one flowing line in the prototype — the lead
+                word rides the sentence, not a heading above it. */}
             <div className="border-line rounded-control bg-surface-card mt-4 border px-3 py-2 text-start">
-              <div className="text-danger-text text-[11px] font-bold">
-                {m.report_career_note_title()}
-              </div>
-              <div className="text-ink-tertiary mt-1 text-[10.5px] leading-relaxed">
+              <div className="text-ink-tertiary text-[10.5px] leading-relaxed">
                 {m.report_career_note()}
               </div>
             </div>

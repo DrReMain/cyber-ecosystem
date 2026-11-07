@@ -225,10 +225,9 @@ test("login → wizard → match → 4 games → done → report → code unlock
     await page.waitForLoadState("load");
     await expect(page.getByText("能力测评报告")).toBeVisible();
     // E5-e honest faces: the free seat rides the one authoritative row, the
-    // curve-pending majority renders absent (missing dims never fake a
-    // score), and the paywall stays up.
+    // curve-pending majority renders absent (missing subs never fake a
+    // score — the no-subs note says it), and the paywall stays up.
     await expect(page.getByText("最高分 · 已解锁")).toBeVisible();
-    await expect(page.getByText(/已测 1 \/ 4 维/)).toBeVisible();
     await expect(page.getByText("未测的能力不虚构分数")).toBeVisible();
     await expect(page.getByText(/¥\d/).first()).toBeVisible();
 

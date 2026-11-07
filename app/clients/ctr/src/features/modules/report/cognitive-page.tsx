@@ -8,7 +8,6 @@ import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { StateScreen } from "#/features/app/states/state-screen";
 import { FlowHeader } from "#/features/modules/match/ui/flow-header";
 import { abilityWord } from "#/features/modules/match/vocabulary";
-import { TierChip } from "#/features/modules/test/ui/tier-chip";
 import { m } from "#/paraglide/messages";
 import { wireCognitiveOf } from "./cognitive";
 import { wireDigestOf } from "./digest";
@@ -26,6 +25,15 @@ const CORE_ABILITIES = [
   "resourceAllocation",
   "decisionEfficiency",
 ] as const;
+
+// The detail row's bare-letter chip keeps the tier ladder's own colors
+// (the head's full chip shares the palette).
+const DIM_TIER_STYLE: Record<string, string> = {
+  s: "bg-[rgba(234,179,8,0.15)] text-[#FDE047]",
+  a: "bg-[rgba(34,197,94,0.15)] text-[#6EE7B7]",
+  b: "bg-[rgba(59,130,246,0.15)] text-[#93C5FD]",
+  c: "bg-[rgba(249,115,22,0.15)] text-[#FDBA74]",
+};
 
 // The eight-dimension aggregate's page. The verdict rides in the same
 // response, so the locked face renders from one call; behind the open
@@ -111,8 +119,13 @@ export function CognitivePage() {
               <AbilityRadar axes={axes} mainCount={axes.length} subCount={0} />
             ) : (
               <div className="border-line bg-surface-card rounded-card border px-4 py-4 backdrop-blur-md">
+                {/* The axis count rides the title only while dimensions
+                    are missing — a complete radar needs no apology. */}
                 <div className="text-ink text-[13px] font-bold">
                   {m.report_cognitive_radar_title()}
+                  {r.testedDimensions < r.totalDimensions
+                    ? m.report_cognitive_radar_axes({ n: r.testedDimensions })
+                    : ""}
                 </div>
                 <div className="text-ink-tertiary mt-1.5 text-[11.5px] leading-relaxed">
                   {m.report_cognitive_radar_few()}
@@ -126,12 +139,12 @@ export function CognitivePage() {
             <div className="border-line bg-surface-card rounded-card border px-4 py-3.5 backdrop-blur-md">
               <div className="text-ink text-[13px] font-bold">
                 {m.report_cognitive_detail_title()}
-                <span className="text-ink-tertiary ml-2 text-[10.5px] font-normal">
-                  {m.report_cognitive_detail_tested({
-                    tested: r.testedDimensions,
-                    total: r.totalDimensions,
-                  })}
-                </span>
+              </div>
+              <div className="text-ink-tertiary text-[10.5px]">
+                {m.report_cognitive_detail_tested({
+                  tested: r.testedDimensions,
+                  total: r.totalDimensions,
+                })}
               </div>
               {r.dimensions.length > 0 ? (
                 <div className="mt-2 divide-y divide-[#1F2937]">
@@ -139,10 +152,19 @@ export function CognitivePage() {
                     <div className="flex items-center justify-between py-2" key={d.dimension}>
                       <span className="text-ink text-[12.5px]">{dimensionWord(d.dimension)}</span>
                       <span className="flex items-center gap-2">
+                        {/* The row's verdict is the bare letter — the
+                            prototype's detail row; the full "letter ·
+                            word" chip stays the head's own shape. */}
                         <span className="text-ink-tertiary text-[11px] tabular-nums">
                           {d.value}
                         </span>
-                        <TierChip grade={tierWord(String(d.tier ?? "")).letter} />
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[9.5px] font-extrabold ${
+                            DIM_TIER_STYLE[tierWord(String(d.tier ?? "")).kind] ?? ""
+                          }`}
+                        >
+                          {tierWord(String(d.tier ?? "")).letter}
+                        </span>
                       </span>
                     </div>
                   ))}
@@ -189,13 +211,20 @@ export function CognitivePage() {
             the upsell aimed at themselves. */}
         {!r.trendAdvancedAccess.allowed ? (
           <button
-            className="rounded-control w-full cursor-pointer bg-[#F97316] px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80"
+            className="rounded-control bg-grade-c w-full cursor-pointer px-4 py-3.5 text-[15px] font-bold text-white active:opacity-80"
             onClick={() => void navigate({ to: "/report/trend" })}
             type="button"
           >
             {m.report_cognitive_to_trend()}
           </button>
         ) : null}
+        <button
+          className="rounded-control border-line text-ink-secondary w-full border px-4 py-2.5 text-[13px] font-bold active:opacity-70"
+          onClick={() => void navigate({ to: "/report/center" })}
+          type="button"
+        >
+          {m.report_cognitive_back()}
+        </button>
       </div>
     </AmbientLayout>
   );

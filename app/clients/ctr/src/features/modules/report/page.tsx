@@ -269,9 +269,11 @@ export function ReportPage() {
         ) : (
           <PendingRatingCard />
         )}
-        <div className="text-ink-tertiary px-0.5 text-[11px] leading-relaxed">
-          {m.report_dims({ tested: model.tested, total: model.total })}
-          {model.tested < model.total ? ` · ${m.report_dims_more()}` : ""}
+        {/* The prototype's own fill-in hint — one unconditional line; the
+            measured/total counts live on the cognitive page's counters,
+            not here. */}
+        <div className="text-ink-tertiary px-0.5 text-center text-[10px]">
+          {m.report_dims_more()}
         </div>
         {model.rows.map((row) => renderRow(row, false))}
         {model.subRows.map((row) => renderRow(row, true))}

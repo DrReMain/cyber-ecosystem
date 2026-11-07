@@ -27,11 +27,36 @@ const FPS_STEPS = [
   { ability: "skillReleaseAccuracy", test_code: "skill_trajectory" },
 ];
 
-// The cohort pool behind the tested preset's reaction percentile: the
-// member's red_dot 75 benched against these ten same-age-same-sex scores
-// lands at raw percentile 78.01 → 78 (round), a hair off both bucket
-// edges so float noise cannot flip it.
-const COHORT_SCORES = [40, 62, 63, 68, 69, 71, 72, 73, 73, 74];
+// The cohort pools behind the tested preset's live percentiles. The
+// engine benches each best against the pool of same-birth-year-same-sex
+// authoritative records (the member's own record joins its own pool)
+// through the z-CDF — pct = round(100·Φ((score−μ)/σ)) — so every pool
+// below is engineered to land its ability's frozen percentile exactly,
+// with a safe margin off the rounding edge (float noise cannot flip
+// it). Ten bench rows plus the member's own clear the pool floor
+// (cohortFloor 10) and stay under the medium-confidence ceiling
+// (cohortCeil 50) — three report faces read these live: the digest's
+// per-ability percentiles, the cognitive page's weighted dimensions
+// (an ability with no pool answer sinks its whole dimension), and the
+// locked single report's live judgement.
+const COHORT_POOLS: Record<string, number[]> = {
+  // reactionSpeed · member 75 → 78 (raw 78.01)
+  red_dot: [40, 62, 63, 68, 69, 71, 72, 73, 73, 74],
+  // aimingAccuracy · member 82 → 86 (raw 86.03)
+  flash_aiming: [38, 45, 52, 59, 59, 66, 73, 73, 80, 87],
+  // trackingStability · member 69 → 71 (raw 71.02)
+  moving_target: [26, 35, 44, 53, 53, 62, 62, 71, 80, 89],
+  // skillReleaseAccuracy · member 63 → 64 (raw 63.87)
+  skill_trajectory: [32, 39, 46, 53, 53, 60, 67, 67, 74, 81],
+};
+// One id suffix per pool record so ten bench users can hold four rows
+// each without id collisions (and cleanup's user_id catch takes all).
+const POOL_SUFFIX: Record<string, string> = {
+  red_dot: "r",
+  flash_aiming: "f",
+  moving_target: "m",
+  skill_trajectory: "t",
+};
 
 // The scored records' grade letters, by percentile band — the band the
 // engine's quantile-frozen curves actually grade (the authoritative
@@ -156,9 +181,11 @@ export function seedResumeSession(tag: string, userId: string): void {
 /** The tested-fps preset's scored session: four authoritative attempts
  * (the prototype's rec() score semantics, each with its band letter), the
  * frozen snapshot that owns the verdict face (tier B, composite 75, the
- * four percentiles), and the ten-row cohort that wakes the reaction
- * best's live percentile to 78. */
-export function seedScoredSession(tag: string, userId: string): void {
+ * four percentiles), and the four ten-row cohort pools that wake the
+ * live percentiles to 78 / 86 / 71 / 64 — the digest's, the cognitive
+ * dimensions', and the locked single face's read-time answers. Returns
+ * the anchor record id the single report's route names. */
+export function seedScoredSession(tag: string, userId: string): { anchorId: string } {
   const sessionId = `${tag}s`;
   const scores: Record<string, number> = {
     red_dot: 75,
@@ -179,13 +206,18 @@ export function seedScoredSession(tag: string, userId: string): void {
   });
   // The anchor is the latest scored record; the snapshot freezes on it.
   const anchorId = `${tag}r4`;
-  const cohortProfiles = COHORT_SCORES.map(
+  // The ten bench users are the red_dot pool's own rows (any pool's
+  // length names them); the ?? only satisfies the index-access check.
+  const benchUsers = COHORT_POOLS.red_dot ?? [];
+  const cohortProfiles = benchUsers.map(
     (_, i) =>
       `('${tag}c${i}p', now(), now(), 'default', '${tag}c${i}', NULL, 2004, 6, 'male', '18-22', NULL)`,
   );
-  const cohortRecords = COHORT_SCORES.map(
-    (score, i) =>
-      `('${tag}c${i}r', now(), now(), 'default', 'red_dot', '${tag}c${i}', 1, NULL, now(), now(), '{}', ${score}, ${score}, true, NULL)`,
+  const cohortRecords = Object.entries(COHORT_POOLS).flatMap(([code, pool]) =>
+    pool.map(
+      (score, i) =>
+        `('${tag}c${i}${POOL_SUFFIX[code]}', now(), now(), 'default', '${code}', '${tag}c${i}', 1, NULL, now(), now(), '{}', ${score}, ${score}, true, NULL)`,
+    ),
   );
   sql(
     "esports",
@@ -201,6 +233,43 @@ export function seedScoredSession(tag: string, userId: string): void {
      INSERT INTO test_record (id, created_at, updated_at, tenant_id, test_code, user_id, attempt_no, session_id, started_at, ended_at, raw_detail, raw_score, authoritative_score, valid, invalid_reason)
      VALUES ${cohortRecords.join(",")};`,
   );
+  return { anchorId };
+}
+
+/** Seeds one report-family unlock grant — the app-side shape of the
+ * prototype's unlocked.cognitive flag (the unlocked-single preset): an
+ * active report_type entitlement, which the kernel's verdict lets
+ * outrank the membership policy. One row per scope per user — the
+ * entitle read is an Only(), so a second row is an error, never a
+ * merge. */
+export function seedReportGrant(tag: string, ref = "cognitive"): void {
+  sql(
+    "esports",
+    `INSERT INTO entitlement (id, created_at, updated_at, tenant_id, user_id, scope_kind, scope_ref, status, source)
+     VALUES ('${tag}e', now(), now(), 'default', '${tag}u', 'report_type', '${ref}', 'active', 'e2e-seed');`,
+  );
+}
+
+/** Reads one family's report_policy override row (null = no row, the
+ * shipped default answers). The career faces' pin needs the standing
+ * value to restore afterwards. */
+export function reportPolicyOf(family: string): string | null {
+  const out = execSync(
+    `${PG} -d esports -t -A -c "SELECT policy FROM report_policy WHERE report_type = '${family}'"`,
+  ).toString();
+  const value = out.trim();
+  return value === "" ? null : value;
+}
+
+/** Rewrites one family's report_policy override row; null removes it.
+ * The career pages' spec pins the row to closed — the prototype
+ * presumes the backend switch off, while the shipped default rules
+ * career open (D-AB) — and restores the standing value after. */
+export function setReportPolicy(family: string, policy: string | null): void {
+  sql(
+    "esports",
+    `DELETE FROM report_policy WHERE report_type = '${family}';${policy === null ? "" : ` INSERT INTO report_policy (id, created_at, updated_at, report_type, policy, updated_by) VALUES ('e2e_pin_${family}', now(), now(), '${family}', '${policy}', 'e2e-seed');`}`,
+  );
 }
 
 export function cleanup(tag: string): void {
@@ -213,8 +282,9 @@ export function cleanup(tag: string): void {
   sql(
     "esports",
     `DELETE FROM report_snapshot WHERE id = '${tag}sn';
-     DELETE FROM test_record WHERE id LIKE '${tag}r%' OR id LIKE '${tag}c%r' OR user_id LIKE '${tag}c%';
+     DELETE FROM test_record WHERE id LIKE '${tag}r%' OR id LIKE '${tag}c%' OR user_id LIKE '${tag}c%';
      DELETE FROM match_session WHERE id = '${tag}s';
+     DELETE FROM entitlement WHERE user_id = '${tag}u';
      DELETE FROM profile WHERE id LIKE '${tag}%' OR user_id LIKE '${tag}%';`,
   );
 }
