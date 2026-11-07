@@ -29,13 +29,13 @@
 
 ctr 冒烟链(每环真登录真走;11-05 修订=九环):
 1. **登录/注册+向导三步**(年龄门槛:未满 13 监护硬闸一拒)
-2. **测评主链一环**:match→guide→一款项 intro→记录回读→成绩/记录页
+2. **测评主链一环**:match→guide→一款项 intro→记录回读;注=记录 Tab=test-records 面 M2 余组未建(点=空指),回读由 /report 族+result 页承载(11-05 预演实况)
 3. **报告族**:单报告三态(免费座/已解锁/会员)+中心四卡判决+趋势面
-4. **会员/订单/付费墙(PAY3 已落)**:③ 卡两态+SKU 价格链;/pay 付费墙三态(无窗 pitch/活窗紫条注到期/过期灰条注往日)+**下单→mock 收银台(底 sheet)→/pay/result(GetOrder 真相化)→解锁回读**全链在产复核(=CP3 第三腿);/member 权益页三态(never 无条/active 紫+until/expired 灰注尾日);态翻转仍走 admin Grant/Terminate 配方;通道按 deploy 当夜实况——真通道期真金腿归 CP3/PAY2 门承载,走查不重复真金
-5. **消息中心(MSG-1 ctr 腿已落)**:/messages 两 Tab(信箱公告+本人反馈队列)切换温数据+未读红点(tabbar/home bell,GetUnreadCount 服务端 own);提一条反馈→详情会话状态徽(pending/replied/closed;R-08 关单文案在,W6 ljr 两窄化裁决若翻契约面随改);G-202 blocked-pane CTA=真跳反馈表
+4. **会员/订单/付费墙(PAY3 已落)**:③ 卡两态+SKU 价格链;/pay 付费墙三态(无窗 pitch/活窗紫条注到期/过期灰条注往日)+**下单→mock 收银台(底 sheet)→/pay/result(GetOrder 真相化)→解锁回读**全链在产复核(=CP3 第三腿);/member 权益页三态(never 无条/active 紫+until/expired 灰注尾日);态翻转仍走 admin Grant/Terminate 配方;通道按 deploy 当夜实况——真通道期真金腿归 CP3/PAY2 门承载,走查不重复真金;墙态③(过期灰条)无自然过期窗不可当场走,terminated 态由 R-04 折 never 形承载(e2e 断言在),预演只证①②态
+5. **消息中心(MSG-1 ctr 腿已落)**:/messages 两 Tab(信箱公告+本人反馈队列)切换温数据+未读红点(tabbar/home bell,GetUnreadCount 服务端 own);提一条反馈→详情会话状态徽(pending/replied/closed;R-08 关单文案在,W6 ljr 两窄化裁决若翻契约面随改);G-202 blocked-pane CTA=真跳反馈表;未读红点正态需公告已发布=admin 三页(W4 MSG-1 余面)落地后才可走,预演时点=零公告诚实空
 6. **账号族**:安全聚合+密码改(校验梯拒一弱)+绑定页在
 7. **admin 抽走**:登录→用户/会员/SKU/订单/激活码/合规族/策略面(数据=迁移后真实数据,词面 Q5 已锁)
-8. **激活码通道**(D-M ④ 兜底腿在产可用性):真码兑换→GetReportAccess 判决翻转
+8. **激活码通道**(D-M ④ 兜底腿):**ctr 兑码输入面未建(11-05 预演实锤,lzx 队列⑫)——梯④ 兜底当前断腿**;现走法=admin 铸码→RedeemActivationCode(服务端腿,11-05 实证 200+判决翻转可见)或 admin Grant 面兜底;兑码面落地后本环升级为端到端
 9. **五语言抽查**:zh/en 全链+ar/ja/ko 各一页
 
 每环≥1 截图存证;走查毕净清(含 match_session)。
@@ -56,3 +56,10 @@ ctr 冒烟链(每环真登录真走;11-05 修订=九环):
 | ljr | 产品侧核对(D-AS 终局口径) |
 
 保险丝 12-17:任何未竟走梯③显式降级,**拉闸即执行,不临场争论(D-M)**。
+
+## 六、预演记(2026-11-05 本地全栈彩排,W5 值守演练提前)
+
+- **T1 门禁四套绿**:服务端 ENT/PAY/MSG 三门控(exit 0;internal/e2e 12.97s 含 Q6-①② 修腿回归断言首跑)+ctr/admin playwright(记 progress);栈=esports 新二进制(迁移 2 已 apply)+ctr vite 热载。
+- **九环全走毕**:13 截图@$TMPDIR/cyber-dev/rehearsal-1105/;hzypw 态还原(会员=terminated 即 Q4 后原态;mock 订单行+terminated 授予行留档——钱行不可变+审计链一致,刻意不清);弃号 hzyrh01+反馈行+码批 B-2611-C48L+认知码授予净清。
+- **预演带出两雷一断**(入 lzx 队列 ⑪⑫):⑪=admin 会员面 grantedAt 窗头错——periodStart 无条件取前行 expiry(entitleadmin/biz.go:441),terminated 行后新购显示错窗头(数据侧正确=Q6-① 修后缝只读活窗;显示推导级一行修);⑫=ctr 兑码输入面全缺(服务端 RPC+admin 铸码+锁面文案三在;D-M 梯④ 断腿,上线前裁)。
+- **工具注**:MCP 原生点击在经浏览器重启的老隔离上下文全堵(水合正常、DOM 实点通)——走查一律开新隔离上下文;骨架 AgentConfigService 502=dev 栈无 agent 服务,非 esports 件,不拦走查。
