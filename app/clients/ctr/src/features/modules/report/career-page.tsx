@@ -1,6 +1,7 @@
 import { useQuery as useConnectQuery } from "@connectrpc/connect-query";
 import { getCareerReport } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/report-ReportService_connectquery";
 import { useNavigate } from "@tanstack/react-router";
+import { Target } from "lucide-react";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { StateScreen } from "#/features/app/states/state-screen";
 import { FlowHeader } from "#/features/modules/match/ui/flow-header";
@@ -57,7 +58,7 @@ export function CareerPage() {
 
         {!r.access.allowed ? (
           <div className="border-line bg-surface-card shadow-card rounded-card border px-4 py-6 text-center backdrop-blur-md">
-            <div className="text-[24px]">🎯</div>
+            <Target aria-hidden className="text-danger-text" size={26} />
             <div className="text-ink mt-2 text-[14px] font-bold">
               {m.report_career_closed_title()}
             </div>
@@ -68,7 +69,7 @@ export function CareerPage() {
               {m.report_career_closed_future()}
             </div>
             <div className="border-line rounded-control bg-surface-card mt-4 border px-3 py-2 text-start">
-              <div className="text-[11px] font-bold text-[#F87171]">
+              <div className="text-danger-text text-[11px] font-bold">
                 {m.report_career_note_title()}
               </div>
               <div className="text-ink-tertiary mt-1 text-[10.5px] leading-relaxed">

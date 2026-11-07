@@ -118,3 +118,12 @@
 - MSG-1 契约+domain 首刀 ✅ 11-04 a564bf77(W5 件拉前):四契约+618x 五枚+ent 四表+message/feedback 双面四模块+文案 7 文件;MSG_E2E 门控全环绿(五拒绝臂全枚举);条件仲裁形五写点+名册定序;HandleEntError(nil) 幻影 500 雷 9 处修守卫形;对原型显式窄化两处登记 W6 ljr;余面=ctr 三页+admin 三页。
 - PAY3 四片全收 11-04..05(门禁全绿+双推,check-drift 提交后自愈 0):片1 服务端执法 82a53f46(CreateOrder 年龄闸 6148/6149+ListSkus 折叠 pay_gate+compliance 第 5 旋钮 renewal_remind_days+mock 收银台桥);片2 ctr 三态墙 e3159a9e(P7 三态/未成年红卡逃生双钮/缺出生回跳/收银台 connect 统一形 MockCashierService.MarkPaid 6156=用户当面临裁;两轴审查加固=plain 律+one-module-one-face 拆 mockcashier+localDateOf 家族四点);片3 购买环 d9ddd12e(pay-result 四态 GetOrder 真值+墙出口原型导航契约三钮全跳 result+CTA 挂接 live+G-401 clientIPOf 双形状闭;两轴审查加固=§3 节序/ref-less 藏单次选项/face click 捕获贯穿/收据 isFetching 闸;G-404 新红);片4 member-detail+Q4 尾 2c3ecb7c(digest 两 field=all-time 解锁计数+含过期最远窗尾/member 三态页/三挂点=profile 链+计数行+墙 P7 链+result ghost 钮/member 域 33 键×2;两轴审查修=plain 理由句+e2e lapsed 组合臂直钉)。
 - 11-04 W6 备料 cutover-watch.md(hzy 值守清单草案,T-1 五检/六节点/冒烟八环含激活码兜底腿)+D-BE P6 代裁(预演定 11-15,回滚腿入绿门)。
+
+## 2026-11-07 重构役三 · roadmap 校准+覆盖核验(用户令,文档可信度审计驱动)
+
+- S1 分母机核毕:旧 191 端点(58+133)/36 业务表(转储 37 含 flyway)/原型 192+41(tsv 零差集);新 21 service/85 RPC/23 表/ctr 50 路由(1+9+40)/admin 17 面;旧前端「64/23 视图」口径失传废弃(实测 65 tsx/26 jsx/25 path)。
+- S2 demand-ledger 重核毕:85 页行级账目对质成立;§四「14 面/83 RPC」漂移修正(17 面/85 RPC)+计数脚本再生纪律入 §五。
+- S3 走查史清零毕:七档退役(coverage/gap-ledger/render-coverage×2/calibration-log/admin-gap-matrix/pm-review-items,全文=git 391ccc87);未修红条转 plan 缺陷工单 B-1..B-9;R-01..R-13+PM-13..20+N-1..N-6 并 prd 偏离接洽单;coverage.md 承重内容分流(验收口径+语料律→design-alignment,活锚→demand-ledger §六)。
+- S4 活档重写毕:plan 重立(未完片+缺陷工单节);progress 执法剪枝律(5567 字巨行→索引行,「修复件待提交」僵尸句清除);README 体制行修正(走查/开发合流如实记档);design-alignment/verify README 指针重锚。
+- S5 八域覆盖核验毕(并行 subagent+主会话复核):85 页全归属零悬空;85 RPC=live 69/e2e-only 11/单测-only 1(SwitchMatchGenre)/全链零执行 3(SetRenewalReminder/UpdateAnnouncement/OfflineAnnouncement)/零消费 1(ListOrders);锚失真 9 处;新偏离 6 项(N-1 趋势 CTA 最重);产出=verify/coverage-map.md。
+- S6 矩阵重立毕:58 例(X13/C30/A15;新增 C1-7 引擎扫尾+C6-6 服务端拒绝腿族),态列全域清零(R2 起正式阶段重走);R-empty 空号角色入 §2;三律入 §1。

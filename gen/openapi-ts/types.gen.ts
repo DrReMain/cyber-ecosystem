@@ -251,6 +251,12 @@ export type CyberEsportsV1AdminOrder = {
      * still hydrate (order history outlives catalog changes).
      */
     skuName?: string;
+    /**
+     * The derived refund fact on a paid order; absent = never refunded.
+     * One full refund per order — the operator face mints it, the channel
+     * idempotency key (out_refund_no) is derived from the order no.
+     */
+    refund?: CyberEsportsV1OrderRefundView;
 };
 
 /**
@@ -517,11 +523,6 @@ export type CyberEsportsV1CreateOrderRequest = {
      * absent for membership; the caller must own the record.
      */
     scopeRef?: string;
-    /**
-     * OpenID for in-WeChat payment, supplied by the wechat binding;
-     * required when the channel pays by invoke.
-     */
-    payerOpenid?: string;
     /**
      * Post-payment landing page for jump channels.
      */
@@ -1364,6 +1365,18 @@ export type CyberEsportsV1ListTestsResponse = {
     tests?: Array<CyberEsportsV1Test>;
 };
 
+export type CyberEsportsV1ListUserMessagesResponse = {
+    page?: CyberSharedCommonV1PageResponse;
+    /**
+     * Newest first, the letterbox's own order.
+     */
+    messages?: Array<CyberEsportsV1Message>;
+    /**
+     * The same count the member's unread badge reads.
+     */
+    unreadCount?: number;
+};
+
 export type CyberEsportsV1MarkAllMessagesReadRequest = {
     [key: string]: unknown;
 };
@@ -1721,6 +1734,30 @@ export type CyberEsportsV1Order = {
 };
 
 /**
+ * What a paid order's one full refund looks like to the operator.
+ */
+export type CyberEsportsV1OrderRefundView = {
+    /**
+     * The caller-minted channel idempotency key ('R'+order_no).
+     */
+    refundNo?: string;
+    /**
+     * The channel's own refund id — the support/portal join key.
+     */
+    channelRefundId?: string;
+    state?: 'REFUND_STATE_UNSPECIFIED' | 'REFUND_STATE_PROCESSING' | 'REFUND_STATE_SUCCEEDED' | 'REFUND_STATE_ABNORMAL';
+    amountFen?: string;
+    /**
+     * The operator's paper trail for the offline exception.
+     */
+    reason?: string;
+    /**
+     * The channel-side success moment; null until the refund succeeds.
+     */
+    refundedAt?: string;
+};
+
+/**
  * What a paid order actually unlocked, folded at read time.
  */
 export type CyberEsportsV1OrderUnlockView = {
@@ -1928,6 +1965,19 @@ export type CyberEsportsV1RedeemActivationCodeResponse = {
      */
     expiresAt?: string;
     grantedAt?: string;
+};
+
+export type CyberEsportsV1RefundPaymentOrderRequest = {
+    orderNo?: string;
+    /**
+     * Why the exception was granted — required: an operator refund with no
+     * recorded reason is an audit hole, not a shortcut.
+     */
+    reason?: string;
+};
+
+export type CyberEsportsV1RefundPaymentOrderResponse = {
+    order?: CyberEsportsV1AdminOrder;
 };
 
 export type CyberEsportsV1ReplyFeedbackRequest = {
@@ -3095,6 +3145,16 @@ export type CyberSystemV1GetTenantResponse = {
 
 export type CyberSystemV1GetUserResponse = {
     user?: CyberSystemV1User;
+};
+
+/**
+ * The caller's wechat openid, raw — the one credential value that crosses
+ * unmasked: the JSAPI unified order takes it as a payer fact, and only the
+ * consuming service's server-side enrichment reads this face (display
+ * surfaces keep the masked form). Null = the caller never bound wechat.
+ */
+export type CyberSystemV1GetWechatOpenIdResponse = {
+    openid?: string;
 };
 
 export type CyberSystemV1ListAuditExportsResponse = {
@@ -5553,6 +5613,24 @@ export type OrderAdminServiceClosePaymentOrderResponses = {
 
 export type OrderAdminServiceClosePaymentOrderResponse = OrderAdminServiceClosePaymentOrderResponses[keyof OrderAdminServiceClosePaymentOrderResponses];
 
+export type OrderAdminServiceRefundPaymentOrderData = {
+    body: CyberEsportsV1RefundPaymentOrderRequest;
+    path: {
+        orderNo: string;
+    };
+    query?: never;
+    url: '/api/v1/esports/payment-orders/{orderNo}/refund';
+};
+
+export type OrderAdminServiceRefundPaymentOrderResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1RefundPaymentOrderResponse;
+};
+
+export type OrderAdminServiceRefundPaymentOrderResponse = OrderAdminServiceRefundPaymentOrderResponses[keyof OrderAdminServiceRefundPaymentOrderResponses];
+
 export type ProfileServiceGetProfileData = {
     body?: never;
     path?: never;
@@ -5930,6 +6008,58 @@ export type FeedbackAdminServiceReplyFeedbackResponses = {
 };
 
 export type FeedbackAdminServiceReplyFeedbackResponse = FeedbackAdminServiceReplyFeedbackResponses[keyof FeedbackAdminServiceReplyFeedbackResponses];
+
+export type MessageAdminServiceListUserMessagesData = {
+    body?: never;
+    path: {
+        /**
+         * The member whose letterbox is read — the same rows the member face
+         * lists, never a different truth. A member nobody ever mailed answers
+         * an empty page, not an error.
+         */
+        userId: string;
+    };
+    query?: {
+        /**
+         * Page number (1-based).
+         */
+        'page.pageNo'?: number;
+        /**
+         * Page size.
+         */
+        'page.pageSize'?: number;
+        /**
+         * Return all results without pagination.
+         */
+        'page.all'?: boolean;
+        /**
+         * Filter by created_at >= this value.
+         */
+        'page.createdAtA'?: string;
+        /**
+         * Filter by created_at <= this value.
+         */
+        'page.createdAtZ'?: string;
+        /**
+         * Filter by updated_at >= this value.
+         */
+        'page.updatedAtA'?: string;
+        /**
+         * Filter by updated_at <= this value.
+         */
+        'page.updatedAtZ'?: string;
+    };
+    url: '/api/v1/esports/users/{userId}/messages';
+};
+
+export type MessageAdminServiceListUserMessagesResponses = {
+    /**
+     * OK
+     */
+    200: CyberEsportsV1ListUserMessagesResponse;
+};
+
+export type MessageAdminServiceListUserMessagesResponse = MessageAdminServiceListUserMessagesResponses[keyof MessageAdminServiceListUserMessagesResponses];
 
 export type AuditServiceListAuditLogsData = {
     body?: never;
@@ -6659,6 +6789,22 @@ export type AuthServiceGetSecurityStatusResponses = {
 };
 
 export type AuthServiceGetSecurityStatusResponse = AuthServiceGetSecurityStatusResponses[keyof AuthServiceGetSecurityStatusResponses];
+
+export type AuthServiceGetWechatOpenIdData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/system/me/wechat-openid';
+};
+
+export type AuthServiceGetWechatOpenIdResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1GetWechatOpenIdResponse;
+};
+
+export type AuthServiceGetWechatOpenIdResponse = AuthServiceGetWechatOpenIdResponses[keyof AuthServiceGetWechatOpenIdResponses];
 
 export type PolicyServiceListPoliciesData = {
     body?: never;

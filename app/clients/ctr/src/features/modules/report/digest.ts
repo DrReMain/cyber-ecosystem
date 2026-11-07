@@ -90,7 +90,11 @@ export function wireDigestOf(data: unknown): WireDigest {
     sessionsTotal: d.sessionsTotal ?? 0,
     sessionsFps: d.sessionsFps ?? 0,
     sessionsMoba: d.sessionsMoba ?? 0,
-    abilities: d.abilities ?? [],
+    // A digest row exists only for abilities the member has actually
+    // played, so an omitted best (proto3 implicit presence drops the
+    // zero) reads as the honest zero — untested abilities have no row at
+    // all and stay untested downstream.
+    abilities: (d.abilities ?? []).map((a) => ({ ...a, bestScore: a.bestScore ?? 0 })),
     sessions: d.sessions ?? [],
     reportAccess: {
       allowed: d.reportAccess?.allowed === true,

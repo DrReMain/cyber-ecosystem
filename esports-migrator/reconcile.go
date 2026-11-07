@@ -400,7 +400,7 @@ func (r *reconciler) sampleIdentity(ctx context.Context) error {
 
 		// Nickname: trimmed, rune-capped at 12.
 		wantNick := ""
-		if trimmed := strings.TrimSpace(u.Nickname); trimmed != "" {
+		if trimmed := strings.TrimSpace(nullStr(u.Nickname)); trimmed != "" {
 			runes := []rune(trimmed)
 			if len(runes) > 12 {
 				runes = runes[:12]

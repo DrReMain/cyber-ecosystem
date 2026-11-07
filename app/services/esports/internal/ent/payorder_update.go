@@ -89,6 +89,133 @@ func (_u *PayOrderUpdate) ClearPaidAt() *PayOrderUpdate {
 	return _u
 }
 
+// SetRefundNo sets the "refund_no" field.
+func (_u *PayOrderUpdate) SetRefundNo(v string) *PayOrderUpdate {
+	_u.mutation.SetRefundNo(v)
+	return _u
+}
+
+// SetNillableRefundNo sets the "refund_no" field if the given value is not nil.
+func (_u *PayOrderUpdate) SetNillableRefundNo(v *string) *PayOrderUpdate {
+	if v != nil {
+		_u.SetRefundNo(*v)
+	}
+	return _u
+}
+
+// ClearRefundNo clears the value of the "refund_no" field.
+func (_u *PayOrderUpdate) ClearRefundNo() *PayOrderUpdate {
+	_u.mutation.ClearRefundNo()
+	return _u
+}
+
+// SetRefundID sets the "refund_id" field.
+func (_u *PayOrderUpdate) SetRefundID(v string) *PayOrderUpdate {
+	_u.mutation.SetRefundID(v)
+	return _u
+}
+
+// SetNillableRefundID sets the "refund_id" field if the given value is not nil.
+func (_u *PayOrderUpdate) SetNillableRefundID(v *string) *PayOrderUpdate {
+	if v != nil {
+		_u.SetRefundID(*v)
+	}
+	return _u
+}
+
+// ClearRefundID clears the value of the "refund_id" field.
+func (_u *PayOrderUpdate) ClearRefundID() *PayOrderUpdate {
+	_u.mutation.ClearRefundID()
+	return _u
+}
+
+// SetRefundedFen sets the "refunded_fen" field.
+func (_u *PayOrderUpdate) SetRefundedFen(v int64) *PayOrderUpdate {
+	_u.mutation.ResetRefundedFen()
+	_u.mutation.SetRefundedFen(v)
+	return _u
+}
+
+// SetNillableRefundedFen sets the "refunded_fen" field if the given value is not nil.
+func (_u *PayOrderUpdate) SetNillableRefundedFen(v *int64) *PayOrderUpdate {
+	if v != nil {
+		_u.SetRefundedFen(*v)
+	}
+	return _u
+}
+
+// AddRefundedFen adds value to the "refunded_fen" field.
+func (_u *PayOrderUpdate) AddRefundedFen(v int64) *PayOrderUpdate {
+	_u.mutation.AddRefundedFen(v)
+	return _u
+}
+
+// ClearRefundedFen clears the value of the "refunded_fen" field.
+func (_u *PayOrderUpdate) ClearRefundedFen() *PayOrderUpdate {
+	_u.mutation.ClearRefundedFen()
+	return _u
+}
+
+// SetRefundReason sets the "refund_reason" field.
+func (_u *PayOrderUpdate) SetRefundReason(v string) *PayOrderUpdate {
+	_u.mutation.SetRefundReason(v)
+	return _u
+}
+
+// SetNillableRefundReason sets the "refund_reason" field if the given value is not nil.
+func (_u *PayOrderUpdate) SetNillableRefundReason(v *string) *PayOrderUpdate {
+	if v != nil {
+		_u.SetRefundReason(*v)
+	}
+	return _u
+}
+
+// ClearRefundReason clears the value of the "refund_reason" field.
+func (_u *PayOrderUpdate) ClearRefundReason() *PayOrderUpdate {
+	_u.mutation.ClearRefundReason()
+	return _u
+}
+
+// SetRefundState sets the "refund_state" field.
+func (_u *PayOrderUpdate) SetRefundState(v payorder.RefundState) *PayOrderUpdate {
+	_u.mutation.SetRefundState(v)
+	return _u
+}
+
+// SetNillableRefundState sets the "refund_state" field if the given value is not nil.
+func (_u *PayOrderUpdate) SetNillableRefundState(v *payorder.RefundState) *PayOrderUpdate {
+	if v != nil {
+		_u.SetRefundState(*v)
+	}
+	return _u
+}
+
+// ClearRefundState clears the value of the "refund_state" field.
+func (_u *PayOrderUpdate) ClearRefundState() *PayOrderUpdate {
+	_u.mutation.ClearRefundState()
+	return _u
+}
+
+// SetRefundedAt sets the "refunded_at" field.
+func (_u *PayOrderUpdate) SetRefundedAt(v time.Time) *PayOrderUpdate {
+	_u.mutation.SetRefundedAt(v)
+	return _u
+}
+
+// SetNillableRefundedAt sets the "refunded_at" field if the given value is not nil.
+func (_u *PayOrderUpdate) SetNillableRefundedAt(v *time.Time) *PayOrderUpdate {
+	if v != nil {
+		_u.SetRefundedAt(*v)
+	}
+	return _u
+}
+
+// ClearRefundedAt clears the value of the "refunded_at" field.
+func (_u *PayOrderUpdate) ClearRefundedAt() *PayOrderUpdate {
+	_u.mutation.ClearRefundedAt()
+	return _u
+}
+
 // Mutation returns the PayOrderMutation object of the builder.
 func (_u *PayOrderUpdate) Mutation() *PayOrderMutation {
 	return _u.mutation
@@ -148,6 +275,31 @@ func (_u *PayOrderUpdate) check() error {
 			return &ValidationError{Name: "transaction_id", err: fmt.Errorf(`ent: validator failed for field "PayOrder.transaction_id": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.RefundNo(); ok {
+		if err := payorder.RefundNoValidator(v); err != nil {
+			return &ValidationError{Name: "refund_no", err: fmt.Errorf(`ent: validator failed for field "PayOrder.refund_no": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.RefundID(); ok {
+		if err := payorder.RefundIDValidator(v); err != nil {
+			return &ValidationError{Name: "refund_id", err: fmt.Errorf(`ent: validator failed for field "PayOrder.refund_id": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.RefundedFen(); ok {
+		if err := payorder.RefundedFenValidator(v); err != nil {
+			return &ValidationError{Name: "refunded_fen", err: fmt.Errorf(`ent: validator failed for field "PayOrder.refunded_fen": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.RefundReason(); ok {
+		if err := payorder.RefundReasonValidator(v); err != nil {
+			return &ValidationError{Name: "refund_reason", err: fmt.Errorf(`ent: validator failed for field "PayOrder.refund_reason": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.RefundState(); ok {
+		if err := payorder.RefundStateValidator(v); err != nil {
+			return &ValidationError{Name: "refund_state", err: fmt.Errorf(`ent: validator failed for field "PayOrder.refund_state": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -189,6 +341,45 @@ func (_u *PayOrderUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.PaidAtCleared() {
 		_spec.ClearField(payorder.FieldPaidAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.RefundNo(); ok {
+		_spec.SetField(payorder.FieldRefundNo, field.TypeString, value)
+	}
+	if _u.mutation.RefundNoCleared() {
+		_spec.ClearField(payorder.FieldRefundNo, field.TypeString)
+	}
+	if value, ok := _u.mutation.RefundID(); ok {
+		_spec.SetField(payorder.FieldRefundID, field.TypeString, value)
+	}
+	if _u.mutation.RefundIDCleared() {
+		_spec.ClearField(payorder.FieldRefundID, field.TypeString)
+	}
+	if value, ok := _u.mutation.RefundedFen(); ok {
+		_spec.SetField(payorder.FieldRefundedFen, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedRefundedFen(); ok {
+		_spec.AddField(payorder.FieldRefundedFen, field.TypeInt64, value)
+	}
+	if _u.mutation.RefundedFenCleared() {
+		_spec.ClearField(payorder.FieldRefundedFen, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.RefundReason(); ok {
+		_spec.SetField(payorder.FieldRefundReason, field.TypeString, value)
+	}
+	if _u.mutation.RefundReasonCleared() {
+		_spec.ClearField(payorder.FieldRefundReason, field.TypeString)
+	}
+	if value, ok := _u.mutation.RefundState(); ok {
+		_spec.SetField(payorder.FieldRefundState, field.TypeEnum, value)
+	}
+	if _u.mutation.RefundStateCleared() {
+		_spec.ClearField(payorder.FieldRefundState, field.TypeEnum)
+	}
+	if value, ok := _u.mutation.RefundedAt(); ok {
+		_spec.SetField(payorder.FieldRefundedAt, field.TypeTime, value)
+	}
+	if _u.mutation.RefundedAtCleared() {
+		_spec.ClearField(payorder.FieldRefundedAt, field.TypeTime)
 	}
 	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
@@ -272,6 +463,133 @@ func (_u *PayOrderUpdateOne) ClearPaidAt() *PayOrderUpdateOne {
 	return _u
 }
 
+// SetRefundNo sets the "refund_no" field.
+func (_u *PayOrderUpdateOne) SetRefundNo(v string) *PayOrderUpdateOne {
+	_u.mutation.SetRefundNo(v)
+	return _u
+}
+
+// SetNillableRefundNo sets the "refund_no" field if the given value is not nil.
+func (_u *PayOrderUpdateOne) SetNillableRefundNo(v *string) *PayOrderUpdateOne {
+	if v != nil {
+		_u.SetRefundNo(*v)
+	}
+	return _u
+}
+
+// ClearRefundNo clears the value of the "refund_no" field.
+func (_u *PayOrderUpdateOne) ClearRefundNo() *PayOrderUpdateOne {
+	_u.mutation.ClearRefundNo()
+	return _u
+}
+
+// SetRefundID sets the "refund_id" field.
+func (_u *PayOrderUpdateOne) SetRefundID(v string) *PayOrderUpdateOne {
+	_u.mutation.SetRefundID(v)
+	return _u
+}
+
+// SetNillableRefundID sets the "refund_id" field if the given value is not nil.
+func (_u *PayOrderUpdateOne) SetNillableRefundID(v *string) *PayOrderUpdateOne {
+	if v != nil {
+		_u.SetRefundID(*v)
+	}
+	return _u
+}
+
+// ClearRefundID clears the value of the "refund_id" field.
+func (_u *PayOrderUpdateOne) ClearRefundID() *PayOrderUpdateOne {
+	_u.mutation.ClearRefundID()
+	return _u
+}
+
+// SetRefundedFen sets the "refunded_fen" field.
+func (_u *PayOrderUpdateOne) SetRefundedFen(v int64) *PayOrderUpdateOne {
+	_u.mutation.ResetRefundedFen()
+	_u.mutation.SetRefundedFen(v)
+	return _u
+}
+
+// SetNillableRefundedFen sets the "refunded_fen" field if the given value is not nil.
+func (_u *PayOrderUpdateOne) SetNillableRefundedFen(v *int64) *PayOrderUpdateOne {
+	if v != nil {
+		_u.SetRefundedFen(*v)
+	}
+	return _u
+}
+
+// AddRefundedFen adds value to the "refunded_fen" field.
+func (_u *PayOrderUpdateOne) AddRefundedFen(v int64) *PayOrderUpdateOne {
+	_u.mutation.AddRefundedFen(v)
+	return _u
+}
+
+// ClearRefundedFen clears the value of the "refunded_fen" field.
+func (_u *PayOrderUpdateOne) ClearRefundedFen() *PayOrderUpdateOne {
+	_u.mutation.ClearRefundedFen()
+	return _u
+}
+
+// SetRefundReason sets the "refund_reason" field.
+func (_u *PayOrderUpdateOne) SetRefundReason(v string) *PayOrderUpdateOne {
+	_u.mutation.SetRefundReason(v)
+	return _u
+}
+
+// SetNillableRefundReason sets the "refund_reason" field if the given value is not nil.
+func (_u *PayOrderUpdateOne) SetNillableRefundReason(v *string) *PayOrderUpdateOne {
+	if v != nil {
+		_u.SetRefundReason(*v)
+	}
+	return _u
+}
+
+// ClearRefundReason clears the value of the "refund_reason" field.
+func (_u *PayOrderUpdateOne) ClearRefundReason() *PayOrderUpdateOne {
+	_u.mutation.ClearRefundReason()
+	return _u
+}
+
+// SetRefundState sets the "refund_state" field.
+func (_u *PayOrderUpdateOne) SetRefundState(v payorder.RefundState) *PayOrderUpdateOne {
+	_u.mutation.SetRefundState(v)
+	return _u
+}
+
+// SetNillableRefundState sets the "refund_state" field if the given value is not nil.
+func (_u *PayOrderUpdateOne) SetNillableRefundState(v *payorder.RefundState) *PayOrderUpdateOne {
+	if v != nil {
+		_u.SetRefundState(*v)
+	}
+	return _u
+}
+
+// ClearRefundState clears the value of the "refund_state" field.
+func (_u *PayOrderUpdateOne) ClearRefundState() *PayOrderUpdateOne {
+	_u.mutation.ClearRefundState()
+	return _u
+}
+
+// SetRefundedAt sets the "refunded_at" field.
+func (_u *PayOrderUpdateOne) SetRefundedAt(v time.Time) *PayOrderUpdateOne {
+	_u.mutation.SetRefundedAt(v)
+	return _u
+}
+
+// SetNillableRefundedAt sets the "refunded_at" field if the given value is not nil.
+func (_u *PayOrderUpdateOne) SetNillableRefundedAt(v *time.Time) *PayOrderUpdateOne {
+	if v != nil {
+		_u.SetRefundedAt(*v)
+	}
+	return _u
+}
+
+// ClearRefundedAt clears the value of the "refunded_at" field.
+func (_u *PayOrderUpdateOne) ClearRefundedAt() *PayOrderUpdateOne {
+	_u.mutation.ClearRefundedAt()
+	return _u
+}
+
 // Mutation returns the PayOrderMutation object of the builder.
 func (_u *PayOrderUpdateOne) Mutation() *PayOrderMutation {
 	return _u.mutation
@@ -344,6 +662,31 @@ func (_u *PayOrderUpdateOne) check() error {
 			return &ValidationError{Name: "transaction_id", err: fmt.Errorf(`ent: validator failed for field "PayOrder.transaction_id": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.RefundNo(); ok {
+		if err := payorder.RefundNoValidator(v); err != nil {
+			return &ValidationError{Name: "refund_no", err: fmt.Errorf(`ent: validator failed for field "PayOrder.refund_no": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.RefundID(); ok {
+		if err := payorder.RefundIDValidator(v); err != nil {
+			return &ValidationError{Name: "refund_id", err: fmt.Errorf(`ent: validator failed for field "PayOrder.refund_id": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.RefundedFen(); ok {
+		if err := payorder.RefundedFenValidator(v); err != nil {
+			return &ValidationError{Name: "refunded_fen", err: fmt.Errorf(`ent: validator failed for field "PayOrder.refunded_fen": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.RefundReason(); ok {
+		if err := payorder.RefundReasonValidator(v); err != nil {
+			return &ValidationError{Name: "refund_reason", err: fmt.Errorf(`ent: validator failed for field "PayOrder.refund_reason": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.RefundState(); ok {
+		if err := payorder.RefundStateValidator(v); err != nil {
+			return &ValidationError{Name: "refund_state", err: fmt.Errorf(`ent: validator failed for field "PayOrder.refund_state": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -402,6 +745,45 @@ func (_u *PayOrderUpdateOne) sqlSave(ctx context.Context) (_node *PayOrder, err 
 	}
 	if _u.mutation.PaidAtCleared() {
 		_spec.ClearField(payorder.FieldPaidAt, field.TypeTime)
+	}
+	if value, ok := _u.mutation.RefundNo(); ok {
+		_spec.SetField(payorder.FieldRefundNo, field.TypeString, value)
+	}
+	if _u.mutation.RefundNoCleared() {
+		_spec.ClearField(payorder.FieldRefundNo, field.TypeString)
+	}
+	if value, ok := _u.mutation.RefundID(); ok {
+		_spec.SetField(payorder.FieldRefundID, field.TypeString, value)
+	}
+	if _u.mutation.RefundIDCleared() {
+		_spec.ClearField(payorder.FieldRefundID, field.TypeString)
+	}
+	if value, ok := _u.mutation.RefundedFen(); ok {
+		_spec.SetField(payorder.FieldRefundedFen, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedRefundedFen(); ok {
+		_spec.AddField(payorder.FieldRefundedFen, field.TypeInt64, value)
+	}
+	if _u.mutation.RefundedFenCleared() {
+		_spec.ClearField(payorder.FieldRefundedFen, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.RefundReason(); ok {
+		_spec.SetField(payorder.FieldRefundReason, field.TypeString, value)
+	}
+	if _u.mutation.RefundReasonCleared() {
+		_spec.ClearField(payorder.FieldRefundReason, field.TypeString)
+	}
+	if value, ok := _u.mutation.RefundState(); ok {
+		_spec.SetField(payorder.FieldRefundState, field.TypeEnum, value)
+	}
+	if _u.mutation.RefundStateCleared() {
+		_spec.ClearField(payorder.FieldRefundState, field.TypeEnum)
+	}
+	if value, ok := _u.mutation.RefundedAt(); ok {
+		_spec.SetField(payorder.FieldRefundedAt, field.TypeTime, value)
+	}
+	if _u.mutation.RefundedAtCleared() {
+		_spec.ClearField(payorder.FieldRefundedAt, field.TypeTime)
 	}
 	_spec.AddModifiers(_u.modifiers...)
 	_node = &PayOrder{config: _u.config}

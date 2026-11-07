@@ -1,61 +1,49 @@
-# esports 验证工作台 — 原型保真与逻辑验收
+# esports 验证工作台 — 用例设计、覆盖映射与对账锚
 
-> 目的:把「高度还原原型」从形容词变成机器口径。本目录是验证会话的工作台,开发仍在开发会话进行;本目录产出 gap 台账喂给开发会话,修复后复跑转绿。
-> 三事实源:UI/文案期望 = 旧仓原型(逐字);逻辑/数值期望 = 需求档 + metric 规格档;操作序列参考 = 旧版代码(只读,不被测)。被测对象 = 本仓 ctr + esports 服务。
+> 重立:2026-11-07 重构役三。本目录=正式测试阶段的仪器集:用例设计执行真值(integration-matrix)、三方覆盖映射与缺口(coverage-map)、需求处置真值(demand-ledger)、断言锚源(q-line)、导航锚(ctr-prototype-matrix/admin-nav-anchor/admin-member-anchor)、保真 harness 重激活 SOP(HARNESS-SOP)。
+> 体制(如实记档):2026-11-05 走查役起,走查与开发同会话执行(发现→当场修→记账同手)——因此**红→绿翻转与「毕」判定须第二证据**(11-07 三律:join 在案项/视觉轴标注/毕=动词全走);历史分权体制(独立验证会话)描述已废。
+> 历史取证档(gap-ledger/render-coverage×2/calibration-log/pm-review-items/admin-gap-matrix/coverage)2026-11-07 退役,**全文=git 391ccc87**;残指一律按此读。
 
-## 防失真协议
+## 防失真协议(承前,继续生效)
 
-完整性不靠 agent 自觉,靠可对账的机制:
-
-1. **清单由脚本生成** — 盘点左列来自 `find`/解析脚本输出,文件数 = 行数,少一行即漏、多一行即编造。
-2. **转写零手工** — 凡逐字内容(文案、数值)一律脚本提取进锚文件,断言按路径引用,agent 永不重打字。
+1. **清单由脚本生成** — 计数类数字(demand-ledger §四 等)随收口脚本再生,禁手打快照。
+2. **转写零手工** — 逐字内容一律脚本/渲染态提取,断言按路径引用。
 3. **台账落仓** — 进度存文件不存上下文,跨会话续读文件。
 4. **出处必填** — 每行标注事实源路径,可任意抽查对质。
-5. **计数收口** — 每轮报告 N 文件→N 行、M 模块→M 行,数目对不上不收口。
+5. **计数收口** — 每轮 N 文件→N 行,数目对不上不收口。
+
+## 断言纪律(承前)
+
+- **蒙眼规则**:期望值只从原型/规格档推导,禁止先读实现再写断言。
+- **copy.ts 不是事实源**:断言「渲染文本==原型字面量」;文案库对原型的一致性是独立检查项。
+- **分层断言**:文案层逐字全等;结构层语义断言;视觉层人工走查+几何测定(G-419 判例:布局判定须几何测定,目测不算)。
+- **数值事实源**:metric.md 单源;战略口径=PRODUCT_STRATEGY_DECK。
 
 ## 原型语料(权威层级,⚠️ 待 PM 确认)
 
-旧仓 `lab/esports/manage/design-systems/ctr/` 下四层,共 192 个 HTML(机器锚:`ctr-design-inventory.tsv`):
+旧仓 `lab/esports/manage/design-systems/ctr/` 四层+导览页,共 **192 html**(2026-11-07 机核:44+45+80+22+1 导览;机器锚=`ctr-design-inventory.tsv`,与磁盘零差集):`prototype/` 44=**主 UI 事实源**;`outputs/block4` 45;`outputs/block3` 80(含 rejected);`outputs/future` 22=远期参考。admin 原型=`design-systems/admin/outputs/prototype/` 41 页;侧栏九组权威=_nav.js。
+原型=活应用(壳+`_state.js`):逐字提取须渲染态读或直读 `_state.js`;每状态枚举=一条用例。
 
-| 层 | 页数 | 角色 |
-|---|---|---|
-| `prototype/` | 44 | 最新整合高保真原型(含状态直达),**主 UI 事实源** |
-| `outputs/block4/` | 45 | 报告中心/会员/支付/记录/反馈族设计(2026-08 定稿层) |
-| `outputs/block3/` | 80 | 登录→报告编号流程 + dated 迭代(含 rejected 14) |
-| `outputs/future/` | 22 | 远期范围参考(学校报告/训练模式/装扮商店等) |
+## 原型固化律(2026-10-28 裁定,承前)
 
-**原型是活的带状态应用**(壳 + `_state.js` 驱动 JS 渲染):静态解析只得壳文本,逐字提取必须 headless 渲染后取 `textContent`;原型自带状态枚举(解锁/锁定/已测 N/6…),每状态即一条用例。
-
-## 断言纪律
-
-- **蒙眼规则**:期望值只能从原型/规格档推导,禁止先读重建实现再写断言(否则把 gap 固化成预期)。
-- **copy.ts 不是事实源**:断言「渲染文本 == 原型字面量」,不断言「渲染 == copy.ts」;文案库对原型的一致性是独立检查项。
-- **分层断言**:文案层逐字全等;结构层语义断言(区块/顺序/组件);视觉层不自动像素对比,走人工走查+截图台账。
-- **数值事实源**:档位/换算/校准引 `design-systems/admin/` 的 METRIC_SPEC_*/CALIBRATION_PLAN/UNIT_SCORE_DESIGN;战略口径(分数双轨等)引 PRODUCT_STRATEGY_DECK。
-
-## 原型固化律(2026-10-28 裁定)
-
-原型在开发阶段不更新,是唯一还原真相:**先严格还原,后细节调优**。存疑不阻塞、不放宽断言——一律转 `pm-review-items.md` 留档,调优阶段(原型失去价值后)携物料与 PM 统一核对。与仓法冲突项(如 emoji 图标 vs lucide 法)同样只记账,不擅自二选一。范围口径(哪页何时建)仍走 plan.md 切片,与保真口径分离。
+原型在开发阶段不更新,是唯一还原真相:先严格还原,后细节调优。存疑不阻塞、不放宽断言——转 prd 偏离接洽单留档;与仓法冲突项同样只记账。范围口径(哪页何时建)走 plan.md,与保真口径分离。
 
 ## 文件
 
 | 文件 | 内容 |
 |---|---|
-| `ctr-design-inventory.tsv` | 192 行设计语料机器锚(路径/title/标题/壳文本量) |
-| `ctr-prototype-matrix.md` | V-0:原型 44 页 × 重建路由映射(状态列已退役,处置=demand-ledger) |
-| `admin-gap-matrix.md` | A-0:旧后台模块 × 新架构三路映射(状态列已退役,处置=demand-ledger) |
-| `demand-ledger.md` | **需求总账(2026-10-30 立)**:85 页×现行处置+旧码功能处置+对账计数——进度对账唯一真值,plan/progress 的需求分母 |
-| `gap-ledger.md` | gap 台账:红条(还原工单)/待面检,逐条含原型期望与出处 |
-| `admin-nav-anchor.md` | admin 菜单真值(_nav.js 九组×现行树差表 N-1..N-5;2026-10-30 立,菜单落位/命名以此为准) |
-| `admin-member-anchor.md` | M2-1 会员两页走查 oracle(渲染态机提+5 Modal+6 语义钉;admin 原型=JS 渲染活原型实证) |
-| `pm-review-items.md` | PM 核对物料:存疑累积档,调优阶段消费 |
+| `integration-matrix.md` | 集成走查矩阵:**用例设计+执行真值**(58 例 X13/C30/A15;态列 R2 起清零重走) |
+| `coverage-map.md` | 覆盖映射:需求→用例→代码三方对照、缺口清单(P0-P4 收割序)、豁免台账、新偏离登记 |
+| `demand-ledger.md` | 需求总账:85 页×处置(进度对账唯一真值)+活锚清单 |
+| `q-line.md` | Q 线校对锚:页级三源断言清单(矩阵预期锚的主锚源;态列=11-04 Q1-Q6 役快照) |
+| `ctr-prototype-matrix.md` | ctr 44 页→路由纯映射(开工导航) |
+| `admin-nav-anchor.md` | admin 菜单真值(_nav.js 九组) |
+| `admin-member-anchor.md` | 会员两页走查 oracle(渲染态机提) |
+| `cutover-watch.md` | 上线走查+值守清单(hzy 座位,W6 执行稿基) |
+| `HARNESS-SOP.md` | 保真 harness 重激活 SOP(封存档,重激活只许照抄) |
 
-## 执行 harness(已封存,2026-10-28)
+## 执行节奏
 
-login 样板验证通过后,按「先开发、后验证」的串行计划撤出 app 树:三件套源码与激活步骤全量存档于 `HARNESS-SOP.md`(脚本原样嵌入,重激活只许照抄,禁止凭记忆重写)。重激活时机:开发阶段完成后。
-
-## 下一步
-
-- V-1 login 样板已验证并封存(重激活见 HARNESS-SOP);开发完成后重激活,E5-f3(0ae81a28)已落 home/profile/report 面,home 样板可直接跑。
-- 重激活后按 ctr-matrix 铺开:先 ✅/◐ 19 页逐页逐预设,❌ 页只出红条;pm-review-items 随开发推进继续累积。
-- 后台可跑面(激活码/会员查询/订单)先出可执行用例;未实现面以红条台账作为开发会话验收契约。
+- 正式测试阶段=多轮走查:每轮开工对账 coverage-map 缺口清单(收割序 P0→P4)+plan 缺陷工单;毕例记「毕@R<n>」;发现按四路处置(面级即修/缺陷→plan/偏离→prd/裁定→prd)。
+- harness 重激活(U2/保真轮)按 HARNESS-SOP 照抄落盘,禁凭记忆重写。
+- 退役档取证:`git show 391ccc87:docs/roadmap/esports/verify/<档名>`。

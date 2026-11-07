@@ -19,9 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	OrderAdminService_ListPaymentOrders_FullMethodName = "/cyber.esports.v1.OrderAdminService/ListPaymentOrders"
-	OrderAdminService_GetPaymentOrder_FullMethodName   = "/cyber.esports.v1.OrderAdminService/GetPaymentOrder"
-	OrderAdminService_ClosePaymentOrder_FullMethodName = "/cyber.esports.v1.OrderAdminService/ClosePaymentOrder"
+	OrderAdminService_ListPaymentOrders_FullMethodName  = "/cyber.esports.v1.OrderAdminService/ListPaymentOrders"
+	OrderAdminService_GetPaymentOrder_FullMethodName    = "/cyber.esports.v1.OrderAdminService/GetPaymentOrder"
+	OrderAdminService_ClosePaymentOrder_FullMethodName  = "/cyber.esports.v1.OrderAdminService/ClosePaymentOrder"
+	OrderAdminService_RefundPaymentOrder_FullMethodName = "/cyber.esports.v1.OrderAdminService/RefundPaymentOrder"
 )
 
 // OrderAdminServiceClient is the client API for OrderAdminService service.
@@ -33,11 +34,14 @@ const (
 // lists by; the detail folds the unlock outcome a paid order produced.
 // Close here is the operator's variant — the same pending-only
 // arbitration, minus the member plane's owner check, plus the operator
-// identity on the audit trail.
+// identity on the audit trail. Refund is the offline-exception executor
+// the member FAQ points at: the product sells no self-service refunds,
+// so this face mints the one full refund an operator grants by hand.
 type OrderAdminServiceClient interface {
 	ListPaymentOrders(ctx context.Context, in *ListPaymentOrdersRequest, opts ...grpc.CallOption) (*ListPaymentOrdersResponse, error)
 	GetPaymentOrder(ctx context.Context, in *GetPaymentOrderRequest, opts ...grpc.CallOption) (*GetPaymentOrderResponse, error)
 	ClosePaymentOrder(ctx context.Context, in *ClosePaymentOrderRequest, opts ...grpc.CallOption) (*ClosePaymentOrderResponse, error)
+	RefundPaymentOrder(ctx context.Context, in *RefundPaymentOrderRequest, opts ...grpc.CallOption) (*RefundPaymentOrderResponse, error)
 }
 
 type orderAdminServiceClient struct {
@@ -78,6 +82,16 @@ func (c *orderAdminServiceClient) ClosePaymentOrder(ctx context.Context, in *Clo
 	return out, nil
 }
 
+func (c *orderAdminServiceClient) RefundPaymentOrder(ctx context.Context, in *RefundPaymentOrderRequest, opts ...grpc.CallOption) (*RefundPaymentOrderResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RefundPaymentOrderResponse)
+	err := c.cc.Invoke(ctx, OrderAdminService_RefundPaymentOrder_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OrderAdminServiceServer is the server API for OrderAdminService service.
 // All implementations must embed UnimplementedOrderAdminServiceServer
 // for forward compatibility.
@@ -87,11 +101,14 @@ func (c *orderAdminServiceClient) ClosePaymentOrder(ctx context.Context, in *Clo
 // lists by; the detail folds the unlock outcome a paid order produced.
 // Close here is the operator's variant — the same pending-only
 // arbitration, minus the member plane's owner check, plus the operator
-// identity on the audit trail.
+// identity on the audit trail. Refund is the offline-exception executor
+// the member FAQ points at: the product sells no self-service refunds,
+// so this face mints the one full refund an operator grants by hand.
 type OrderAdminServiceServer interface {
 	ListPaymentOrders(context.Context, *ListPaymentOrdersRequest) (*ListPaymentOrdersResponse, error)
 	GetPaymentOrder(context.Context, *GetPaymentOrderRequest) (*GetPaymentOrderResponse, error)
 	ClosePaymentOrder(context.Context, *ClosePaymentOrderRequest) (*ClosePaymentOrderResponse, error)
+	RefundPaymentOrder(context.Context, *RefundPaymentOrderRequest) (*RefundPaymentOrderResponse, error)
 	mustEmbedUnimplementedOrderAdminServiceServer()
 }
 
@@ -110,6 +127,9 @@ func (UnimplementedOrderAdminServiceServer) GetPaymentOrder(context.Context, *Ge
 }
 func (UnimplementedOrderAdminServiceServer) ClosePaymentOrder(context.Context, *ClosePaymentOrderRequest) (*ClosePaymentOrderResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ClosePaymentOrder not implemented")
+}
+func (UnimplementedOrderAdminServiceServer) RefundPaymentOrder(context.Context, *RefundPaymentOrderRequest) (*RefundPaymentOrderResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method RefundPaymentOrder not implemented")
 }
 func (UnimplementedOrderAdminServiceServer) mustEmbedUnimplementedOrderAdminServiceServer() {}
 func (UnimplementedOrderAdminServiceServer) testEmbeddedByValue()                           {}
@@ -186,6 +206,24 @@ func _OrderAdminService_ClosePaymentOrder_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _OrderAdminService_RefundPaymentOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RefundPaymentOrderRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderAdminServiceServer).RefundPaymentOrder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: OrderAdminService_RefundPaymentOrder_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderAdminServiceServer).RefundPaymentOrder(ctx, req.(*RefundPaymentOrderRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // OrderAdminService_ServiceDesc is the grpc.ServiceDesc for OrderAdminService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -204,6 +242,10 @@ var OrderAdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ClosePaymentOrder",
 			Handler:    _OrderAdminService_ClosePaymentOrder_Handler,
+		},
+		{
+			MethodName: "RefundPaymentOrder",
+			Handler:    _OrderAdminService_RefundPaymentOrder_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -14,7 +14,7 @@ Monorepo for the Cyber Ecosystem platform — a **generic development skeleton**
 
 ## Hard laws
 
-1. **Workflows run through Nx** — `./nx run <project>:<target>`; every valid target is declared in the project's `project.json`. Package-local binaries go through `pnpm exec <bin>`. A workflow with no target gets one added, never an ad-hoc command.
+1. **Workflows run through Nx** — `./nx run <project>:<target>`; every valid target is declared in the project's `project.json`. A workflow with no target gets one added, never an ad-hoc command.
 2. **pnpm is the only package manager.** A `package-lock.json` or `yarn.lock` anywhere means a command bypassed pnpm — delete the artifact, fix the command.
 3. **Never hand-edit `gen/`.** Fix the source or generator and regenerate (proto conventions §7).
 4. **No cross-service code dependencies.** Cross-service reads go through the owning service's RPCs, behind a `<Remote>RP` ACL adapter (kratos conventions §5); capability packages stay self-contained (kratos conventions §1).
@@ -36,3 +36,4 @@ Monorepo for the Cyber Ecosystem platform — a **generic development skeleton**
 | tanstack (web clients) | `docs/conventions/tanstack/CONVENTIONS.md` | writing under `app/clients/*` or `shared-ts/` |
 | deploy (containers) | `docs/conventions/deploy/CONVENTIONS.md` | touching `deploy/`, Dockerfiles, compose, edge, migrations |
 | skin (antd presets) | `docs/conventions/skin/CONVENTIONS.md` | touching `shared-ts/antd/src/skin-presets/**` or authoring a skin |
+| browser walkthrough (chrome mcp) | `docs/conventions/browser-walkthrough/CONVENTIONS.md` | any simulated walkthrough / live-proof pass / browser verification of a web client |

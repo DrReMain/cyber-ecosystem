@@ -115,6 +115,7 @@
   "error_ESPORTS_PAY_AGE_BLOCKED": "أقل من خط سن الدفع، لا يمكن الشراء حاليًا",
   "error_ESPORTS_PAY_BIRTH_MISSING": "يرجى إضافة سنة وشهر الميلاد قبل الشراء",
   "error_ESPORTS_PAY_CASHIER_DISABLED": "كاشير المحاكاة غير متاح: قناة الدفع الفعّالة ليست مزوّد المحاكاة",
+  "error_ESPORTS_PAY_WECHAT_UNBOUND": "الدفع عبر WeChat يتطلب ربط حساب WeChat أولاً",
   "error_INFRA_ERROR_PAYMENT_INVALID_ARGUMENT": "طلب الدفع غير صالح، حاول مرة أخرى لاحقًا",
   "error_INFRA_ERROR_PAYMENT_NOT_FOUND": "لم يعثر قناة الدفع على هذه المعاملة، حاول مرة أخرى لاحقًا",
   "error_INFRA_ERROR_PAYMENT_DUPLICATE": "طلب دفع مكرر، حاول مرة أخرى لاحقًا",
@@ -146,5 +147,6 @@
   "error_ESPORTS_FEEDBACK_NOT_OWNED": "يمكنك عرض ملاحظاتك فقط",
   "error_ESPORTS_FEEDBACK_CLOSED": "تم إغلاق هذه الملاحظات؛ أرسل ملاحظات جديدة لأي أسئلة أخرى",
   "error_ESPORTS_ANNOUNCEMENT_NOT_FOUND": "لم يتم العثور على الإعلان",
-  "error_ESPORTS_ANNOUNCEMENT_STATE_CONFLICT": "الحالة الحالية للإعلان لا تسمح بهذا الإجراء"
+  "error_ESPORTS_ANNOUNCEMENT_STATE_CONFLICT": "الحالة الحالية للإعلان لا تسمح بهذا الإجراء",
+  "error_ESPORTS_ORDER_ALREADY_REFUNDED": "تم استرداد قيمة هذا الطلب بالكامل بالفعل"
 }

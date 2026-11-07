@@ -284,6 +284,14 @@ func (uc *MessageAdminUC) ListAnnouncements(ctx context.Context, kind, status *s
 	return uc.messageRP.ListAnnouncements(ctx, kind, status)
 }
 
+func (uc *MessageAdminUC) ListUserMessages(ctx context.Context, userID string, page *commonv1.PageRequest) (*ListMessagesOut, error) {
+	_, ok := security.SubjectFromCtx(ctx)
+	if !ok {
+		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("letterbox listing requires an admin session"))
+	}
+	return uc.messageRP.ListUserMessages(ctx, &ListMessagesIn{PageRequest: helper.EnsurePageRequest(page), UserID: userID})
+}
+
 // Private -------------------------------------------------------------------------------------------------------------
 
 func (uc *MessageAdminUC) requireDraft(ctx context.Context, id string) (*Announcement, error) {

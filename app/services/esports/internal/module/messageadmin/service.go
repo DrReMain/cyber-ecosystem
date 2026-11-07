@@ -97,6 +97,18 @@ func (s *MessageAdminService) ListAnnouncements(ctx context.Context, in *esports
 	}, nil
 }
 
+func (s *MessageAdminService) ListUserMessages(ctx context.Context, in *esportspb.ListUserMessagesRequest) (*esportspb.ListUserMessagesResponse, error) {
+	out, err := s.messageAdminUC.ListUserMessages(ctx, in.GetUserId(), in.GetPage())
+	if err != nil {
+		return nil, err
+	}
+	return &esportspb.ListUserMessagesResponse{
+		Page:        out.PageResponse,
+		Messages:    utils.SliceMap(out.Rows, message.MessagePB),
+		UnreadCount: utils.ConvNum[int32](out.Unread),
+	}, nil
+}
+
 // Private -------------------------------------------------------------------------------------------------------------
 
 func announcementPB(a *message.Announcement) *esportspb.Announcement {

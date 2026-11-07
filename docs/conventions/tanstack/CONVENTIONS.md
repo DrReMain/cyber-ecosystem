@@ -460,7 +460,8 @@ every package with a `test` target runs `vitest run`; end-to-end tests run in
 `playwright.config.ts` booting the dev server on a dedicated port via
 `webServer` — an explicit `<client>:e2e` target outside the regular chain
 (the web counterpart of ENT_E2E). A fresh environment installs browser
-binaries once (`pnpm exec playwright install`); artifacts (`test-results/`,
+binaries once — a manual user-plane step (`playwright install`); artifacts
+(`test-results/`,
 `playwright-report/`) stay out of git and out of biome. The config and the
 spec files belong in the client's tsconfig include — a file outside the
 include is outside the type gate, and the editor's inferred-project fallback

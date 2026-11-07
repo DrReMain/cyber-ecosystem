@@ -59,16 +59,16 @@
 
 | 处置桶 | 页 | 计数 | 归属 |
 |---|---|---|---|
-| ✅/◐ 已建 | 01-user-list ✅、02-user-detail ◐(assessments+membership 两 Tab 随 M2-4 首刀建成 197fdbc6,11-01 走查+双轴审查毕;余 trace(P22)/messages(MSG-1) 占位)、01-member-list ✅、02-member-detail ✅(两会员页随 M2-1 建成,10-31 走查毕)、activation-code ✅(批次码表/停用/导出/码值搜索随 M2-3 建成,11-01 走查毕)、game-config ◐(引擎参数+题库只读抽屉在;难度三档权重/上下架缺)、agreement-manage ✅、agreement-consent ✅(两协议页随 E9 首刀建成 067a89ce,11-01 走查毕;版本表/查看全文真法务文/建即当前/切换/删除拒当前版/同意记录预填+昵称搜索+CSV 导出;渠道列递延 P23,手机号搜索递延 G-306 族)、compliance-config ✅(随 E9 余刀建成 32f5cf0a,11-01 走查毕;出生采集开关/付费年龄线敏感二次确认/两条付费文案覆盖+默认折面)、sku-manage ✅、04-order-record ✅、05-order-detail ✅(三面随 M2-2 建成 9860eb34,10-31 走查+双轴审查毕;pricing 区 skus+orders 两族)、activation-code-detail ✅(批次页 $batchNo 逐码明细随 M2-3 建成 45c276d4,11-01 走查毕) | **13** | 余面→M2-4/余组;另 report-policies 页为新建面(A4 开关承载,不在 41 页内) |
+| ✅/◐ 已建 | 01-user-list ✅、02-user-detail ◐(assessments+membership 两 Tab 随 M2-4 首刀建成 197fdbc6,11-01 走查+双轴审查毕;余 trace(P22)/messages(已随 MSG-1 admin 腿闭合) 占位)、01-member-list ✅、02-member-detail ✅(两会员页随 M2-1 建成,10-31 走查毕)、activation-code ✅(批次码表/停用/导出/码值搜索随 M2-3 建成,11-01 走查毕)、game-config ◐(引擎参数+题库只读抽屉在;难度三档权重/上下架缺)、agreement-manage ✅、agreement-consent ✅(两协议页随 E9 首刀建成 067a89ce,11-01 走查毕;版本表/查看全文真法务文/建即当前/切换/删除拒当前版/同意记录预填+昵称搜索+CSV 导出;渠道列递延 P23,手机号搜索递延 G-306 族)、compliance-config ✅(随 E9 余刀建成 32f5cf0a,11-01 走查毕;出生采集开关/付费年龄线敏感二次确认/两条付费文案覆盖+默认折面)、sku-manage ✅、04-order-record ✅、05-order-detail ✅(三面随 M2-2 建成 9860eb34,10-31 走查+双轴审查毕;pricing 区 skus+orders 两族)、activation-code-detail ✅(批次页 $batchNo 逐码明细随 M2-3 建成 45c276d4,11-01 走查毕)、feedback-manage ✅、07-feedback-detail ✅、announcement ✅(三页随 MSG-1 admin 腿建成 11-05,V10 全环 live 走查毕:反馈队列/快捷回复+详情对话/公告两步发布;窄化 R-09..R-13 在案) | **16** | 余面→M2-4/余组;另 report-policies 页为新建面(A4 开关承载,不在 41 页内) |
 | 📐 底座 IAM 承接(**D-AY**:直接用骨架,不为 esports 再造/不改名) | audit-log、06-audit-detail、admin-user-manage、role-manage、permission-manage、menu-manage | 6 | system 既有面;操作级敏感清单对照(A8)留待 |
 | 🌫 原型非本期 | attribution、channel-manage、landing-material、report-config | 4 | _nav.js 灰标(P5/梯①) |
 | 🎯 M2 核心组 | — | **0** | 全员升已建桶(11-02 对账):member 两页随 M2-1(347a9ce7)、sku-manage/04-order-record/05-order-detail 随 M2-2(9860eb34)、activation-code+activation-code-detail 随 M2-3(45c276d4);到期提醒/批量续费/每日扫描按 M2-1 裁面不含 |
 | 📋 E9 增量(D-AS⑥) | — | 0 | compliance-config 已随 E9 余刀建成升已建桶(11-01);执法消费面(注册年龄带/付费墙)随 PAY3/注册面 |
-| 📋 D-AS 消息组 | feedback-manage、07-feedback-detail、announcement | 3 | →MSG-1;**契约+domain 已落(11-04 W3 拉前:四契约+四表+四模块,MSG_E2E 门控全环绿),三页随 W6**;契约对原型显式窄化(两型两范围/无触达已读统计/contact 128vs40)随 W6 ljr 裁;P21 已裁(D-BC 11-02:A1 服务端行级) |
+| 📋 D-AS 消息组 | — | 0 | 三页随 MSG-1 建成升已建桶(11-05,V10 闭环毕);窄化复核=prd 偏离接洽单 PM-13..20(11-07 并档);P21 已裁(D-BC 11-02:A1 服务端行级) |
 | 📋 M2 余组(梯①) | dashboard、user-portrait、09-user-import、question-bank、question-detail、test-record、08-test-record-detail、test-type、game-category、payment-channel、rating-manage、system-config、app-version | 13 | 各项开工前先过对应 P 票:P20(dashboard/portrait 数据源)、P2(评级)、P24(归类)、P25(渠道面);app-version 已裁 B 建(D-BC 11-02),system-config=裁不建候选(config 珍稀原则) |
 | 📋 M3/P4 | tob-tenant-list、tob-tenant-detail | 2 | 窗外 buffer;P14 已解散(11-02 D-BA),随 M3/P4 |
 
-**计数:41 = 已建 13 + 底座 6 + 非本期 4 + M2 核心 0 + E9 增量 0 + 消息组 3 + 余组 13 + M3 2。**(11-02 对账吸收 M2-2/M2-3 四面;已建率 13/41≈32%;窗内可达成面 =已建 13+底座 6+消息组 3=22 页,余组 13+M3 2=15 页窗外,非本期 4 不计。)
+**计数:41 = 已建 16 + 底座 6 + 非本期 4 + M2 核心 0 + E9 增量 0 + 消息组 0 + 余组 13 + M3 2。**(11-05 对账吸收 MSG-1 三页;已建率 16/41≈39%;窗内可达成面 =已建 16+底座 6=22 页,余组 13+M3 2=15 页窗外,非本期 4 不计。)
 
 ## §三 旧码功能 × 处置(不在 85 页内者;出处=旧码穷举 2026-10-30)
 
@@ -89,14 +89,27 @@
 | 题库三表 CRUD 23 端点(攻防/角色/克制) | 📋 余组 | E9 只读抽屉已建;CRUD/Excel 随余组(10-28 已注) |
 | 双 Java 服务共享库/Flyway/Snowflake/JWT 细节 | 🗑 不迁 | clean-room 律(README §0.1) |
 
-## §四 现状计数(2026-11-05 二盘点;对账基准)
+## §四 现状计数(2026-11-07 重构役三机核;对账基准)
 
-- 新实现:esports=21 service/83 RPC/23 表/2 ticker(支付收敛 1min+对账 24h;MSG 四表+mockcashier 面已入);ctr=47 路由(+4=messages 树 2+feedback 树 2,MSG-1 ctr 腿)+13 引擎(前后端一一对应)+0 业务 store;admin=esports 面 14 页(13 计账+report-policies 账外)。
-- 对照:旧 191 端点(admin 133)/36 表/ctr 64 视图/admin 23 视图。新版**反超项**=支付后端(旧仅枚举)/匹配引擎(旧纯设计)/全量服务端判分(旧 4 款作弊面)/账号合并(旧无)/报告快照冻结(旧无)/消息反馈线程域(旧单发回复)。
-- 投入分布(esports/main 提交数):10-09 起全窗 ctr 140 : 后端 99 : admin 41;**10-30 校正后(至 11-05)ctr 42 : 后端 25 : admin 14**——admin 占比升至约 ctr 的 1/3,CP2/CP3 增 admin 构成项已见效。
+- 新实现(实测):esports=**21 service/85 RPC/23 ent 表**/23 模块(authz、compliance 两模块无独立 service)/2 ticker(支付收敛 1min+对账 24h)+13 游戏引擎(前后端一一对应);ctr=**50 路由文件**(1 root+9 布局壳+40 叶页)+13 feature 模块+0 业务 store;admin=**52 路由文件**(dashboard 49+顶层 3),esports 面 **17**(16 计账+report-policies 账外)。
+- 旧侧真源(11-07 机核):esport-server **58**+esport-admin **133**=**191** 方法级端点(注解计数);生产转储 **37 表**(含 flyway_schema_history)=**36 业务表**;ctr 原型语料 **192 html**(prototype 44+block4 45+block3 80+future 22+导览页 1;机器锚 tsv 与磁盘零差集);admin 原型 **41**。
+- 计数纪律:本节随切片收口**由脚本再生**(防快照漂移;11-05 版曾「14 面/83 RPC」两处漂移,役三修正)。
+- 对照:旧 191 端点/36 表/旧前端 ctr-game 65 页面组件·admin-game 26 页面组件·router 25 path(「64/23 视图」旧口径废弃)。新版**反超项**=支付后端/匹配引擎/全量服务端判分/账号合并/报告快照冻结/消息反馈线程域。
+- 投入分布(esports/main 提交数):10-09 起全窗 ctr 140 : 后端 99 : admin 41;10-30 校正后 ctr 42 : 后端 25 : admin 14。
 
 ## §五 对账环
 
 - 本档为唯一处置真值:切片收口时对应行 ◐/❌→✅ 并注 hash;P 票裁毕即改 ⏸→📋/🗑。
-- 与 gap-ledger 分工:本档=「建没建/归谁」;gap-ledger=「建得像不像」(逐字/态比对,六批=产品口径级偏离登记)。两档互不吸收。
-- 对账节拍:2026-11-05 全档校准(PAY3 四片+Q 线收口吸收;§四 盘点刷新;原型仓 manage/design-systems git 零演进实证=10-30 四路穷举基线仍有效)。
+- 分工:本档=「建没建/归谁」;**用例设计与覆盖映射=verify/integration-matrix.md(用例层)+verify/coverage-map.md(需求/代码/用例三方对照与缺口)**;已裁偏离=R-01..R-13 系(prd.md 待裁区)。历史取证档(gap-ledger/q-line/render-coverage 两份/calibration-log/pm-review-items)已于 2026-11-07 役三退役,**全文=git 391ccc87**;本档及矩阵中残留的历史指针一律按此读。
+- 对账节拍:切片收口改行+脚本再生 §四;2026-11-07 役三=全档对 demand 分母与落地代码重核(85 页行级账目逐行对质成立,§四 计数修正)+八域覆盖核验落 coverage-map。原型仓 manage/design-systems 零演进=10-30 基线仍有效。
+
+## §六 活锚清单(未建页开工时消费;2026-11-07 自 coverage.md 迁入;其余锚随对应切片开工现读原型/PRD)
+
+| 锚 | 内容 | 归属 |
+|---|---|---|
+| test-records 三态 | block4 未完成/完成锁定/历史最佳三态设计(?t=) | M2 余组记录读面 |
+| share-invite 两态 | 免费层 5 维卡+动态三档文案+未成年代称+保存图片 | MSG-2(P23) |
+| E4 三配置模块 | 学科优势匹配/职业发展潜能/提升计划(契约无字段,后台可配置+空态不造假) | P4(ljr)/M3 |
+| scheme-b 三页 | 渠道版 6 能力直测+渠道报告 | M3/P4 窗外 |
+| admin 余组 13 页 | 逐页开工时以 _nav.js+对应 PRD 节为锚(D-AQ admin 面流程) | M2 余组梯① |
+| message 族 admin 侧 | 已建(11-05);窄化复核=prd 偏离接洽单 PM-13..20 | W6 ljr |

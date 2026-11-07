@@ -18,14 +18,22 @@ for that seam.
 
 ## Run
 
-```sh
-export APP_MIG_SOURCE_DSN='user:pass@tcp(host:3306)/legacy?charset=utf8mb4'   # old MySQL, read-only
-export APP_MIG_SYSTEM_DSN='postgres://user:pass@host:5432/system?sslmode=disable'
-export APP_MIG_ESPORTS_DSN='postgres://user:pass@host:5432/esports?sslmode=disable'
+DSNs live in env files under `~/.xgwl-secrets/esports-mig/` (deploy-plane
+facts — never inline in commands, never in the repo): `source.env` holds
+`APP_MIG_SOURCE_DSN` (old MySQL); the write phases additionally read
+`APP_MIG_SYSTEM_DSN` / `APP_MIG_ESPORTS_DSN` from the same file. The `run`
+nx target is the execution plane — direct `go` shell calls are forbidden in
+this repo — and it sources the env file itself:
 
-go run . --phase all --dry-run   # census only, no target credentials needed
-go run . --phase all             # guard + identity + entitlement + behavior (later cuts add phases)
+```sh
+./nx run esports-migrator:run -- --phase all --dry-run   # census only, no target credentials needed
+./nx run esports-migrator:run -- --phase all             # guard + identity + entitlement + behavior (later cuts add phases)
 ```
+
+> TODO(mig1 temporary instrumentation, teardown listed): `project.json` is a
+> rehearsal-run-up wrapper only — the module stays deliberately outside the
+> build graph (user ruling 2026-11-02). Tear it down with the directory's
+> post-cutover single-commit removal; it must not outlive the tool.
 
 Phases: `guard` (halt on any school-domain rows), `identity`, `entitlement`
 (legacy unlock flags, activation records, and unredeemed codes → grant
@@ -42,8 +50,30 @@ calibration-curve window (both filed as P26/P26.1). Every phase is
 idempotent — re-running after a failure resumes where the durable markers
 left off.
 
+## Rehearsal scripts
+
+`rehearsal/` holds the rehearsal environment pieces (cutover checklist
+items 2 and 7; the rollback leg was proven in a dry rehearsal on
+2026-11-06 — snapshot, synthetic, restore, counts diff all green):
+
+- `snapshot-source.sh` / `restore-source.sh` — dump and replay the lab
+  MySQL copy. The dump is self-contained (`--add-drop-database`), and the
+  restore re-counts every table and diffs against the snapshot's counts
+  sidecar, aborting on any mismatch — a partial restore is never mistaken
+  for a rollback point. Snapshots live in
+  `~/Desktop/lab/esports/mig-snapshots/` (production data, unsanitized,
+  never inside the repo).
+- `synthetic.sql` / `revert-synthetic.sql` — production-shaped rows the
+  copy has zero or thin real coverage of (HarmonyOS NEXT device, IPv6
+  registrant, CGNAT registrant, combined), with a demo MD5 password so the
+  walkthrough exercises verify-then-rehash on a migrated account. Shapes
+  the copy already has for real (soft-deleted users, register_ip-less old
+  users) are not manufactured. Idempotent (delete-then-insert over fixed
+  id bands below the snowflake segment, double-keyed so a revert can never
+  touch a real row).
+
 ## Checks
 
 ```sh
-go build ./... && go test -race -count=1 ./... && go tool golangci-lint run ./...
+./nx run esports-migrator:check
 ```

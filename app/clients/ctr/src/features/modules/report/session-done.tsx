@@ -26,7 +26,9 @@ interface WireAbility {
 export function SessionDonePage() {
   const { sessionId } = useParams({ from: "/report/session/$sessionId" });
   const navigate = useNavigate();
-  const reportQuery = useConnectQuery(getSessionReport, { sessionId });
+  // The retry face below owns a failed report read; the global throw
+  // default would hand it to the route boundary instead.
+  const reportQuery = useConnectQuery(getSessionReport, { sessionId }, { throwOnError: false });
 
   if (reportQuery.isPending) {
     return (
@@ -67,8 +69,13 @@ export function SessionDonePage() {
   const total = data.totalDimensions ?? 0;
 
   // The grid rows ride the lineup's own order; the gold card's winner is
-  // the best score among them.
-  const abilities = (data.abilities ?? []) as WireAbility[];
+  // the best score among them. A row exists only for abilities this
+  // lineup actually scored, so an omitted best (proto3 implicit presence
+  // drops the zero) narrows to the honest zero — never NaN.
+  const abilities = ((data.abilities ?? []) as WireAbility[]).map((a) => ({
+    ...a,
+    bestScore: a.bestScore ?? 0,
+  }));
   const top = abilities.reduce<WireAbility | undefined>(
     (best, a) => (best === undefined || a.bestScore > best.bestScore ? a : best),
     undefined,

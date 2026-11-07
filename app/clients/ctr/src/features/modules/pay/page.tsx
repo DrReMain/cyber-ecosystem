@@ -35,6 +35,7 @@ import { PayFilingFooter } from "./ui/filing-footer";
 import { MinorCard } from "./ui/minor-card";
 import { OptionCard } from "./ui/option-card";
 import { PayWayCard } from "./ui/pay-way-card";
+import { QrTile } from "./ui/qr-tile";
 import { StateBanner } from "./ui/state-banner";
 
 // 态②'s two-orb art direction — the membership tint up top, the cyan
@@ -194,13 +195,28 @@ interface CreateInput {
   returnUrl?: string;
 }
 
+// The H5 leg's post-payment landing: the absolute receipt URL carrying
+// the face the purchase started under (and the wall's own from
+// passthrough). The order number cannot be known here — it is minted by
+// the same create call this rides into — so the server stitches it onto
+// this URL before the channel sees it, and the cashier's redirect lands
+// the payer on a receipt reading its own row, never back on a wall that
+// lost the order context.
+function h5ReturnUrl(face: MemberFace, from: string | undefined): string {
+  const params = new URLSearchParams({ face });
+  if (from !== undefined) {
+    params.set("from", from);
+  }
+  return `${window.location.origin}/pay/result?${params.toString()}`;
+}
+
 // Create and continue: one purchase attempt end to end. The refusal
 // toasts ride the mutation cache; nothing here swallows a state change.
 async function createAndContinue(
   kind: PurchaseKind,
   face: PurchaseFace,
   memberFace: MemberFace,
-  ref: string | undefined,
+  search: PaySearch,
   mutate: (input: CreateInput) => Promise<CreateResult>,
   onMockSheet: (state: SheetState) => void,
   onInvokePaid: (orderNo: string) => void,
@@ -214,8 +230,8 @@ async function createAndContinue(
     const res = await mutate({
       skuCode: face.row.skuCode ?? "",
       channel,
-      ...(kind === "trial" && ref !== undefined ? { scopeRef: ref } : {}),
-      ...(channel === "wechat_h5" ? { returnUrl: window.location.href } : {}),
+      ...(kind === "trial" && search.ref !== undefined ? { scopeRef: search.ref } : {}),
+      ...(channel === "wechat_h5" ? { returnUrl: h5ReturnUrl(memberFace, search.from) } : {}),
     });
     continueWithCredential(res, kind, memberFace, face.yuan, onMockSheet, onInvokePaid, onQr);
   } catch {
@@ -264,20 +280,20 @@ function RenewalFace({
       <div className="rounded-card shadow-card border border-[rgba(168,85,247,0.55)] bg-[linear-gradient(135deg,rgba(168,85,247,0.1),rgba(17,24,39,0.92))] p-4 backdrop-blur-md">
         <div className="flex items-center justify-between">
           <span className="text-ink text-[15px] font-extrabold">{m.pay_opt_member_name()}</span>
-          <span className="text-[22px] font-black text-[#FDE047] tabular-nums">¥{price}</span>
+          <span className="text-grade-s text-[22px] font-black tabular-nums">¥{price}</span>
         </div>
         <p className="text-ink-muted mt-2 text-[11.5px] leading-[1.7]">{m.pay_renew_desc()}</p>
       </div>
       <PayWayCard title={m.pay_pay_way()} way={m.pay_pay_wechat()} />
       <Button
-        className="bg-cta-success shadow-cta-success w-full rounded-[12px] py-[14px] text-[15px] font-bold text-white active:opacity-80 disabled:opacity-50"
+        className="bg-cta-success shadow-cta-success w-full rounded-[12px] py-3.5 text-[15px] font-bold text-white active:opacity-80 disabled:opacity-50"
         isDisabled={disabled}
         onPress={onPay}
       >
         {m.pay_act_renew({ price })}
       </Button>
       <button
-        className="tap-zone flex w-full items-center justify-center gap-0.5 text-[11px] text-[#93C5FD] active:opacity-60"
+        className="tap-zone text-accent-info flex w-full items-center justify-center gap-0.5 text-[11px] active:opacity-60"
         onClick={onDetail}
         type="button"
       >
@@ -334,7 +350,7 @@ function DualFace({
         </div>
       </div>
       <Button
-        className="bg-cta-primary shadow-cta-primary w-full rounded-[12px] py-[14px] text-[15px] font-bold text-white active:opacity-80 disabled:opacity-50"
+        className="bg-cta-primary shadow-cta-primary w-full rounded-[12px] py-3.5 text-[15px] font-bold text-white active:opacity-80 disabled:opacity-50"
         isDisabled={memberDisabled}
         onPress={() => onPay("member")}
       >
@@ -342,7 +358,7 @@ function DualFace({
       </Button>
       {showTrial ? (
         <Button
-          className="bg-surface-input text-ink-secondary w-full rounded-[12px] border-[1.5px] border-[#4B5563] py-[14px] text-[15px] font-medium active:opacity-80 disabled:opacity-50"
+          className="bg-surface-input text-ink-secondary border-ambient-slate w-full rounded-[12px] border-[1.5px] py-3.5 text-[15px] font-medium active:opacity-80 disabled:opacity-50"
           isDisabled={trialDisabled}
           onPress={() => onPay("trial")}
         >
@@ -441,7 +457,7 @@ function usePayFlow(faces: ReturnType<typeof purchaseFaces>, search: PaySearch) 
       kind,
       kind === "member" ? faces.member : faces.trial,
       face,
-      search.ref,
+      search,
       createOrderMut.mutateAsync,
       setSheet,
       (orderNo) => setPolling({ kind, orderNo, face }),
@@ -664,9 +680,10 @@ export function PayConfirmPage() {
       {flow.qr !== null ? (
         <BottomConfirmSheet
           actions={flow.qrActions}
-          body={`${m.pay_qr_body()} ${flow.qr.value}`}
+          body={m.pay_qr_body()}
           onDismiss={flow.closeQr}
           title={m.pay_qr_title()}
+          visual={<QrTile value={flow.qr.value} />}
         />
       ) : null}
     </AmbientLayout>

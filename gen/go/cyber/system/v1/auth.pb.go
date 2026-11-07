@@ -1666,6 +1666,90 @@ func (x *SecurityCredential) GetMaskedIdentifier() string {
 	return ""
 }
 
+type GetWechatOpenIdRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetWechatOpenIdRequest) Reset() {
+	*x = GetWechatOpenIdRequest{}
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetWechatOpenIdRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetWechatOpenIdRequest) ProtoMessage() {}
+
+func (x *GetWechatOpenIdRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetWechatOpenIdRequest.ProtoReflect.Descriptor instead.
+func (*GetWechatOpenIdRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{27}
+}
+
+// The caller's wechat openid, raw — the one credential value that crosses
+// unmasked: the JSAPI unified order takes it as a payer fact, and only the
+// consuming service's server-side enrichment reads this face (display
+// surfaces keep the masked form). Null = the caller never bound wechat.
+type GetWechatOpenIdResponse struct {
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Openid        *wrapperspb.StringValue `protobuf:"bytes,1,opt,name=openid,proto3" json:"openid,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetWechatOpenIdResponse) Reset() {
+	*x = GetWechatOpenIdResponse{}
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetWechatOpenIdResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetWechatOpenIdResponse) ProtoMessage() {}
+
+func (x *GetWechatOpenIdResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetWechatOpenIdResponse.ProtoReflect.Descriptor instead.
+func (*GetWechatOpenIdResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *GetWechatOpenIdResponse) GetOpenid() *wrapperspb.StringValue {
+	if x != nil {
+		return x.Openid
+	}
+	return nil
+}
+
 type LogoutRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -1674,7 +1758,7 @@ type LogoutRequest struct {
 
 func (x *LogoutRequest) Reset() {
 	*x = LogoutRequest{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[27]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1686,7 +1770,7 @@ func (x *LogoutRequest) String() string {
 func (*LogoutRequest) ProtoMessage() {}
 
 func (x *LogoutRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[27]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1699,7 +1783,7 @@ func (x *LogoutRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogoutRequest.ProtoReflect.Descriptor instead.
 func (*LogoutRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{27}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{29}
 }
 
 type LogoutResponse struct {
@@ -1710,7 +1794,7 @@ type LogoutResponse struct {
 
 func (x *LogoutResponse) Reset() {
 	*x = LogoutResponse{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[28]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1722,7 +1806,7 @@ func (x *LogoutResponse) String() string {
 func (*LogoutResponse) ProtoMessage() {}
 
 func (x *LogoutResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[28]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1735,7 +1819,7 @@ func (x *LogoutResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogoutResponse.ProtoReflect.Descriptor instead.
 func (*LogoutResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{28}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{30}
 }
 
 // getCurrentUser
@@ -1747,7 +1831,7 @@ type GetCurrentUserRequest struct {
 
 func (x *GetCurrentUserRequest) Reset() {
 	*x = GetCurrentUserRequest{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[29]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1759,7 +1843,7 @@ func (x *GetCurrentUserRequest) String() string {
 func (*GetCurrentUserRequest) ProtoMessage() {}
 
 func (x *GetCurrentUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[29]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1772,7 +1856,7 @@ func (x *GetCurrentUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCurrentUserRequest.ProtoReflect.Descriptor instead.
 func (*GetCurrentUserRequest) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{29}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{31}
 }
 
 type GetCurrentUserResponse struct {
@@ -1786,7 +1870,7 @@ type GetCurrentUserResponse struct {
 
 func (x *GetCurrentUserResponse) Reset() {
 	*x = GetCurrentUserResponse{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[30]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1798,7 +1882,7 @@ func (x *GetCurrentUserResponse) String() string {
 func (*GetCurrentUserResponse) ProtoMessage() {}
 
 func (x *GetCurrentUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[30]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1811,7 +1895,7 @@ func (x *GetCurrentUserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetCurrentUserResponse.ProtoReflect.Descriptor instead.
 func (*GetCurrentUserResponse) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{30}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *GetCurrentUserResponse) GetUser() *User {
@@ -1847,7 +1931,7 @@ type Membership struct {
 
 func (x *Membership) Reset() {
 	*x = Membership{}
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[31]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1859,7 +1943,7 @@ func (x *Membership) String() string {
 func (*Membership) ProtoMessage() {}
 
 func (x *Membership) ProtoReflect() protoreflect.Message {
-	mi := &file_cyber_system_v1_auth_proto_msgTypes[31]
+	mi := &file_cyber_system_v1_auth_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1872,7 +1956,7 @@ func (x *Membership) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Membership.ProtoReflect.Descriptor instead.
 func (*Membership) Descriptor() ([]byte, []int) {
-	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{31}
+	return file_cyber_system_v1_auth_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *Membership) GetTenant() string {
@@ -2029,7 +2113,10 @@ const file_cyber_system_v1_auth_proto_rawDesc = "" +
 	"\vcredentials\x18\x02 \x03(\v2#.cyber.system.v1.SecurityCredentialR\vcredentials\"U\n" +
 	"\x12SecurityCredential\x12\x12\n" +
 	"\x04kind\x18\x01 \x01(\tR\x04kind\x12+\n" +
-	"\x11masked_identifier\x18\x02 \x01(\tR\x10maskedIdentifier\"\x0f\n" +
+	"\x11masked_identifier\x18\x02 \x01(\tR\x10maskedIdentifier\"\x18\n" +
+	"\x16GetWechatOpenIdRequest\"O\n" +
+	"\x17GetWechatOpenIdResponse\x124\n" +
+	"\x06openid\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x06openid\"\x0f\n" +
 	"\rLogoutRequest\"\x10\n" +
 	"\x0eLogoutResponse\"\x17\n" +
 	"\x15GetCurrentUserRequest\"\xa4\x01\n" +
@@ -2042,7 +2129,7 @@ const file_cyber_system_v1_auth_proto_rawDesc = "" +
 	"\x06tenant\x18\x01 \x01(\tR\x06tenant\x12\x1e\n" +
 	"\n" +
 	"population\x18\x02 \x01(\tR\n" +
-	"population2\xbf\x14\n" +
+	"population2\x9d\x16\n" +
 	"\vAuthService\x12~\n" +
 	"\x05Login\x12\x1d.cyber.system.v1.LoginRequest\x1a\x1e.cyber.system.v1.LoginResponse\"6\x88\xf1\x04\x01\x8a\xd3\x0e\n" +
 	"\n" +
@@ -2066,7 +2153,9 @@ const file_cyber_system_v1_auth_proto_rawDesc = "" +
 	"\rResetPassword\x12%.cyber.system.v1.ResetPasswordRequest\x1a&.cyber.system.v1.ResetPasswordResponse\"l\x88\xf1\x04\x01\x8a\xd3\x0e7\n" +
 	"3重置登录密码：短信码证明手机号归属\x10\x02\x82\xd3\xe4\x93\x02':\x01*\"\"/api/v1/system/auth/reset-password\x12\xb5\x01\n" +
 	"\x11GetSecurityStatus\x12).cyber.system.v1.GetSecurityStatusRequest\x1a*.cyber.system.v1.GetSecurityStatusResponse\"I\x88\xf1\x04\x04\x8a\xd3\x0e\x1f\n" +
-	"\x1b获取当前账号绑定面\x10\x01\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v1/system/me/security\x12\x82\x01\n" +
+	"\x1b获取当前账号绑定面\x10\x01\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v1/system/me/security\x12\xdb\x01\n" +
+	"\x0fGetWechatOpenId\x12'.cyber.system.v1.GetWechatOpenIdRequest\x1a(.cyber.system.v1.GetWechatOpenIdResponse\"u\x88\xf1\x04\x04\x8a\xd3\x0eF\n" +
+	"B自读微信支付身份（openid），服务端下单富集专用\x10\x01\x82\xd3\xe4\x93\x02!\x12\x1f/api/v1/system/me/wechat-openid\x12\x82\x01\n" +
 	"\x06Logout\x12\x1e.cyber.system.v1.LogoutRequest\x1a\x1f.cyber.system.v1.LogoutResponse\"7\x88\xf1\x04\x04\x8a\xd3\x0e\n" +
 	"\n" +
 	"\x06登出\x10\x02\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/api/v1/system/auth/logout\x12\xa0\x01\n" +
@@ -2085,7 +2174,7 @@ func file_cyber_system_v1_auth_proto_rawDescGZIP() []byte {
 	return file_cyber_system_v1_auth_proto_rawDescData
 }
 
-var file_cyber_system_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 32)
+var file_cyber_system_v1_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 34)
 var file_cyber_system_v1_auth_proto_goTypes = []any{
 	(*LoginRequest)(nil),                // 0: cyber.system.v1.LoginRequest
 	(*LoginResponse)(nil),               // 1: cyber.system.v1.LoginResponse
@@ -2114,24 +2203,26 @@ var file_cyber_system_v1_auth_proto_goTypes = []any{
 	(*GetSecurityStatusRequest)(nil),    // 24: cyber.system.v1.GetSecurityStatusRequest
 	(*GetSecurityStatusResponse)(nil),   // 25: cyber.system.v1.GetSecurityStatusResponse
 	(*SecurityCredential)(nil),          // 26: cyber.system.v1.SecurityCredential
-	(*LogoutRequest)(nil),               // 27: cyber.system.v1.LogoutRequest
-	(*LogoutResponse)(nil),              // 28: cyber.system.v1.LogoutResponse
-	(*GetCurrentUserRequest)(nil),       // 29: cyber.system.v1.GetCurrentUserRequest
-	(*GetCurrentUserResponse)(nil),      // 30: cyber.system.v1.GetCurrentUserResponse
-	(*Membership)(nil),                  // 31: cyber.system.v1.Membership
-	(*timestamppb.Timestamp)(nil),       // 32: google.protobuf.Timestamp
-	(*wrapperspb.StringValue)(nil),      // 33: google.protobuf.StringValue
-	(*User)(nil),                        // 34: cyber.system.v1.User
+	(*GetWechatOpenIdRequest)(nil),      // 27: cyber.system.v1.GetWechatOpenIdRequest
+	(*GetWechatOpenIdResponse)(nil),     // 28: cyber.system.v1.GetWechatOpenIdResponse
+	(*LogoutRequest)(nil),               // 29: cyber.system.v1.LogoutRequest
+	(*LogoutResponse)(nil),              // 30: cyber.system.v1.LogoutResponse
+	(*GetCurrentUserRequest)(nil),       // 31: cyber.system.v1.GetCurrentUserRequest
+	(*GetCurrentUserResponse)(nil),      // 32: cyber.system.v1.GetCurrentUserResponse
+	(*Membership)(nil),                  // 33: cyber.system.v1.Membership
+	(*timestamppb.Timestamp)(nil),       // 34: google.protobuf.Timestamp
+	(*wrapperspb.StringValue)(nil),      // 35: google.protobuf.StringValue
+	(*User)(nil),                        // 36: cyber.system.v1.User
 }
 var file_cyber_system_v1_auth_proto_depIdxs = []int32{
-	32, // 0: cyber.system.v1.LoginResponse.issued_at:type_name -> google.protobuf.Timestamp
-	32, // 1: cyber.system.v1.LoginResponse.expires_at:type_name -> google.protobuf.Timestamp
+	34, // 0: cyber.system.v1.LoginResponse.issued_at:type_name -> google.protobuf.Timestamp
+	34, // 1: cyber.system.v1.LoginResponse.expires_at:type_name -> google.protobuf.Timestamp
 	3,  // 2: cyber.system.v1.LoginByIdentityRequest.wechat:type_name -> cyber.system.v1.WeChatIdentityPayload
 	4,  // 3: cyber.system.v1.LoginByIdentityRequest.sms:type_name -> cyber.system.v1.SmsIdentityPayload
-	33, // 4: cyber.system.v1.WeChatProfile.nickname:type_name -> google.protobuf.StringValue
-	33, // 5: cyber.system.v1.WeChatProfile.avatar_url:type_name -> google.protobuf.StringValue
-	32, // 6: cyber.system.v1.LoginByIdentityResponse.issued_at:type_name -> google.protobuf.Timestamp
-	32, // 7: cyber.system.v1.LoginByIdentityResponse.expires_at:type_name -> google.protobuf.Timestamp
+	35, // 4: cyber.system.v1.WeChatProfile.nickname:type_name -> google.protobuf.StringValue
+	35, // 5: cyber.system.v1.WeChatProfile.avatar_url:type_name -> google.protobuf.StringValue
+	34, // 6: cyber.system.v1.LoginByIdentityResponse.issued_at:type_name -> google.protobuf.Timestamp
+	34, // 7: cyber.system.v1.LoginByIdentityResponse.expires_at:type_name -> google.protobuf.Timestamp
 	5,  // 8: cyber.system.v1.LoginByIdentityResponse.wechat_profile:type_name -> cyber.system.v1.WeChatProfile
 	3,  // 9: cyber.system.v1.BindCredentialRequest.wechat:type_name -> cyber.system.v1.WeChatIdentityPayload
 	4,  // 10: cyber.system.v1.BindCredentialRequest.sms:type_name -> cyber.system.v1.SmsIdentityPayload
@@ -2143,39 +2234,42 @@ var file_cyber_system_v1_auth_proto_depIdxs = []int32{
 	26, // 16: cyber.system.v1.CredentialOwner.credentials:type_name -> cyber.system.v1.SecurityCredential
 	4,  // 17: cyber.system.v1.ResetPasswordRequest.sms:type_name -> cyber.system.v1.SmsIdentityPayload
 	26, // 18: cyber.system.v1.GetSecurityStatusResponse.credentials:type_name -> cyber.system.v1.SecurityCredential
-	34, // 19: cyber.system.v1.GetCurrentUserResponse.user:type_name -> cyber.system.v1.User
-	31, // 20: cyber.system.v1.GetCurrentUserResponse.memberships:type_name -> cyber.system.v1.Membership
-	0,  // 21: cyber.system.v1.AuthService.Login:input_type -> cyber.system.v1.LoginRequest
-	2,  // 22: cyber.system.v1.AuthService.LoginByIdentity:input_type -> cyber.system.v1.LoginByIdentityRequest
-	7,  // 23: cyber.system.v1.AuthService.BeginIdentityLogin:input_type -> cyber.system.v1.BeginIdentityLoginRequest
-	9,  // 24: cyber.system.v1.AuthService.SendSmsCode:input_type -> cyber.system.v1.SendSmsCodeRequest
-	11, // 25: cyber.system.v1.AuthService.BindCredential:input_type -> cyber.system.v1.BindCredentialRequest
-	13, // 26: cyber.system.v1.AuthService.BeginBindCredential:input_type -> cyber.system.v1.BeginBindCredentialRequest
-	15, // 27: cyber.system.v1.AuthService.SendBindSmsCode:input_type -> cyber.system.v1.SendBindSmsCodeRequest
-	17, // 28: cyber.system.v1.AuthService.MergeAccounts:input_type -> cyber.system.v1.MergeAccountsRequest
-	19, // 29: cyber.system.v1.AuthService.ResolveCredential:input_type -> cyber.system.v1.ResolveCredentialRequest
-	22, // 30: cyber.system.v1.AuthService.ResetPassword:input_type -> cyber.system.v1.ResetPasswordRequest
-	24, // 31: cyber.system.v1.AuthService.GetSecurityStatus:input_type -> cyber.system.v1.GetSecurityStatusRequest
-	27, // 32: cyber.system.v1.AuthService.Logout:input_type -> cyber.system.v1.LogoutRequest
-	29, // 33: cyber.system.v1.AuthService.GetCurrentUser:input_type -> cyber.system.v1.GetCurrentUserRequest
-	1,  // 34: cyber.system.v1.AuthService.Login:output_type -> cyber.system.v1.LoginResponse
-	6,  // 35: cyber.system.v1.AuthService.LoginByIdentity:output_type -> cyber.system.v1.LoginByIdentityResponse
-	8,  // 36: cyber.system.v1.AuthService.BeginIdentityLogin:output_type -> cyber.system.v1.BeginIdentityLoginResponse
-	10, // 37: cyber.system.v1.AuthService.SendSmsCode:output_type -> cyber.system.v1.SendSmsCodeResponse
-	12, // 38: cyber.system.v1.AuthService.BindCredential:output_type -> cyber.system.v1.BindCredentialResponse
-	14, // 39: cyber.system.v1.AuthService.BeginBindCredential:output_type -> cyber.system.v1.BeginBindCredentialResponse
-	16, // 40: cyber.system.v1.AuthService.SendBindSmsCode:output_type -> cyber.system.v1.SendBindSmsCodeResponse
-	18, // 41: cyber.system.v1.AuthService.MergeAccounts:output_type -> cyber.system.v1.MergeAccountsResponse
-	20, // 42: cyber.system.v1.AuthService.ResolveCredential:output_type -> cyber.system.v1.ResolveCredentialResponse
-	23, // 43: cyber.system.v1.AuthService.ResetPassword:output_type -> cyber.system.v1.ResetPasswordResponse
-	25, // 44: cyber.system.v1.AuthService.GetSecurityStatus:output_type -> cyber.system.v1.GetSecurityStatusResponse
-	28, // 45: cyber.system.v1.AuthService.Logout:output_type -> cyber.system.v1.LogoutResponse
-	30, // 46: cyber.system.v1.AuthService.GetCurrentUser:output_type -> cyber.system.v1.GetCurrentUserResponse
-	34, // [34:47] is the sub-list for method output_type
-	21, // [21:34] is the sub-list for method input_type
-	21, // [21:21] is the sub-list for extension type_name
-	21, // [21:21] is the sub-list for extension extendee
-	0,  // [0:21] is the sub-list for field type_name
+	35, // 19: cyber.system.v1.GetWechatOpenIdResponse.openid:type_name -> google.protobuf.StringValue
+	36, // 20: cyber.system.v1.GetCurrentUserResponse.user:type_name -> cyber.system.v1.User
+	33, // 21: cyber.system.v1.GetCurrentUserResponse.memberships:type_name -> cyber.system.v1.Membership
+	0,  // 22: cyber.system.v1.AuthService.Login:input_type -> cyber.system.v1.LoginRequest
+	2,  // 23: cyber.system.v1.AuthService.LoginByIdentity:input_type -> cyber.system.v1.LoginByIdentityRequest
+	7,  // 24: cyber.system.v1.AuthService.BeginIdentityLogin:input_type -> cyber.system.v1.BeginIdentityLoginRequest
+	9,  // 25: cyber.system.v1.AuthService.SendSmsCode:input_type -> cyber.system.v1.SendSmsCodeRequest
+	11, // 26: cyber.system.v1.AuthService.BindCredential:input_type -> cyber.system.v1.BindCredentialRequest
+	13, // 27: cyber.system.v1.AuthService.BeginBindCredential:input_type -> cyber.system.v1.BeginBindCredentialRequest
+	15, // 28: cyber.system.v1.AuthService.SendBindSmsCode:input_type -> cyber.system.v1.SendBindSmsCodeRequest
+	17, // 29: cyber.system.v1.AuthService.MergeAccounts:input_type -> cyber.system.v1.MergeAccountsRequest
+	19, // 30: cyber.system.v1.AuthService.ResolveCredential:input_type -> cyber.system.v1.ResolveCredentialRequest
+	22, // 31: cyber.system.v1.AuthService.ResetPassword:input_type -> cyber.system.v1.ResetPasswordRequest
+	24, // 32: cyber.system.v1.AuthService.GetSecurityStatus:input_type -> cyber.system.v1.GetSecurityStatusRequest
+	27, // 33: cyber.system.v1.AuthService.GetWechatOpenId:input_type -> cyber.system.v1.GetWechatOpenIdRequest
+	29, // 34: cyber.system.v1.AuthService.Logout:input_type -> cyber.system.v1.LogoutRequest
+	31, // 35: cyber.system.v1.AuthService.GetCurrentUser:input_type -> cyber.system.v1.GetCurrentUserRequest
+	1,  // 36: cyber.system.v1.AuthService.Login:output_type -> cyber.system.v1.LoginResponse
+	6,  // 37: cyber.system.v1.AuthService.LoginByIdentity:output_type -> cyber.system.v1.LoginByIdentityResponse
+	8,  // 38: cyber.system.v1.AuthService.BeginIdentityLogin:output_type -> cyber.system.v1.BeginIdentityLoginResponse
+	10, // 39: cyber.system.v1.AuthService.SendSmsCode:output_type -> cyber.system.v1.SendSmsCodeResponse
+	12, // 40: cyber.system.v1.AuthService.BindCredential:output_type -> cyber.system.v1.BindCredentialResponse
+	14, // 41: cyber.system.v1.AuthService.BeginBindCredential:output_type -> cyber.system.v1.BeginBindCredentialResponse
+	16, // 42: cyber.system.v1.AuthService.SendBindSmsCode:output_type -> cyber.system.v1.SendBindSmsCodeResponse
+	18, // 43: cyber.system.v1.AuthService.MergeAccounts:output_type -> cyber.system.v1.MergeAccountsResponse
+	20, // 44: cyber.system.v1.AuthService.ResolveCredential:output_type -> cyber.system.v1.ResolveCredentialResponse
+	23, // 45: cyber.system.v1.AuthService.ResetPassword:output_type -> cyber.system.v1.ResetPasswordResponse
+	25, // 46: cyber.system.v1.AuthService.GetSecurityStatus:output_type -> cyber.system.v1.GetSecurityStatusResponse
+	28, // 47: cyber.system.v1.AuthService.GetWechatOpenId:output_type -> cyber.system.v1.GetWechatOpenIdResponse
+	30, // 48: cyber.system.v1.AuthService.Logout:output_type -> cyber.system.v1.LogoutResponse
+	32, // 49: cyber.system.v1.AuthService.GetCurrentUser:output_type -> cyber.system.v1.GetCurrentUserResponse
+	36, // [36:50] is the sub-list for method output_type
+	22, // [22:36] is the sub-list for method input_type
+	22, // [22:22] is the sub-list for extension type_name
+	22, // [22:22] is the sub-list for extension extendee
+	0,  // [0:22] is the sub-list for field type_name
 }
 
 func init() { file_cyber_system_v1_auth_proto_init() }
@@ -2218,7 +2312,7 @@ func file_cyber_system_v1_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_cyber_system_v1_auth_proto_rawDesc), len(file_cyber_system_v1_auth_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   32,
+			NumMessages:   34,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

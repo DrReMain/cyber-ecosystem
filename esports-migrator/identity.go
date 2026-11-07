@@ -120,7 +120,7 @@ func buildPlans(users []*srcUser) ([]*userPlan, *census, error) {
 			c.forcedReset++
 		}
 
-		if nick := strings.TrimSpace(u.Nickname); nick != "" {
+		if nick := strings.TrimSpace(nullStr(u.Nickname)); nick != "" {
 			runes := []rune(nick)
 			if len(runes) > 12 {
 				nick = string(runes[:12])

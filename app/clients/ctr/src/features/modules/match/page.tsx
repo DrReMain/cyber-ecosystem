@@ -10,7 +10,7 @@ import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { StateScreen } from "#/features/app/states/state-screen";
 import { getGameModule } from "#/features/modules/test/registry";
 import { m } from "#/paraglide/messages";
-import { reasonGenreUndecided } from "./session";
+import { reasonGenreUndecided, reasonGenreUnknown, reasonNoDrawable } from "./session";
 import { FlowHeader } from "./ui/flow-header";
 import { abilityWord, type Genre, genreLabel, genreMeta, narrowGenre } from "./vocabulary";
 
@@ -130,13 +130,20 @@ interface SessionGateProps {
   readonly pending: boolean;
   readonly error: boolean;
   readonly undecided: boolean;
+  readonly emptyPool: boolean;
   readonly onRetry: () => void;
 }
 
-// The session read's non-faces: loading, the brief wait while the tie
-// verdict's redirect is in flight, and the retryable error face.
-function SessionGate({ pending, error, undecided, onRetry }: Readonly<SessionGateProps>) {
-  if (pending || (error && undecided)) {
+// The session read's non-faces: loading, the brief wait while a verdict's
+// redirect (tie or empty pool) is in flight, and the retryable error face.
+function SessionGate({
+  pending,
+  error,
+  undecided,
+  emptyPool,
+  onRetry,
+}: Readonly<SessionGateProps>) {
+  if (pending || (error && (undecided || emptyPool))) {
     return (
       <AmbientLayout orbs={guideOrbs}>
         <StateScreen variant="loading" />
@@ -181,6 +188,40 @@ function bestScoresOf(data: { abilities?: unknown[] } | undefined): Map<string, 
  * it), the tie verdict routes to the pick page, and the start button
  * enters the first step with retakes left.
  */
+// The verdict's landing word: tie and empty pool both route to the pick
+// page, each carrying its own why.
+function pickWhyOf(undecided: boolean, emptyPool: boolean): "tie" | "empty" | null {
+  if (undecided) return "tie";
+  if (emptyPool) return "empty";
+  return null;
+}
+
+// The session-derived readers: the done set, retakes left, the test-name
+// lookup, and the engine gate — derived once from the session read, then
+// read by every row.
+function matchReaders(
+  tests: { code?: string; name?: string }[],
+  session: { done?: string[]; retestLeft?: Record<string, number> } | null | undefined,
+) {
+  return {
+    doneCodes: session?.done ?? [],
+    leftOf: (code: string): number => session?.retestLeft?.[code] ?? 0,
+    nameOf: (code: string) => tests.find((t) => t.code === code)?.name ?? code,
+    engineReady: (code: string): boolean => getGameModule(code) !== null,
+  };
+}
+
+// The start button walks the linear path (prototype match-guide): the
+// first step not yet done — a done step re-enters only by its own row
+// tap, even with retakes left; the flow never re-parks on it.
+function isOpenStep(
+  step: { testCode?: string },
+  done: readonly string[],
+  engineReady: (code: string) => boolean,
+): boolean {
+  return step.testCode != null && !done.includes(step.testCode) && engineReady(step.testCode);
+}
+
 export function MatchPage() {
   const navigate = useNavigate();
   const search = useSearch({ from: "/match/" }) as { genre?: Genre };
@@ -188,6 +229,10 @@ export function MatchPage() {
   const sessionQuery = useConnectQuery(
     getMatchSession,
     search.genre ? { genre: search.genre } : {},
+    // The undecided and empty-pool redirects below decide on this very
+    // error — the global throw default would hand it to the route
+    // boundary before any page-level branch could act.
+    { throwOnError: false },
   );
 
   const tests = testsQuery.data?.tests ?? [];
@@ -204,33 +249,28 @@ export function MatchPage() {
     },
   );
   const bestOf = bestScoresOf(reportQuery.data);
-  const leftOf = (code: string): number => session?.retestLeft?.[code] ?? 0;
-  const nameOf = (code: string) => tests.find((t) => t.code === code)?.name ?? code;
-  const engineReady = (code: string): boolean => getGameModule(code) !== null;
-  const doneCount = (session?.done ?? []).length;
-  // The start button walks the linear path (prototype match-guide): the
-  // first step not yet done — a done step re-enters only by its own row
-  // tap, even with retakes left; the flow never re-parks on it.
-  const next = steps.find(
-    (s) =>
-      s.testCode != null && !(session?.done ?? []).includes(s.testCode) && engineReady(s.testCode),
-  );
-  const undecided =
-    (sessionQuery.error as { reason?: string } | null)?.reason === reasonGenreUndecided;
+  const { doneCodes, leftOf, nameOf, engineReady } = matchReaders(tests, session);
+  const doneCount = doneCodes.length;
+  const next = steps.find((s) => isOpenStep(s, doneCodes, engineReady));
+  const errorReason = (sessionQuery.error as { reason?: string } | null)?.reason;
+  const undecided = errorReason === reasonGenreUndecided;
+  const emptyPool = errorReason === reasonGenreUnknown || errorReason === reasonNoDrawable;
   // The session's genre is an open word on the wire; faces narrow it to
   // the two-genre vocabulary this UI speaks.
   const genre = narrowGenre(session?.genre);
   const switched = search.genre !== undefined;
 
   useEffect(() => {
-    if (undecided) {
-      void navigate({ to: "/match/pick", search: { why: "tie" } });
+    const why = pickWhyOf(undecided, emptyPool);
+    if (why !== null) {
+      void navigate({ to: "/match/pick", search: { why } });
     }
-  }, [undecided, navigate]);
+  }, [undecided, emptyPool, navigate]);
 
   if (sessionQuery.isPending || sessionQuery.isError) {
     return (
       <SessionGate
+        emptyPool={emptyPool}
         error={sessionQuery.isError}
         onRetry={() => void sessionQuery.refetch()}
         pending={sessionQuery.isPending}
@@ -260,7 +300,7 @@ export function MatchPage() {
             <div className="flex flex-col gap-[9px]">
               {steps.map((step, i) => {
                 const code = step.testCode ?? "";
-                const done = (session?.done ?? []).includes(code);
+                const done = doneCodes.includes(code);
                 return (
                   <StepRow
                     ability={step.ability ?? ""}

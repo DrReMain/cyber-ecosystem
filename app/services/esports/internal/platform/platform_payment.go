@@ -49,6 +49,12 @@ func NewPayments(c *conf.Payment) (*Payments, func(), error) {
 			// consumer's choice never changes when the platform swaps it in.
 			backend, channel = mock.New(), mock.Channels()
 		case "wechat":
+			// WeChat's servers call back into the notify base; without one
+			// the orders would carry a callback URL no one can reach, so
+			// the boot refuses rather than mint broken notify URLs.
+			if p.notifyBase == "" {
+				return nil, nil, fmt.Errorf("payment provider %q: wechat requires a non-empty notify_base_url", prov.GetName())
+			}
 			backend, err = wechat.New(toWechatConfig(prov.GetWechat()))
 			channel = wechat.Channels()
 		default:

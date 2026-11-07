@@ -115,6 +115,7 @@
   "error_ESPORTS_PAY_AGE_BLOCKED": "未满付费年龄线，暂时无法购买",
   "error_ESPORTS_PAY_BIRTH_MISSING": "请先补填出生年月再购买",
   "error_ESPORTS_PAY_CASHIER_DISABLED": "模拟收银台不可用：当前支付环境未启用 mock 通道",
+  "error_ESPORTS_PAY_WECHAT_UNBOUND": "微信支付需先完成微信授权绑定",
   "error_INFRA_ERROR_PAYMENT_INVALID_ARGUMENT": "支付请求无效，请稍后重试",
   "error_INFRA_ERROR_PAYMENT_NOT_FOUND": "支付渠道未找到该交易，请稍后重试",
   "error_INFRA_ERROR_PAYMENT_DUPLICATE": "重复的支付请求，请稍后重试",
@@ -146,5 +147,6 @@
   "error_ESPORTS_FEEDBACK_NOT_OWNED": "只能查看自己的反馈",
   "error_ESPORTS_FEEDBACK_CLOSED": "该反馈已关闭，如有新问题请重新提交",
   "error_ESPORTS_ANNOUNCEMENT_NOT_FOUND": "公告不存在",
-  "error_ESPORTS_ANNOUNCEMENT_STATE_CONFLICT": "公告当前状态不支持该操作"
+  "error_ESPORTS_ANNOUNCEMENT_STATE_CONFLICT": "公告当前状态不支持该操作",
+  "error_ESPORTS_ORDER_ALREADY_REFUNDED": "该订单已全额退款，请勿重复操作"
 }

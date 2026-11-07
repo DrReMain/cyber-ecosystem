@@ -4,6 +4,7 @@ import {
   getCareerReport,
 } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/report-ReportService_connectquery";
 import { useNavigate } from "@tanstack/react-router";
+import { Brain, ChartColumn, ChevronRight, Target, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { StateScreen } from "#/features/app/states/state-screen";
@@ -72,7 +73,7 @@ export function CenterPage() {
       // The prototype keys this card on the cognitive family's verdict —
       // the same key the next card reads — not on the tested state.
       desc: m.report_center_card_digest_desc(),
-      icon: "📊",
+      icon: ChartColumn,
       state: digest.reportAccess.allowed
         ? m.report_center_status_unlocked()
         : m.report_center_status_locked(),
@@ -87,7 +88,7 @@ export function CenterPage() {
         covered >= 6
           ? m.report_center_cognitive_full({ covered })
           : m.report_center_card_cognitive_desc({ covered }),
-      icon: "🧠",
+      icon: Brain,
       state: digest.reportAccess.allowed
         ? m.report_center_status_unlocked()
         : m.report_center_status_locked(),
@@ -96,7 +97,7 @@ export function CenterPage() {
     },
     {
       desc: m.report_center_card_career_desc(),
-      icon: "🎯",
+      icon: Target,
       state: career.access.allowed
         ? m.report_center_status_open()
         : m.report_center_status_closed(),
@@ -108,7 +109,7 @@ export function CenterPage() {
       // yet, the free base tier, or the membership-gated advanced tier —
       // the advanced verdict is the digest's own carried gate.
       desc: m.report_center_card_trend_desc(),
-      icon: "📈",
+      icon: TrendingUp,
       state:
         digest.sessionsTotal > 0
           ? digest.trendAdvancedAccess.allowed
@@ -146,8 +147,8 @@ export function CenterPage() {
             onClick={card.onOpen}
             type="button"
           >
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[rgba(37,99,235,0.16)] text-[16px]">
-              {card.icon}
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[rgba(37,99,235,0.16)]">
+              <card.icon aria-hidden className="text-[#60A5FA]" size={18} />
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
@@ -160,7 +161,7 @@ export function CenterPage() {
                 {card.desc}
               </div>
             </div>
-            <span className="text-ink-tertiary shrink-0 text-[11px]">›</span>
+            <ChevronRight aria-hidden className="text-ink-tertiary shrink-0" size={14} />
           </button>
         ))}
       </div>

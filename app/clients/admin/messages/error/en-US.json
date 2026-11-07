@@ -115,6 +115,7 @@
   "error_ESPORTS_PAY_AGE_BLOCKED": "Under the pay age line — purchasing is unavailable for now",
   "error_ESPORTS_PAY_BIRTH_MISSING": "Add your birth year and month before purchasing",
   "error_ESPORTS_PAY_CASHIER_DISABLED": "The simulated cashier is unavailable: the active payment channel is not the mock provider",
+  "error_ESPORTS_PAY_WECHAT_UNBOUND": "WeChat pay needs your WeChat authorization first — bind it, then pay",
   "error_INFRA_ERROR_PAYMENT_INVALID_ARGUMENT": "Invalid payment request; try again later",
   "error_INFRA_ERROR_PAYMENT_NOT_FOUND": "The payment channel has no such transaction; try again later",
   "error_INFRA_ERROR_PAYMENT_DUPLICATE": "Duplicate payment request; try again later",
@@ -146,5 +147,6 @@
   "error_ESPORTS_FEEDBACK_NOT_OWNED": "You can only view your own feedback",
   "error_ESPORTS_FEEDBACK_CLOSED": "This feedback is closed; submit a new one for further questions",
   "error_ESPORTS_ANNOUNCEMENT_NOT_FOUND": "Announcement not found",
-  "error_ESPORTS_ANNOUNCEMENT_STATE_CONFLICT": "The announcement's current state refuses this action"
+  "error_ESPORTS_ANNOUNCEMENT_STATE_CONFLICT": "The announcement's current state refuses this action",
+  "error_ESPORTS_ORDER_ALREADY_REFUNDED": "This order has already been refunded in full"
 }

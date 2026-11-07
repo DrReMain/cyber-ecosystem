@@ -15,6 +15,14 @@ export const stateTags: Record<string, { color: string; label: () => string }> =
   ORDER_STATE_CLOSED: { color: "default", label: () => m.esports_orders_state_closed() },
 };
 
+// The derived refund fact rides beside the state tag — a paid order stays
+// paid; the refund is what the channel did with the money after the fact.
+export const refundTags: Record<string, { color: string; label: () => string }> = {
+  REFUND_STATE_PROCESSING: { color: "warning", label: () => m.esports_orders_refund_processing() },
+  REFUND_STATE_SUCCEEDED: { color: "purple", label: () => m.esports_orders_refund_succeeded() },
+  REFUND_STATE_ABNORMAL: { color: "error", label: () => m.esports_orders_refund_abnormal() },
+};
+
 const scopeLabels: Record<string, () => string> = {
   ORDER_SCOPE_TRIAL: () => m.esports_orders_scope_trial(),
   ORDER_SCOPE_PERIOD: () => m.esports_orders_scope_period(),
@@ -101,15 +109,25 @@ export function OrdersTable({
     {
       title: () => m.esports_orders_col_state(),
       dataIndex: "state",
-      width: 90,
+      width: 100,
       render: (_, row) => {
         const tag = stateTags[String(row.order?.state ?? "")];
-        return tag ? (
-          <Tag className="m-0" color={tag.color}>
-            {tag.label()}
-          </Tag>
-        ) : (
-          String(row.order?.state ?? "")
+        const refund = row.refund ? refundTags[String(row.refund.state ?? "")] : undefined;
+        return (
+          <div className="flex flex-col items-start gap-0.5">
+            {tag ? (
+              <Tag className="m-0" color={tag.color}>
+                {tag.label()}
+              </Tag>
+            ) : (
+              String(row.order?.state ?? "")
+            )}
+            {row.refund && refund ? (
+              <Tag className="m-0" color={refund.color}>
+                {refund.label()}
+              </Tag>
+            ) : null}
+          </div>
         );
       },
     },

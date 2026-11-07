@@ -1,7 +1,7 @@
 // Package main is the one-shot legacy importer for the esports cutover: it
 // reads the old MySQL store and writes the new system (identity core) and
 // esports (business) databases. It runs as a deploy-plane job — rehearsal
-// against a desensitized production copy first, then the cutover window —
+// against the unmasked production copy first (user ruling 2026-11-02), then the cutover window —
 // never inside a live service process.
 //
 // It is deliberately its own Go module with zero imports from the platform

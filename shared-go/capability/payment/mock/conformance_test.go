@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strconv"
 	"sync"
 	"testing"
@@ -68,6 +69,34 @@ func TestCreateQueryRoundTrip(t *testing.T) {
 		if status.AmountFen != payment.Fen(30000) {
 			t.Errorf("%s: amount %s, want 300.00", c.channel, status.AmountFen)
 		}
+	}
+}
+
+// TestH5RedirectMirror pins the wechat h5 contract mirror: the payer's
+// post-payment landing rides the jump url as redirect_url, and a payer
+// without one keeps the bare jump url.
+func TestH5RedirectMirror(t *testing.T) {
+	p, _ := Open()
+	landing := "https://app.example.com/pay/result?face=open&order=ES-1"
+	with, err := p.Gateway.CreatePayment(context.Background(), input(ChannelH5, &payment.Payer{
+		ClientIP:  "203.0.113.7",
+		ReturnURL: landing,
+	}, "ord-h5red"))
+	if err != nil {
+		t.Fatalf("create with landing: %v", err)
+	}
+	want := "https://mock.pay/jump?out_trade_no=ord-h5red&redirect_url=" + url.QueryEscape(landing)
+	if with.Credential.Value != want {
+		t.Errorf("credential value:\n got %s\nwant %s", with.Credential.Value, want)
+	}
+	without, err := p.Gateway.CreatePayment(context.Background(), input(ChannelH5, &payment.Payer{
+		ClientIP: "203.0.113.7",
+	}, "ord-h5plain"))
+	if err != nil {
+		t.Fatalf("create without landing: %v", err)
+	}
+	if without.Credential.Value != "https://mock.pay/jump?out_trade_no=ord-h5plain" {
+		t.Errorf("bare jump url: %s", without.Credential.Value)
 	}
 }
 

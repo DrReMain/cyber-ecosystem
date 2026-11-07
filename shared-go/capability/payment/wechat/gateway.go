@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"cyber-ecosystem/shared-go/capability/payment"
@@ -54,6 +55,20 @@ func enforceChannel(in *payment.CreatePaymentInput) error {
 type gateway struct {
 	c     *client
 	appID string
+}
+
+// withRedirectURL appends the payer's post-payment landing to the h5_url
+// as the redirect_url query param — the documented v3 h5 redirect
+// contract; an empty landing leaves the cashier's own default.
+func withRedirectURL(h5URL, landing string) string {
+	if landing == "" {
+		return h5URL
+	}
+	sep := "?"
+	if strings.Contains(h5URL, "?") {
+		sep = "&"
+	}
+	return h5URL + sep + "redirect_url=" + url.QueryEscape(landing)
 }
 
 func (g *gateway) CreatePayment(ctx context.Context, in *payment.CreatePaymentInput) (*payment.PrepayResult, error) {
@@ -103,7 +118,11 @@ func (g *gateway) CreatePayment(ctx context.Context, in *payment.CreatePaymentIn
 	case ChannelJSAPI:
 		cred.Value = resp.PrepayID
 	case ChannelH5:
-		cred.Value = resp.H5URL
+		// The v3 h5 flow's only redirect hook: the cashier lands the
+		// browser on redirect_url appended to the returned h5_url — the
+		// payer hint carries the caller's post-payment landing (with the
+		// order reference stitched in by the caller's side).
+		cred.Value = withRedirectURL(resp.H5URL, in.Payer.ReturnURL)
 	case ChannelNative:
 		cred.Value = resp.CodeURL
 	}

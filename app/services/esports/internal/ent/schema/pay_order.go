@@ -51,6 +51,18 @@ func (PayOrder) Fields() []ent.Field {
 			Comment("payment deadline carried from creation (channel default two hours); expiry closes pending orders"),
 		field.Time("paid_at").Optional().Nillable().
 			Comment("channel-side payment time; the entitlement window starts here for membership"),
+		field.String("refund_no").Optional().Nillable().MaxLen(40).
+			Comment("out_refund_no of the order's one full refund ('R'+order_no); null = never refunded — the refund is a derived fact on a paid order, not a state"),
+		field.String("refund_id").Optional().Nillable().MaxLen(64).
+			Comment("channel refund id backfilled from the refund answer — the support/portal join key"),
+		field.Int64("refunded_fen").Optional().Nillable().Positive().
+			Comment("refunded amount in fen; the full-refund tool writes the order amount, partial refunds are not a product shape"),
+		field.String("refund_reason").Optional().Nillable().MaxRuneLen(255).
+			Comment("the operator's recorded reason for the offline exception — the audit trail the FAQ's manual handling assumes"),
+		field.Enum("refund_state").Values("processing", "succeeded", "abnormal").Optional().Nillable().
+			Comment("channel refund lifecycle; abnormal is terminal-for-now (the channel's manual-intervention bucket), processing converges through the refund query"),
+		field.Time("refunded_at").Optional().Nillable().
+			Comment("channel-side refund success time; null until the refund succeeds"),
 	}
 }
 

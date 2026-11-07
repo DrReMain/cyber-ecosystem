@@ -76,5 +76,19 @@
   "esports_user_detail_mem_unlocks_value": "{n} اختبارات",
   "esports_user_detail_mem_to_member": "إدارة العضوية",
   "esports_user_detail_mem_history": "خط زمني للتجديد",
-  "esports_user_detail_mem_note": "دورة حياة العضوية مستقلة عن الملف الشخصي؛ الإجراءات الجماعية والإنهاء في تفاصيل إدارة العضوية."
+  "esports_user_detail_mem_note": "دورة حياة العضوية مستقلة عن الملف الشخصي؛ الإجراءات الجماعية والإنهاء في تفاصيل إدارة العضوية.",
+  "esports_user_detail_msg_title": "صندوق الرسائل",
+  "esports_user_detail_msg_note": "غير مقروءة {unread} · الإجمالي {total}",
+  "esports_user_detail_msg_col_time": "الوقت",
+  "esports_user_detail_msg_col_type": "النوع",
+  "esports_user_detail_msg_col_subject": "العنوان",
+  "esports_user_detail_msg_col_content": "المحتوى",
+  "esports_user_detail_msg_col_read": "حالة القراءة",
+  "esports_user_detail_msg_read": "مقروءة",
+  "esports_user_detail_msg_unread": "غير مقروءة",
+  "esports_user_detail_msg_type_announcement": "إعلان",
+  "esports_user_detail_msg_type_report": "تقرير",
+  "esports_user_detail_msg_type_membership": "عضوية",
+  "esports_user_detail_msg_type_feedback": "رد الملاحظات",
+  "esports_user_detail_msg_empty": "لا رسائل بعد"
 }

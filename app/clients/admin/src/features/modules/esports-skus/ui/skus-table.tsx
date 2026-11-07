@@ -61,18 +61,10 @@ export function SkusTable({
       title: () => m.esports_skus_col_price(),
       dataIndex: "price",
       width: 110,
+      // No list-price column beside this one: the no-discount ruling keeps
+      // listPriceFen identical to the selling price on every write path, so
+      // that column could only ever render a placeholder.
       render: (_, row) => <span className="font-semibold">{fenToYuan(row.sku?.priceFen)}</span>,
-    },
-    {
-      title: () => m.esports_skus_col_list_price(),
-      dataIndex: "listPrice",
-      width: 110,
-      render: (_, row) =>
-        row.sku?.listPriceFen != null && row.sku?.listPriceFen !== row.sku?.priceFen ? (
-          fenToYuan(row.sku?.listPriceFen)
-        ) : (
-          <Typography.Text type="secondary">-</Typography.Text>
-        ),
     },
     {
       title: () => m.esports_skus_col_shelf(),
@@ -90,6 +82,12 @@ export function SkusTable({
     {
       title: () => m.esports_skus_col_desc(),
       dataIndex: "description",
+      // The table rides its columns' natural widths (DataTable's
+      // max-content scroll); a free-text column carries a cap + ellipsis so
+      // one long sentence cannot push the table under the pinned action
+      // column.
+      ellipsis: true,
+      width: 280,
       render: (_, row) => row.sku?.description ?? "",
     },
     {
@@ -128,6 +126,11 @@ export function SkusTable({
       emptyDescription={m.esports_skus_empty()}
       loading={loading}
       rowKey={(r) => r.sku?.skuCode ?? ""}
+      // A bounded scroll width, not the max-content default: max-content
+      // defeats column ellipsis (the nowrap style makes the column's
+      // min-content the whole sentence), letting one long description push
+      // the table under the pinned action column.
+      scroll={{ x: 880 }}
       toolbar={{
         labels: {
           density: m.common_toolbar_density(),

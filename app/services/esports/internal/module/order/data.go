@@ -105,6 +105,66 @@ func (rp *orderRP) Settle(ctx context.Context, in *SettleIn) (*Order, bool, erro
 	return order, rows > 0, nil
 }
 
+func (rp *orderRP) RefundPaid(ctx context.Context, in *RefundIn) (*Order, bool, error) {
+	// The refund twin of the settle arbitration: a paid, never-refunded row
+	// takes its one full refund; zero rows means a rival refund already won
+	// — the re-read hands the caller the winner (the same channel refund,
+	// the out_refund_no being derived from the order).
+	var refundID *string
+	if in.RefundID != "" {
+		refundID = &in.RefundID
+	}
+	rows, err := rp.Platform.GetClient(ctx).PayOrder.Update().
+		Where(
+			payorder.OrderNoEQ(in.OrderNo),
+			payorder.StateEQ(payorder.StatePaid),
+			payorder.RefundNoIsNil(),
+		).
+		SetRefundNo(in.RefundNo).
+		SetNillableRefundID(refundID).
+		SetRefundedFen(in.AmountFen).
+		SetRefundReason(in.Reason).
+		SetRefundState(payorder.RefundState(in.State)).
+		SetNillableRefundedAt(in.RefundedAt).
+		Save(ctx)
+	if err != nil {
+		return nil, false, rp.Platform.HandleEntError(err)
+	}
+	order, err := rp.ByNo(ctx, in.OrderNo)
+	if err != nil {
+		return nil, false, err
+	}
+	return order, rows > 0, nil
+}
+
+func (rp *orderRP) SettleRefund(ctx context.Context, in *RefundIn) (*Order, bool, error) {
+	// Processing → terminal, arbitrated on the row's own refund number: a
+	// rival converge that already folded the channel truth leaves zero
+	// rows, and the re-read serves what it wrote.
+	var refundID *string
+	if in.RefundID != "" {
+		refundID = &in.RefundID
+	}
+	rows, err := rp.Platform.GetClient(ctx).PayOrder.Update().
+		Where(
+			payorder.OrderNoEQ(in.OrderNo),
+			payorder.RefundNoEQ(in.RefundNo),
+			payorder.RefundStateEQ(payorder.RefundStateProcessing),
+		).
+		SetRefundState(payorder.RefundState(in.State)).
+		SetNillableRefundID(refundID).
+		SetNillableRefundedAt(in.RefundedAt).
+		Save(ctx)
+	if err != nil {
+		return nil, false, rp.Platform.HandleEntError(err)
+	}
+	order, err := rp.ByNo(ctx, in.OrderNo)
+	if err != nil {
+		return nil, false, err
+	}
+	return order, rows > 0, nil
+}
+
 func (rp *orderRP) List(ctx context.Context, in *ListIn) (*ListOut, error) {
 	// The member face narrows by its caller; the operator face arrives
 	// with the filter set instead — unset fields simply add no predicate.
@@ -241,6 +301,30 @@ func (rp *payChannelRP) QueryPayment(ctx context.Context, provider, outTradeNo s
 	return out, nil
 }
 
+func (rp *payChannelRP) Refund(ctx context.Context, provider string, in *payment.RefundInput) (*payment.RefundResult, error) {
+	backend, err := rp.Platform.PaymentFor(provider)
+	if err != nil {
+		return nil, rp.Platform.HandlePaymentError(err)
+	}
+	out, err := backend.Gateway.Refund(ctx, in)
+	if err != nil {
+		return nil, rp.Platform.HandlePaymentError(err)
+	}
+	return out, nil
+}
+
+func (rp *payChannelRP) QueryRefund(ctx context.Context, provider, outRefundNo string) (*payment.RefundStatusResult, error) {
+	backend, err := rp.Platform.PaymentFor(provider)
+	if err != nil {
+		return nil, rp.Platform.HandlePaymentError(err)
+	}
+	out, err := backend.Gateway.QueryRefund(ctx, outRefundNo)
+	if err != nil {
+		return nil, rp.Platform.HandlePaymentError(err)
+	}
+	return out, nil
+}
+
 func (rp *payChannelRP) ParseNotification(ctx context.Context, provider string, in *payment.NotificationInput) (*payment.NotificationEvent, error) {
 	backend, err := rp.Platform.PaymentFor(provider)
 	if err != nil {
@@ -292,7 +376,7 @@ func (rp *payChannelRP) NotifyBaseURL() string { return rp.Platform.Payments().N
 // Private -------------------------------------------------------------------------------------------------------------
 
 func mapOrder(row *ent.PayOrder) *Order {
-	return &Order{
+	o := &Order{
 		OrderNo:         row.OrderNo,
 		UserID:          row.UserID,
 		SKUCode:         row.SkuCode,
@@ -308,5 +392,16 @@ func mapOrder(row *ent.PayOrder) *Order {
 		CreatedAt:       row.CreatedAt,
 		ExpiresAt:       row.ExpiresAt,
 		PaidAt:          row.PaidAt,
+		RefundNo:        row.RefundNo,
+		RefundID:        row.RefundID,
+		RefundedFen:     row.RefundedFen,
+		RefundReason:    row.RefundReason,
+		RefundedAt:      row.RefundedAt,
 	}
+	if row.RefundState != nil {
+		// The column's enum type narrows to the domain's plain string.
+		state := string(*row.RefundState)
+		o.RefundState = &state
+	}
+	return o
 }

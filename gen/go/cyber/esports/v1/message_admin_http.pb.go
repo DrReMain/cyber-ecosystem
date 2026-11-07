@@ -19,6 +19,7 @@ const _ = http.SupportPackageIsVersion3
 
 const OperationMessageAdminServiceCreateAnnouncement = "/cyber.esports.v1.MessageAdminService/CreateAnnouncement"
 const OperationMessageAdminServiceListAnnouncements = "/cyber.esports.v1.MessageAdminService/ListAnnouncements"
+const OperationMessageAdminServiceListUserMessages = "/cyber.esports.v1.MessageAdminService/ListUserMessages"
 const OperationMessageAdminServiceOfflineAnnouncement = "/cyber.esports.v1.MessageAdminService/OfflineAnnouncement"
 const OperationMessageAdminServicePublishAnnouncement = "/cyber.esports.v1.MessageAdminService/PublishAnnouncement"
 const OperationMessageAdminServiceUpdateAnnouncement = "/cyber.esports.v1.MessageAdminService/UpdateAnnouncement"
@@ -26,6 +27,11 @@ const OperationMessageAdminServiceUpdateAnnouncement = "/cyber.esports.v1.Messag
 type MessageAdminServiceHTTPServer interface {
 	CreateAnnouncement(context.Context, *CreateAnnouncementRequest) (*CreateAnnouncementResponse, error)
 	ListAnnouncements(context.Context, *ListAnnouncementsRequest) (*ListAnnouncementsResponse, error)
+	// ListUserMessages Read-only: the operator inspects a member's letterbox — the same rows
+	// the member face lists, never a different truth. Read state lives on
+	// the row and only the member's own mark-read flips it; this face
+	// observes, it never mutates.
+	ListUserMessages(context.Context, *ListUserMessagesRequest) (*ListUserMessagesResponse, error)
 	OfflineAnnouncement(context.Context, *OfflineAnnouncementRequest) (*OfflineAnnouncementResponse, error)
 	PublishAnnouncement(context.Context, *PublishAnnouncementRequest) (*PublishAnnouncementResponse, error)
 	UpdateAnnouncement(context.Context, *UpdateAnnouncementRequest) (*UpdateAnnouncementResponse, error)
@@ -38,6 +44,7 @@ func RegisterMessageAdminServiceHTTPServer(s *http.Server, srv MessageAdminServi
 	r.Handle("POST", "/api/v1/esports/announcements/{announcement_id}/publish", _MessageAdminService_PublishAnnouncement0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/esports/announcements/{announcement_id}/offline", _MessageAdminService_OfflineAnnouncement0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/esports/announcements", _MessageAdminService_ListAnnouncements0_HTTP_Handler(srv))
+	r.Handle("GET", "/api/v1/esports/users/{user_id}/messages", _MessageAdminService_ListUserMessages0_HTTP_Handler(srv))
 }
 
 func _MessageAdminService_CreateAnnouncement0_HTTP_Handler(srv MessageAdminServiceHTTPServer) func(ctx http.Context) error {
@@ -144,9 +151,36 @@ func _MessageAdminService_ListAnnouncements0_HTTP_Handler(srv MessageAdminServic
 	}
 }
 
+func _MessageAdminService_ListUserMessages0_HTTP_Handler(srv MessageAdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListUserMessagesRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationMessageAdminServiceListUserMessages)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListUserMessages(ctx, req.(*ListUserMessagesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListUserMessagesResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type MessageAdminServiceHTTPClient interface {
 	CreateAnnouncement(ctx context.Context, req *CreateAnnouncementRequest, opts ...http.CallOption) (rsp *CreateAnnouncementResponse, err error)
 	ListAnnouncements(ctx context.Context, req *ListAnnouncementsRequest, opts ...http.CallOption) (rsp *ListAnnouncementsResponse, err error)
+	// ListUserMessages Read-only: the operator inspects a member's letterbox — the same rows
+	// the member face lists, never a different truth. Read state lives on
+	// the row and only the member's own mark-read flips it; this face
+	// observes, it never mutates.
+	ListUserMessages(ctx context.Context, req *ListUserMessagesRequest, opts ...http.CallOption) (rsp *ListUserMessagesResponse, err error)
 	OfflineAnnouncement(ctx context.Context, req *OfflineAnnouncementRequest, opts ...http.CallOption) (rsp *OfflineAnnouncementResponse, err error)
 	PublishAnnouncement(ctx context.Context, req *PublishAnnouncementRequest, opts ...http.CallOption) (rsp *PublishAnnouncementResponse, err error)
 	UpdateAnnouncement(ctx context.Context, req *UpdateAnnouncementRequest, opts ...http.CallOption) (rsp *UpdateAnnouncementResponse, err error)
@@ -184,6 +218,26 @@ func (c *MessageAdminServiceHTTPClientImpl) ListAnnouncements(ctx context.Contex
 	opts = append([]http.CallOption{
 		http.Accept("application/protojson"),
 		http.Operation(OperationMessageAdminServiceListAnnouncements),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// ListUserMessages Read-only: the operator inspects a member's letterbox — the same rows
+// the member face lists, never a different truth. Read state lives on
+// the row and only the member's own mark-read flips it; this face
+// observes, it never mutates.
+func (c *MessageAdminServiceHTTPClientImpl) ListUserMessages(ctx context.Context, in *ListUserMessagesRequest, opts ...http.CallOption) (*ListUserMessagesResponse, error) {
+	var out ListUserMessagesResponse
+	pattern := "/api/v1/esports/users/{user_id}/messages"
+	path := http.BuildPath(pattern, in, http.WithQueryParams())
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.Operation(OperationMessageAdminServiceListUserMessages),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)

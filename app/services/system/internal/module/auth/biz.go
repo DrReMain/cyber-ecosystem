@@ -493,6 +493,27 @@ func (uc *AuthUC) GetSecurityStatus(ctx context.Context) (*SecurityStatus, error
 	}, nil
 }
 
+func (uc *AuthUC) WechatOpenID(ctx context.Context) (*string, error) {
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok {
+		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("wechat openid requires an authenticated caller"))
+	}
+	creds, err := uc.userRP.ListCredentialsByUser(ctx, subject.UserID)
+	if err != nil {
+		return nil, err
+	}
+	for _, c := range creds {
+		if c.Kind != wechatKind {
+			continue
+		}
+		// Raw, not masked: this read exists to feed the JSAPI unified
+		// order's payer fact, which the masked display form cannot serve.
+		id := c.Identifier
+		return &id, nil
+	}
+	return nil, nil
+}
+
 func (uc *AuthUC) Logout(ctx context.Context) error {
 	subject, ok := security.SubjectFromCtx(ctx)
 	if !ok {

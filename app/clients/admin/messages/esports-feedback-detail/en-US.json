@@ -1,0 +1,14 @@
+{
+  "esports_feedback_detail_title": "Feedback details",
+  "esports_feedback_detail_back": "Back to feedback",
+  "esports_feedback_detail_user": "Member",
+  "esports_feedback_detail_category": "Category",
+  "esports_feedback_detail_time": "Submitted at",
+  "esports_feedback_detail_contact": "Contact",
+  "esports_feedback_detail_content": "Content",
+  "esports_feedback_detail_thread": "Conversation",
+  "esports_feedback_detail_sender_admin": "Operator reply",
+  "esports_feedback_detail_reply_placeholder": "Write the operator's reply…",
+  "esports_feedback_detail_reply_send": "Reply",
+  "esports_feedback_detail_reply_ok": "Replied and synced to the member's message center"
+}

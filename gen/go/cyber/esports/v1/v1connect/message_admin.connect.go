@@ -48,6 +48,9 @@ const (
 	// MessageAdminServiceListAnnouncementsProcedure is the fully-qualified name of the
 	// MessageAdminService's ListAnnouncements RPC.
 	MessageAdminServiceListAnnouncementsProcedure = "/cyber.esports.v1.MessageAdminService/ListAnnouncements"
+	// MessageAdminServiceListUserMessagesProcedure is the fully-qualified name of the
+	// MessageAdminService's ListUserMessages RPC.
+	MessageAdminServiceListUserMessagesProcedure = "/cyber.esports.v1.MessageAdminService/ListUserMessages"
 )
 
 // MessageAdminServiceClient is a client for the cyber.esports.v1.MessageAdminService service.
@@ -57,6 +60,11 @@ type MessageAdminServiceClient interface {
 	PublishAnnouncement(context.Context, *connect.Request[v1.PublishAnnouncementRequest]) (*connect.Response[v1.PublishAnnouncementResponse], error)
 	OfflineAnnouncement(context.Context, *connect.Request[v1.OfflineAnnouncementRequest]) (*connect.Response[v1.OfflineAnnouncementResponse], error)
 	ListAnnouncements(context.Context, *connect.Request[v1.ListAnnouncementsRequest]) (*connect.Response[v1.ListAnnouncementsResponse], error)
+	// Read-only: the operator inspects a member's letterbox — the same rows
+	// the member face lists, never a different truth. Read state lives on
+	// the row and only the member's own mark-read flips it; this face
+	// observes, it never mutates.
+	ListUserMessages(context.Context, *connect.Request[v1.ListUserMessagesRequest]) (*connect.Response[v1.ListUserMessagesResponse], error)
 }
 
 // NewMessageAdminServiceClient constructs a client for the cyber.esports.v1.MessageAdminService
@@ -100,6 +108,12 @@ func NewMessageAdminServiceClient(httpClient connect.HTTPClient, baseURL string,
 			connect.WithSchema(messageAdminServiceMethods.ByName("ListAnnouncements")),
 			connect.WithClientOptions(opts...),
 		),
+		listUserMessages: connect.NewClient[v1.ListUserMessagesRequest, v1.ListUserMessagesResponse](
+			httpClient,
+			baseURL+MessageAdminServiceListUserMessagesProcedure,
+			connect.WithSchema(messageAdminServiceMethods.ByName("ListUserMessages")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -110,6 +124,7 @@ type messageAdminServiceClient struct {
 	publishAnnouncement *connect.Client[v1.PublishAnnouncementRequest, v1.PublishAnnouncementResponse]
 	offlineAnnouncement *connect.Client[v1.OfflineAnnouncementRequest, v1.OfflineAnnouncementResponse]
 	listAnnouncements   *connect.Client[v1.ListAnnouncementsRequest, v1.ListAnnouncementsResponse]
+	listUserMessages    *connect.Client[v1.ListUserMessagesRequest, v1.ListUserMessagesResponse]
 }
 
 // CreateAnnouncement calls cyber.esports.v1.MessageAdminService.CreateAnnouncement.
@@ -137,6 +152,11 @@ func (c *messageAdminServiceClient) ListAnnouncements(ctx context.Context, req *
 	return c.listAnnouncements.CallUnary(ctx, req)
 }
 
+// ListUserMessages calls cyber.esports.v1.MessageAdminService.ListUserMessages.
+func (c *messageAdminServiceClient) ListUserMessages(ctx context.Context, req *connect.Request[v1.ListUserMessagesRequest]) (*connect.Response[v1.ListUserMessagesResponse], error) {
+	return c.listUserMessages.CallUnary(ctx, req)
+}
+
 // MessageAdminServiceHandler is an implementation of the cyber.esports.v1.MessageAdminService
 // service.
 type MessageAdminServiceHandler interface {
@@ -145,6 +165,11 @@ type MessageAdminServiceHandler interface {
 	PublishAnnouncement(context.Context, *connect.Request[v1.PublishAnnouncementRequest]) (*connect.Response[v1.PublishAnnouncementResponse], error)
 	OfflineAnnouncement(context.Context, *connect.Request[v1.OfflineAnnouncementRequest]) (*connect.Response[v1.OfflineAnnouncementResponse], error)
 	ListAnnouncements(context.Context, *connect.Request[v1.ListAnnouncementsRequest]) (*connect.Response[v1.ListAnnouncementsResponse], error)
+	// Read-only: the operator inspects a member's letterbox — the same rows
+	// the member face lists, never a different truth. Read state lives on
+	// the row and only the member's own mark-read flips it; this face
+	// observes, it never mutates.
+	ListUserMessages(context.Context, *connect.Request[v1.ListUserMessagesRequest]) (*connect.Response[v1.ListUserMessagesResponse], error)
 }
 
 // NewMessageAdminServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -184,6 +209,12 @@ func NewMessageAdminServiceHandler(svc MessageAdminServiceHandler, opts ...conne
 		connect.WithSchema(messageAdminServiceMethods.ByName("ListAnnouncements")),
 		connect.WithHandlerOptions(opts...),
 	)
+	messageAdminServiceListUserMessagesHandler := connect.NewUnaryHandler(
+		MessageAdminServiceListUserMessagesProcedure,
+		svc.ListUserMessages,
+		connect.WithSchema(messageAdminServiceMethods.ByName("ListUserMessages")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/cyber.esports.v1.MessageAdminService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case MessageAdminServiceCreateAnnouncementProcedure:
@@ -196,6 +227,8 @@ func NewMessageAdminServiceHandler(svc MessageAdminServiceHandler, opts ...conne
 			messageAdminServiceOfflineAnnouncementHandler.ServeHTTP(w, r)
 		case MessageAdminServiceListAnnouncementsProcedure:
 			messageAdminServiceListAnnouncementsHandler.ServeHTTP(w, r)
+		case MessageAdminServiceListUserMessagesProcedure:
+			messageAdminServiceListUserMessagesHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -223,4 +256,8 @@ func (UnimplementedMessageAdminServiceHandler) OfflineAnnouncement(context.Conte
 
 func (UnimplementedMessageAdminServiceHandler) ListAnnouncements(context.Context, *connect.Request[v1.ListAnnouncementsRequest]) (*connect.Response[v1.ListAnnouncementsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.MessageAdminService.ListAnnouncements is not implemented"))
+}
+
+func (UnimplementedMessageAdminServiceHandler) ListUserMessages(context.Context, *connect.Request[v1.ListUserMessagesRequest]) (*connect.Response[v1.ListUserMessagesResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.MessageAdminService.ListUserMessages is not implemented"))
 }

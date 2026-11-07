@@ -4,22 +4,18 @@
     "allow": [
       "Bash(curl *)",
       "Bash(grpcurl *)",
-      "Bash(./nx *)",
-      "Bash(pnpm *)"
+      "Bash(docker *)",
+      "Bash(./nx *)"
     ],
     "deny": [
       "Bash(nohup)",
       "Bash(kill)",
-      "Bash(node)",
       "Bash(node *)",
-      "Bash(npm)",
       "Bash(npm *)",
-      "Bash(npx)",
-      "Bash(npx *)",
-      "Bash(yarn)",
       "Bash(yarn *)",
-      "Bash(go run)",
+      "Bash(pnpm exec *)",
       "Bash(go run *)",
+      "Bash(go tool *)",
       "Bash(golangci-lint *)",
       "Bash(vitest *)"
     ]

@@ -120,6 +120,19 @@
         "datascope": false
       },
       {
+        "name": "GetWechatOpenId",
+        "full_name": "cyber.system.v1.AuthService.GetWechatOpenId",
+        "request_name": "GetWechatOpenIdRequest",
+        "request_full_name": "cyber.system.v1.GetWechatOpenIdRequest",
+        "response_name": "GetWechatOpenIdResponse",
+        "response_full_name": "cyber.system.v1.GetWechatOpenIdResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/system/me/wechat-openid",
+        "comment": "自读微信支付身份（openid），服务端下单富集专用",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
         "name": "Login",
         "full_name": "cyber.system.v1.AuthService.Login",
         "request_name": "LoginRequest",

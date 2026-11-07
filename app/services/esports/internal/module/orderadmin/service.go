@@ -54,6 +54,14 @@ func (s *OrderAdminService) ClosePaymentOrder(ctx context.Context, req *esportsp
 	return &esportspb.ClosePaymentOrderResponse{Order: adminOrderPB(row)}, nil
 }
 
+func (s *OrderAdminService) RefundPaymentOrder(ctx context.Context, req *esportspb.RefundPaymentOrderRequest) (*esportspb.RefundPaymentOrderResponse, error) {
+	row, err := s.adminUC.Refund(ctx, req.GetOrderNo(), req.GetReason())
+	if err != nil {
+		return nil, err
+	}
+	return &esportspb.RefundPaymentOrderResponse{Order: adminOrderPB(row)}, nil
+}
+
 func (s *OrderAdminService) ListPaymentOrders(ctx context.Context, req *esportspb.ListPaymentOrdersRequest) (*esportspb.ListPaymentOrdersResponse, error) {
 	in := &order.AdminListIn{PageRequest: req.GetPage()}
 	if req.GetState() != esportspb.OrderState_ORDER_STATE_UNSPECIFIED {
@@ -92,6 +100,36 @@ func adminOrderPB(r *order.AdminOrderRow) *esportspb.AdminOrder {
 		Nickname:    utils.Wrap(r.Nickname, utils.StringW),
 		PhoneMasked: utils.Wrap(r.PhoneMasked, utils.StringW),
 		SkuName:     utils.Wrap(r.SkuName, utils.StringW),
+		Refund:      refundViewPB(r.Order),
+	}
+}
+
+func refundViewPB(o *order.Order) *esportspb.OrderRefundView {
+	if o == nil || o.RefundNo == nil {
+		return nil
+	}
+	return &esportspb.OrderRefundView{
+		RefundNo:        utils.Wrap(o.RefundNo, utils.StringW),
+		ChannelRefundId: utils.Wrap(o.RefundID, utils.StringW),
+		State:           refundStatePB(o.RefundState),
+		AmountFen:       utils.Wrap(o.RefundedFen, utils.Int64W),
+		Reason:          utils.Wrap(o.RefundReason, utils.StringW),
+		RefundedAt:      utils.ToTimestamp(o.RefundedAt),
+	}
+}
+
+func refundStatePB(state *string) esportspb.RefundState {
+	// nil folds to UNSPECIFIED — the view only exists when a refund does,
+	// so an absent state never reaches a consumer's switch.
+	switch utils.Deref(state, "") {
+	case order.RefundProcessing:
+		return esportspb.RefundState_REFUND_STATE_PROCESSING
+	case order.RefundSucceeded:
+		return esportspb.RefundState_REFUND_STATE_SUCCEEDED
+	case order.RefundAbnormal:
+		return esportspb.RefundState_REFUND_STATE_ABNORMAL
+	default:
+		return esportspb.RefundState_REFUND_STATE_UNSPECIFIED
 	}
 }
 

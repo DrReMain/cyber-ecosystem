@@ -49,6 +49,18 @@ const (
 	FieldExpiresAt = "expires_at"
 	// FieldPaidAt holds the string denoting the paid_at field in the database.
 	FieldPaidAt = "paid_at"
+	// FieldRefundNo holds the string denoting the refund_no field in the database.
+	FieldRefundNo = "refund_no"
+	// FieldRefundID holds the string denoting the refund_id field in the database.
+	FieldRefundID = "refund_id"
+	// FieldRefundedFen holds the string denoting the refunded_fen field in the database.
+	FieldRefundedFen = "refunded_fen"
+	// FieldRefundReason holds the string denoting the refund_reason field in the database.
+	FieldRefundReason = "refund_reason"
+	// FieldRefundState holds the string denoting the refund_state field in the database.
+	FieldRefundState = "refund_state"
+	// FieldRefundedAt holds the string denoting the refunded_at field in the database.
+	FieldRefundedAt = "refunded_at"
 	// Table holds the table name of the payorder in the database.
 	Table = "pay_order"
 )
@@ -73,6 +85,12 @@ var Columns = []string{
 	FieldTransactionID,
 	FieldExpiresAt,
 	FieldPaidAt,
+	FieldRefundNo,
+	FieldRefundID,
+	FieldRefundedFen,
+	FieldRefundReason,
+	FieldRefundState,
+	FieldRefundedAt,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -121,6 +139,14 @@ var (
 	CredentialValueValidator func(string) error
 	// TransactionIDValidator is a validator for the "transaction_id" field. It is called by the builders before save.
 	TransactionIDValidator func(string) error
+	// RefundNoValidator is a validator for the "refund_no" field. It is called by the builders before save.
+	RefundNoValidator func(string) error
+	// RefundIDValidator is a validator for the "refund_id" field. It is called by the builders before save.
+	RefundIDValidator func(string) error
+	// RefundedFenValidator is a validator for the "refunded_fen" field. It is called by the builders before save.
+	RefundedFenValidator func(int64) error
+	// RefundReasonValidator is a validator for the "refund_reason" field. It is called by the builders before save.
+	RefundReasonValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() string
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -174,6 +200,30 @@ func StateValidator(s State) error {
 		return nil
 	default:
 		return fmt.Errorf("payorder: invalid enum value for state field: %q", s)
+	}
+}
+
+// RefundState defines the type for the "refund_state" enum field.
+type RefundState string
+
+// RefundState values.
+const (
+	RefundStateProcessing RefundState = "processing"
+	RefundStateSucceeded  RefundState = "succeeded"
+	RefundStateAbnormal   RefundState = "abnormal"
+)
+
+func (rs RefundState) String() string {
+	return string(rs)
+}
+
+// RefundStateValidator is a validator for the "refund_state" field enum values. It is called by the builders before save.
+func RefundStateValidator(rs RefundState) error {
+	switch rs {
+	case RefundStateProcessing, RefundStateSucceeded, RefundStateAbnormal:
+		return nil
+	default:
+		return fmt.Errorf("payorder: invalid enum value for refund_state field: %q", rs)
 	}
 }
 
@@ -268,4 +318,34 @@ func ByExpiresAt(opts ...sql.OrderTermOption) OrderOption {
 // ByPaidAt orders the results by the paid_at field.
 func ByPaidAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPaidAt, opts...).ToFunc()
+}
+
+// ByRefundNo orders the results by the refund_no field.
+func ByRefundNo(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRefundNo, opts...).ToFunc()
+}
+
+// ByRefundID orders the results by the refund_id field.
+func ByRefundID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRefundID, opts...).ToFunc()
+}
+
+// ByRefundedFen orders the results by the refunded_fen field.
+func ByRefundedFen(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRefundedFen, opts...).ToFunc()
+}
+
+// ByRefundReason orders the results by the refund_reason field.
+func ByRefundReason(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRefundReason, opts...).ToFunc()
+}
+
+// ByRefundState orders the results by the refund_state field.
+func ByRefundState(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRefundState, opts...).ToFunc()
+}
+
+// ByRefundedAt orders the results by the refunded_at field.
+func ByRefundedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRefundedAt, opts...).ToFunc()
 }

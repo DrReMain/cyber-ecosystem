@@ -76,5 +76,19 @@
   "esports_user_detail_mem_unlocks_value": "{n}건",
   "esports_user_detail_mem_to_member": "멤버십 관리",
   "esports_user_detail_mem_history": "갱신 타임라인",
-  "esports_user_detail_mem_note": "멤버십 라이프사이클은 사용자 프로필과 독립입니다. 일괄 작업과 종료는 멤버십 관리 상세에서."
+  "esports_user_detail_mem_note": "멤버십 라이프사이클은 사용자 프로필과 독립입니다. 일괄 작업과 종료는 멤버십 관리 상세에서.",
+  "esports_user_detail_msg_title": "사이트 내 메시지",
+  "esports_user_detail_msg_note": "읽지 않음 {unread} · 총 {total}통",
+  "esports_user_detail_msg_col_time": "시간",
+  "esports_user_detail_msg_col_type": "유형",
+  "esports_user_detail_msg_col_subject": "제목",
+  "esports_user_detail_msg_col_content": "내용",
+  "esports_user_detail_msg_col_read": "읽음 상태",
+  "esports_user_detail_msg_read": "읽음",
+  "esports_user_detail_msg_unread": "읽지 않음",
+  "esports_user_detail_msg_type_announcement": "공지",
+  "esports_user_detail_msg_type_report": "리포트",
+  "esports_user_detail_msg_type_membership": "멤버십",
+  "esports_user_detail_msg_type_feedback": "피드백 답변",
+  "esports_user_detail_msg_empty": "아직 메시지가 없습니다"
 }

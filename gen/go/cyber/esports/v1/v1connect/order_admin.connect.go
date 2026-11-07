@@ -42,6 +42,9 @@ const (
 	// OrderAdminServiceClosePaymentOrderProcedure is the fully-qualified name of the
 	// OrderAdminService's ClosePaymentOrder RPC.
 	OrderAdminServiceClosePaymentOrderProcedure = "/cyber.esports.v1.OrderAdminService/ClosePaymentOrder"
+	// OrderAdminServiceRefundPaymentOrderProcedure is the fully-qualified name of the
+	// OrderAdminService's RefundPaymentOrder RPC.
+	OrderAdminServiceRefundPaymentOrderProcedure = "/cyber.esports.v1.OrderAdminService/RefundPaymentOrder"
 )
 
 // OrderAdminServiceClient is a client for the cyber.esports.v1.OrderAdminService service.
@@ -49,6 +52,7 @@ type OrderAdminServiceClient interface {
 	ListPaymentOrders(context.Context, *connect.Request[v1.ListPaymentOrdersRequest]) (*connect.Response[v1.ListPaymentOrdersResponse], error)
 	GetPaymentOrder(context.Context, *connect.Request[v1.GetPaymentOrderRequest]) (*connect.Response[v1.GetPaymentOrderResponse], error)
 	ClosePaymentOrder(context.Context, *connect.Request[v1.ClosePaymentOrderRequest]) (*connect.Response[v1.ClosePaymentOrderResponse], error)
+	RefundPaymentOrder(context.Context, *connect.Request[v1.RefundPaymentOrderRequest]) (*connect.Response[v1.RefundPaymentOrderResponse], error)
 }
 
 // NewOrderAdminServiceClient constructs a client for the cyber.esports.v1.OrderAdminService
@@ -80,14 +84,21 @@ func NewOrderAdminServiceClient(httpClient connect.HTTPClient, baseURL string, o
 			connect.WithSchema(orderAdminServiceMethods.ByName("ClosePaymentOrder")),
 			connect.WithClientOptions(opts...),
 		),
+		refundPaymentOrder: connect.NewClient[v1.RefundPaymentOrderRequest, v1.RefundPaymentOrderResponse](
+			httpClient,
+			baseURL+OrderAdminServiceRefundPaymentOrderProcedure,
+			connect.WithSchema(orderAdminServiceMethods.ByName("RefundPaymentOrder")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // orderAdminServiceClient implements OrderAdminServiceClient.
 type orderAdminServiceClient struct {
-	listPaymentOrders *connect.Client[v1.ListPaymentOrdersRequest, v1.ListPaymentOrdersResponse]
-	getPaymentOrder   *connect.Client[v1.GetPaymentOrderRequest, v1.GetPaymentOrderResponse]
-	closePaymentOrder *connect.Client[v1.ClosePaymentOrderRequest, v1.ClosePaymentOrderResponse]
+	listPaymentOrders  *connect.Client[v1.ListPaymentOrdersRequest, v1.ListPaymentOrdersResponse]
+	getPaymentOrder    *connect.Client[v1.GetPaymentOrderRequest, v1.GetPaymentOrderResponse]
+	closePaymentOrder  *connect.Client[v1.ClosePaymentOrderRequest, v1.ClosePaymentOrderResponse]
+	refundPaymentOrder *connect.Client[v1.RefundPaymentOrderRequest, v1.RefundPaymentOrderResponse]
 }
 
 // ListPaymentOrders calls cyber.esports.v1.OrderAdminService.ListPaymentOrders.
@@ -105,11 +116,17 @@ func (c *orderAdminServiceClient) ClosePaymentOrder(ctx context.Context, req *co
 	return c.closePaymentOrder.CallUnary(ctx, req)
 }
 
+// RefundPaymentOrder calls cyber.esports.v1.OrderAdminService.RefundPaymentOrder.
+func (c *orderAdminServiceClient) RefundPaymentOrder(ctx context.Context, req *connect.Request[v1.RefundPaymentOrderRequest]) (*connect.Response[v1.RefundPaymentOrderResponse], error) {
+	return c.refundPaymentOrder.CallUnary(ctx, req)
+}
+
 // OrderAdminServiceHandler is an implementation of the cyber.esports.v1.OrderAdminService service.
 type OrderAdminServiceHandler interface {
 	ListPaymentOrders(context.Context, *connect.Request[v1.ListPaymentOrdersRequest]) (*connect.Response[v1.ListPaymentOrdersResponse], error)
 	GetPaymentOrder(context.Context, *connect.Request[v1.GetPaymentOrderRequest]) (*connect.Response[v1.GetPaymentOrderResponse], error)
 	ClosePaymentOrder(context.Context, *connect.Request[v1.ClosePaymentOrderRequest]) (*connect.Response[v1.ClosePaymentOrderResponse], error)
+	RefundPaymentOrder(context.Context, *connect.Request[v1.RefundPaymentOrderRequest]) (*connect.Response[v1.RefundPaymentOrderResponse], error)
 }
 
 // NewOrderAdminServiceHandler builds an HTTP handler from the service implementation. It returns
@@ -137,6 +154,12 @@ func NewOrderAdminServiceHandler(svc OrderAdminServiceHandler, opts ...connect.H
 		connect.WithSchema(orderAdminServiceMethods.ByName("ClosePaymentOrder")),
 		connect.WithHandlerOptions(opts...),
 	)
+	orderAdminServiceRefundPaymentOrderHandler := connect.NewUnaryHandler(
+		OrderAdminServiceRefundPaymentOrderProcedure,
+		svc.RefundPaymentOrder,
+		connect.WithSchema(orderAdminServiceMethods.ByName("RefundPaymentOrder")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/cyber.esports.v1.OrderAdminService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case OrderAdminServiceListPaymentOrdersProcedure:
@@ -145,6 +168,8 @@ func NewOrderAdminServiceHandler(svc OrderAdminServiceHandler, opts ...connect.H
 			orderAdminServiceGetPaymentOrderHandler.ServeHTTP(w, r)
 		case OrderAdminServiceClosePaymentOrderProcedure:
 			orderAdminServiceClosePaymentOrderHandler.ServeHTTP(w, r)
+		case OrderAdminServiceRefundPaymentOrderProcedure:
+			orderAdminServiceRefundPaymentOrderHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -164,4 +189,8 @@ func (UnimplementedOrderAdminServiceHandler) GetPaymentOrder(context.Context, *c
 
 func (UnimplementedOrderAdminServiceHandler) ClosePaymentOrder(context.Context, *connect.Request[v1.ClosePaymentOrderRequest]) (*connect.Response[v1.ClosePaymentOrderResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.OrderAdminService.ClosePaymentOrder is not implemented"))
+}
+
+func (UnimplementedOrderAdminServiceHandler) RefundPaymentOrder(context.Context, *connect.Request[v1.RefundPaymentOrderRequest]) (*connect.Response[v1.RefundPaymentOrderResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.esports.v1.OrderAdminService.RefundPaymentOrder is not implemented"))
 }

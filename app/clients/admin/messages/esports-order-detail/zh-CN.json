@@ -13,5 +13,15 @@
   "esports_order_detail_unlock_closed": "订单已关闭，未产生解锁",
   "esports_order_detail_unlock_trial": "报告 {id} · 永久解锁",
   "esports_order_detail_unlock_period": "{from} ~ {to} 窗口 · 期内解锁 {n} 份（永久保留）",
-  "esports_order_detail_refund_note": "退款口径：不向客户开放线上/自助退款。数字内容一经解锁/生效即视为交付完成，默认不退；例外由客服线下人工处理（附原因与凭证），退款单回收对应解锁（单次）或剩余有效期（会员），全程入审计。"
+  "esports_order_detail_refund_note": "退款口径：不向客户开放线上/自助退款。数字内容一经解锁/生效即视为交付完成，默认不退；例外由客服线下人工处理（附原因与凭证），退款单回收对应解锁（单次）或剩余有效期（会员），全程入审计。",
+  "esports_order_detail_refund": "退款",
+  "esports_order_detail_refund_reason": "退款原因",
+  "esports_order_detail_refund_act": "全额退款",
+  "esports_order_detail_refund_title": "全额退款",
+  "esports_order_detail_refund_desc": "将 {amount} 原路全额退回，不可撤销；解锁与会员剩余有效期不随本操作自动回收，如需回收请在会员侧另行处理，全程入审计。",
+  "esports_order_detail_refund_label": "退款原因（必填，入审计）",
+  "esports_order_detail_refund_ph": "记录线下协商结论，如：客服工单 #123",
+  "esports_order_detail_refund_ok": "确认退款",
+  "esports_order_detail_refund_cancel": "取消",
+  "esports_order_detail_refund_done": "退款已受理：{no}"
 }

@@ -76,5 +76,19 @@
   "esports_user_detail_mem_unlocks_value": "{n} 项",
   "esports_user_detail_mem_to_member": "会员管理",
   "esports_user_detail_mem_history": "续订时间线",
-  "esports_user_detail_mem_note": "会员生命周期独立于用户档案；批处理与终止操作在会员管理详情。"
+  "esports_user_detail_mem_note": "会员生命周期独立于用户档案；批处理与终止操作在会员管理详情。",
+  "esports_user_detail_msg_title": "站内信",
+  "esports_user_detail_msg_note": "未读 {unread} · 共 {total} 封",
+  "esports_user_detail_msg_col_time": "时间",
+  "esports_user_detail_msg_col_type": "类型",
+  "esports_user_detail_msg_col_subject": "标题",
+  "esports_user_detail_msg_col_content": "内容",
+  "esports_user_detail_msg_col_read": "已读态",
+  "esports_user_detail_msg_read": "已读",
+  "esports_user_detail_msg_unread": "未读",
+  "esports_user_detail_msg_type_announcement": "公告",
+  "esports_user_detail_msg_type_report": "报告",
+  "esports_user_detail_msg_type_membership": "会员",
+  "esports_user_detail_msg_type_feedback": "反馈回复",
+  "esports_user_detail_msg_empty": "该用户暂无站内信"
 }

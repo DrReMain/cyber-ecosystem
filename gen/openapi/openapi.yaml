@@ -2046,6 +2046,30 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.ClosePaymentOrderResponse'
+    /api/v1/esports/payment-orders/{orderNo}/refund:
+        post:
+            tags:
+                - OrderAdminService
+            operationId: OrderAdminService_RefundPaymentOrder
+            parameters:
+                - name: orderNo
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.esports.v1.RefundPaymentOrderRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.RefundPaymentOrderResponse'
     /api/v1/esports/profile:
         get:
             tags:
@@ -2471,6 +2495,74 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.esports.v1.ReplyFeedbackResponse'
+    /api/v1/esports/users/{userId}/messages:
+        get:
+            tags:
+                - MessageAdminService
+            description: |-
+                Read-only: the operator inspects a member's letterbox — the same rows
+                 the member face lists, never a different truth. Read state lives on
+                 the row and only the member's own mark-read flips it; this face
+                 observes, it never mutates.
+            operationId: MessageAdminService_ListUserMessages
+            parameters:
+                - name: userId
+                  in: path
+                  description: |-
+                    The member whose letterbox is read — the same rows the member face
+                     lists, never a different truth. A member nobody ever mailed answers
+                     an empty page, not an error.
+                  required: true
+                  schema:
+                    type: string
+                - name: page.pageNo
+                  in: query
+                  description: Page number (1-based).
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.pageSize
+                  in: query
+                  description: Page size.
+                  schema:
+                    type: integer
+                    format: int32
+                - name: page.all
+                  in: query
+                  description: Return all results without pagination.
+                  schema:
+                    type: boolean
+                - name: page.createdAtA
+                  in: query
+                  description: Filter by created_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.createdAtZ
+                  in: query
+                  description: Filter by created_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtA
+                  in: query
+                  description: Filter by updated_at >= this value.
+                  schema:
+                    type: string
+                    format: date-time
+                - name: page.updatedAtZ
+                  in: query
+                  description: Filter by updated_at <= this value.
+                  schema:
+                    type: string
+                    format: date-time
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.esports.v1.ListUserMessagesResponse'
     /api/v1/system/audit-logs:
         get:
             tags:
@@ -3351,6 +3443,18 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.GetSecurityStatusResponse'
+    /api/v1/system/me/wechat-openid:
+        get:
+            tags:
+                - AuthService
+            operationId: AuthService_GetWechatOpenId
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.GetWechatOpenIdResponse'
     /api/v1/system/policies:
         get:
             tags:
@@ -4648,6 +4752,13 @@ components:
                     description: |-
                         The sku's display title at read time; off-shelf and deleted rows
                          still hydrate (order history outlives catalog changes).
+                refund:
+                    allOf:
+                        - $ref: '#/components/schemas/cyber.esports.v1.OrderRefundView'
+                    description: |-
+                        The derived refund fact on a paid order; absent = never refunded.
+                         One full refund per order — the operator face mints it, the channel
+                         idempotency key (out_refund_no) is derived from the order no.
             description: |-
                 An order row as the operator reads it: the wire Order plus the
                  hydrated facts the list columns need. Absent hydration fields are the
@@ -5052,11 +5163,6 @@ components:
                     description: |-
                         The test record a trial sku unlocks — required for trial, must be
                          absent for membership; the caller must own the record.
-                payerOpenid:
-                    type: string
-                    description: |-
-                        OpenID for in-WeChat payment, supplied by the wechat binding;
-                         required when the channel pays by invoke.
                 returnUrl:
                     type: string
                     description: Post-payment landing page for jump channels.
@@ -6238,6 +6344,20 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/cyber.esports.v1.Test'
+        cyber.esports.v1.ListUserMessagesResponse:
+            type: object
+            properties:
+                page:
+                    $ref: '#/components/schemas/cyber.shared.common.v1.PageResponse'
+                messages:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.esports.v1.Message'
+                    description: Newest first, the letterbox's own order.
+                unreadCount:
+                    type: integer
+                    description: The same count the member's unread badge reads.
+                    format: int32
         cyber.esports.v1.MarkAllMessagesReadRequest:
             type: object
             properties: {}
@@ -6715,6 +6835,33 @@ components:
                 paidAt:
                     type: string
                     format: date-time
+        cyber.esports.v1.OrderRefundView:
+            type: object
+            properties:
+                refundNo:
+                    type: string
+                    description: The caller-minted channel idempotency key ('R'+order_no).
+                channelRefundId:
+                    type: string
+                    description: The channel's own refund id — the support/portal join key.
+                state:
+                    enum:
+                        - REFUND_STATE_UNSPECIFIED
+                        - REFUND_STATE_PROCESSING
+                        - REFUND_STATE_SUCCEEDED
+                        - REFUND_STATE_ABNORMAL
+                    type: string
+                    format: enum
+                amountFen:
+                    type: string
+                reason:
+                    type: string
+                    description: The operator's paper trail for the offline exception.
+                refundedAt:
+                    type: string
+                    description: The channel-side success moment; null until the refund succeeds.
+                    format: date-time
+            description: What a paid order's one full refund looks like to the operator.
         cyber.esports.v1.OrderUnlockView:
             type: object
             properties:
@@ -6993,6 +7140,21 @@ components:
                 grantedAt:
                     type: string
                     format: date-time
+        cyber.esports.v1.RefundPaymentOrderRequest:
+            type: object
+            properties:
+                orderNo:
+                    type: string
+                reason:
+                    type: string
+                    description: |-
+                        Why the exception was granted — required: an operator refund with no
+                         recorded reason is an audit hole, not a shortcut.
+        cyber.esports.v1.RefundPaymentOrderResponse:
+            type: object
+            properties:
+                order:
+                    $ref: '#/components/schemas/cyber.esports.v1.AdminOrder'
         cyber.esports.v1.ReplyFeedbackRequest:
             type: object
             properties:
@@ -8531,6 +8693,16 @@ components:
             properties:
                 user:
                     $ref: '#/components/schemas/cyber.system.v1.User'
+        cyber.system.v1.GetWechatOpenIdResponse:
+            type: object
+            properties:
+                openid:
+                    type: string
+            description: |-
+                The caller's wechat openid, raw — the one credential value that crosses
+                 unmasked: the JSAPI unified order takes it as a payer fact, and only the
+                 consuming service's server-side enrichment reads this face (display
+                 surfaces keep the masked form). Null = the caller never bound wechat.
         cyber.system.v1.ListAuditExportsResponse:
             type: object
             properties:
@@ -9629,7 +9801,9 @@ tags:
          lists by; the detail folds the unlock outcome a paid order produced.
          Close here is the operator's variant — the same pending-only
          arbitration, minus the member plane's owner check, plus the operator
-         identity on the audit trail.
+         identity on the audit trail. Refund is the offline-exception executor
+         the member FAQ points at: the product sells no self-service refunds,
+         so this face mints the one full refund an operator grants by hand.
     - name: OrderService
       description: |-
         The order aggregate's faces. The member plane creates and reads its own

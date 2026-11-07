@@ -3,6 +3,8 @@ syntax = "proto3";
 package cyber.esports.v1;
 
 import "buf/validate/validate.proto";
+import "cyber/esports/v1/message.proto";
+import "cyber/shared/common/v1/pagination.proto";
 import "ext/v1/access.proto";
 import "ext/v1/desc.proto";
 import "google/api/annotations.proto";
@@ -75,6 +77,18 @@ service MessageAdminService {
     };
     option (cyber.ext.v1.access) = ACCESS_ADMIN;
     option (google.api.http) = {get: "/api/v1/esports/announcements"};
+  }
+  // Read-only: the operator inspects a member's letterbox — the same rows
+  // the member face lists, never a different truth. Read state lives on
+  // the row and only the member's own mark-read flips it; this face
+  // observes, it never mutates.
+  rpc ListUserMessages(ListUserMessagesRequest) returns (ListUserMessagesResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "按用户列站内信(含已读态)"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {get: "/api/v1/esports/users/{user_id}/messages"};
   }
 }
 
@@ -220,4 +234,23 @@ message ListAnnouncementsResponse {
   // Newest created first — an announcement ledger is a handful of rows
   // per season, no paging.
   repeated Announcement announcements = 1;
+}
+
+message ListUserMessagesRequest {
+  // The member whose letterbox is read — the same rows the member face
+  // lists, never a different truth. A member nobody ever mailed answers
+  // an empty page, not an error.
+  string user_id = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.len = 20
+  ];
+  cyber.shared.common.v1.PageRequest page = 2;
+}
+
+message ListUserMessagesResponse {
+  cyber.shared.common.v1.PageResponse page = 1;
+  // Newest first, the letterbox's own order.
+  repeated Message messages = 2;
+  // The same count the member's unread badge reads.
+  int32 unread_count = 3;
 }

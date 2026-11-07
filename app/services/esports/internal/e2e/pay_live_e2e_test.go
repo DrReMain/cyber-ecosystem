@@ -10,6 +10,7 @@ import (
 	"bytes"
 	"context"
 	"log/slog"
+	"net/url"
 	"os"
 	"slices"
 	"strings"
@@ -43,6 +44,10 @@ func (noopHooks) OnStart(func(context.Context) error) {}
 func (noopHooks) OnStop(func(context.Context) error)  {}
 
 func strp(v string) *string { return &v }
+
+type fakeWechatID struct{ openid *string }
+
+func (f *fakeWechatID) WechatOpenID(context.Context) (*string, error) { return f.openid, nil }
 
 func envOr(key, def string) string {
 	if v := os.Getenv(key); v != "" {
@@ -107,9 +112,10 @@ func TestPayLiveE2E(t *testing.T) {
 	if !ok {
 		t.Fatalf("mock controller: not a mock backend")
 	}
+	payerID := &fakeWechatID{openid: strp("oid-e2e-payer")}
 	uc := order.NewOrderUC(logger, pf, noopHooks{}, nil, order.NewOrderRP(logger, pf), sku.NewSkuRP(logger, pf),
 		entitle.NewEntitlementRP(logger, pf), test.NewTestRP(logger, pf), chanRP,
-		profile.NewProfileRP(logger, pf), compliance.NewComplianceRP(logger, pf))
+		profile.NewProfileRP(logger, pf), compliance.NewComplianceRP(logger, pf), payerID)
 	svc := order.NewOrderService(logger, uc)
 
 	channels, err := chanRP.Channels("mock")
@@ -329,19 +335,60 @@ func TestPayLiveE2E(t *testing.T) {
 	// The H5 channel's payer hint is a server-derived wire fact, never a
 	// client declaration: the channel refuses a create carrying no client
 	// address and mints the jump credential once the service face supplies
-	// one.
+	// one. The caller's landing names its own params (the receipt face)
+	// but cannot name the order — the service mints it — so the credential
+	// must come back with the landing riding the jump url as redirect_url
+	// and the order stitched in beside the caller's params.
 	if _, err := uc.Create(ctx, &order.CreateIn{SKUCode: "member_month", Channel: h5}); err == nil {
 		t.Fatalf("h5 create without a client address passed")
 	}
-	h5o, err := uc.Create(ctx, &order.CreateIn{SKUCode: "member_month", Channel: h5, ClientIP: "203.0.113.9"})
+	landing := "https://app.example.com/pay/result?face=open"
+	h5o, err := uc.Create(ctx, &order.CreateIn{
+		SKUCode:   "member_month",
+		Channel:   h5,
+		ClientIP:  "203.0.113.9",
+		ReturnURL: strp(landing),
+	})
 	if err != nil {
 		t.Fatalf("h5 create: %v", err)
 	}
 	if h5o.Credential.Kind != payment.CredentialJumpURL {
 		t.Fatalf("h5 credential kind: %+v", h5o.Credential)
 	}
+	wantRedirect := url.QueryEscape(landing + "&order=" + h5o.Order.OrderNo)
+	if !strings.Contains(h5o.Credential.Value, "redirect_url="+wantRedirect) {
+		t.Fatalf("h5 credential must carry the stitched landing as redirect_url:\n%s", h5o.Credential.Value)
+	}
 	if _, err := uc.Close(ctx, h5o.Order.OrderNo); err != nil {
 		t.Fatalf("h5 close: %v", err)
+	}
+	// The invoke channel's payer is the caller's wechat binding, never a
+	// request fact: an unbound account is refused before the channel ever
+	// sees an order; a bound one's openid rides the payer silently and the
+	// mock answers with the invoke credential.
+	var jsapi payment.Channel
+	for _, c := range channels {
+		if strings.HasSuffix(string(c), "_jsapi") {
+			jsapi = c
+		}
+	}
+	if jsapi == "" {
+		t.Fatalf("no jsapi channel in %v", channels)
+	}
+	payerID.openid = nil
+	if _, err := uc.Create(ctx, &order.CreateIn{SKUCode: "member_month", Channel: jsapi}); !esportspb.IsEsportsPayWechatUnbound(err) {
+		t.Fatalf("jsapi unbound: want ESPORTS_PAY_WECHAT_UNBOUND, got %v", err)
+	}
+	payerID.openid = strp("oid-e2e-payer")
+	jsapio, err := uc.Create(ctx, &order.CreateIn{SKUCode: "member_month", Channel: jsapi})
+	if err != nil {
+		t.Fatalf("jsapi create: %v", err)
+	}
+	if jsapio.Credential.Kind != payment.CredentialInvoke {
+		t.Fatalf("jsapi credential kind: %+v", jsapio.Credential)
+	}
+	if _, err := uc.Close(ctx, jsapio.Order.OrderNo); err != nil {
+		t.Fatalf("jsapi close: %v", err)
 	}
 	if _, err := uc.Close(ctx, mem1.Order.OrderNo); !esportspb.IsEsportsOrderStateConflict(err) {
 		t.Fatalf("close paid: err=%v", err)
@@ -436,6 +483,39 @@ func TestPayLiveE2E(t *testing.T) {
 	}
 	if _, err := adminUC.Close(actx, mem1.Order.OrderNo); !esportspb.IsEsportsOrderStateConflict(err) {
 		t.Fatalf("operator close of a paid order: err=%v", err)
+	}
+
+	// The refund leg: the offline-exception executor takes the paid order's
+	// one full refund (the mock channel answers terminal synchronously),
+	// refuses a second, and never touches a closed row.
+	refunded, err := adminUC.Refund(actx, mem1.Order.OrderNo, "e2e: full refund of the settled membership")
+	if err != nil {
+		t.Fatalf("refund: %v", err)
+	}
+	if refunded.RefundNo == nil || *refunded.RefundNo != order.RefundNoPrefix+mem1.Order.OrderNo ||
+		refunded.RefundedFen == nil || *refunded.RefundedFen != mem1.Order.AmountFen ||
+		refunded.RefundState == nil || *refunded.RefundState != order.RefundSucceeded || refunded.RefundedAt == nil {
+		t.Fatalf("refund row: %+v", refunded.Order)
+	}
+	if _, err := adminUC.Refund(actx, mem1.Order.OrderNo, "e2e: again"); !esportspb.IsEsportsOrderAlreadyRefunded(err) {
+		t.Fatalf("re-refund: err=%v", err)
+	}
+	if _, err := adminUC.Refund(actx, aged.Order.OrderNo, "e2e: closed"); !esportspb.IsEsportsOrderStateConflict(err) {
+		t.Fatalf("refund of a closed order: err=%v", err)
+	}
+	// The read-time converge: a row stuck on processing folds onto the
+	// channel's terminal truth at the operator's next read.
+	if _, err := db.ExecContext(context.Background(),
+		`UPDATE pay_order SET refund_state = 'processing', refunded_at = NULL WHERE order_no = $1`,
+		mem1.Order.OrderNo); err != nil {
+		t.Fatalf("restick refund: %v", err)
+	}
+	converged, _, err := adminUC.Get(actx, mem1.Order.OrderNo)
+	if err != nil {
+		t.Fatalf("converge get: %v", err)
+	}
+	if converged.RefundState == nil || *converged.RefundState != order.RefundSucceeded || converged.RefundedAt == nil {
+		t.Fatalf("refund converge: %+v", converged.Order)
 	}
 
 	skuUC := sku.NewSkuUC(logger, pf, sku.NewSkuRP(logger, pf), compliance.NewComplianceRP(logger, pf))

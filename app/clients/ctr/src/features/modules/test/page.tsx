@@ -15,7 +15,9 @@ export function TestPage() {
   const { code } = useParams({ from: "/test/$code" });
   const { review } = useSearch({ from: "/test/$code" });
   const navigate = useNavigate();
-  const listQuery = useConnectQuery(listTests, {});
+  // The error face below owns a failed catalog read; the global throw
+  // default would hand it to the route boundary instead.
+  const listQuery = useConnectQuery(listTests, {}, { throwOnError: false });
   const row = (listQuery.data?.tests ?? []).find((test) => test.code === code) ?? null;
 
   if (listQuery.isPending) {

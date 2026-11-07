@@ -40,3 +40,27 @@ observability:
 
 remote:
   system_connect: ${SYSTEM_CONNECT:http://system.api:13001} # system connect
+
+payment:
+  default_provider: ${PAY_PROVIDER:mock}
+  # The notify base WeChat's servers call back — a public edge origin the
+  # deploy plane must name, never an in-mesh alias; empty fails the boot
+  # validate once a wechat provider is selected.
+  notify_base_url: ${PAY_NOTIFY_BASE_URL:}
+  providers:
+    - name: ${PAY_PROVIDER:mock}
+      kind: ${PAY_PROVIDER:mock}
+      # Inert under the mock default; selecting wechat via APP_PAY_PROVIDER
+      # with empty env fails the boot validate — credentials are deploy-plane
+      # facts, never literals. Env overrides need the APP_ prefix (bare names
+      # never land), and a numeric-looking string value (mch_id) must ride
+      # quoted or the proto scan rejects it.
+      wechat:
+        mch_id: ${WECHAT_MCH_ID:}
+        mch_serial: ${WECHAT_MCH_SERIAL:}
+        app_id: ${WECHAT_APP_ID:}
+        apiv3_key: ${WECHAT_APIV3_KEY:}
+        private_key_pem: ${WECHAT_PRIVATE_KEY_PEM:}
+        public_key_id: ${WECHAT_PUBLIC_KEY_ID:}
+        public_key_pem: ${WECHAT_PUBLIC_KEY_PEM:}
+        base_url: ${WECHAT_BASE_URL:}

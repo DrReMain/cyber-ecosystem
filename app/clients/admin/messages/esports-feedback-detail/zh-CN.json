@@ -1,0 +1,14 @@
+{
+  "esports_feedback_detail_title": "反馈详情",
+  "esports_feedback_detail_back": "返回反馈管理",
+  "esports_feedback_detail_user": "用户",
+  "esports_feedback_detail_category": "分类",
+  "esports_feedback_detail_time": "提交时间",
+  "esports_feedback_detail_contact": "联系方式",
+  "esports_feedback_detail_content": "内容",
+  "esports_feedback_detail_thread": "对话记录",
+  "esports_feedback_detail_sender_admin": "管理员回复",
+  "esports_feedback_detail_reply_placeholder": "输入管理员回复…",
+  "esports_feedback_detail_reply_send": "回复",
+  "esports_feedback_detail_reply_ok": "已回复并同步 C 端消息中心"
+}

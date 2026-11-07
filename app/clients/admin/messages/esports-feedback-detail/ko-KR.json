@@ -1,0 +1,14 @@
+{
+  "esports_feedback_detail_title": "피드백 상세",
+  "esports_feedback_detail_back": "피드백 관리로 돌아가기",
+  "esports_feedback_detail_user": "사용자",
+  "esports_feedback_detail_category": "분류",
+  "esports_feedback_detail_time": "제출 시각",
+  "esports_feedback_detail_contact": "연락처",
+  "esports_feedback_detail_content": "내용",
+  "esports_feedback_detail_thread": "대화 기록",
+  "esports_feedback_detail_sender_admin": "운영자 답변",
+  "esports_feedback_detail_reply_placeholder": "운영자 답변 입력…",
+  "esports_feedback_detail_reply_send": "답변",
+  "esports_feedback_detail_reply_ok": "답변했으며 메시지 센터에 동기화되었습니다"
+}

@@ -9,6 +9,7 @@ package v1
 import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	_ "cyber-ecosystem/gen/go/cyber/ext/v1"
+	v1 "cyber-ecosystem/gen/go/cyber/shared/common/v1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -799,11 +800,128 @@ func (x *ListAnnouncementsResponse) GetAnnouncements() []*Announcement {
 	return nil
 }
 
+type ListUserMessagesRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The member whose letterbox is read — the same rows the member face
+	// lists, never a different truth. A member nobody ever mailed answers
+	// an empty page, not an error.
+	UserId        string          `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Page          *v1.PageRequest `protobuf:"bytes,2,opt,name=page,proto3" json:"page,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListUserMessagesRequest) Reset() {
+	*x = ListUserMessagesRequest{}
+	mi := &file_cyber_esports_v1_message_admin_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListUserMessagesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListUserMessagesRequest) ProtoMessage() {}
+
+func (x *ListUserMessagesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_message_admin_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListUserMessagesRequest.ProtoReflect.Descriptor instead.
+func (*ListUserMessagesRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_message_admin_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *ListUserMessagesRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *ListUserMessagesRequest) GetPage() *v1.PageRequest {
+	if x != nil {
+		return x.Page
+	}
+	return nil
+}
+
+type ListUserMessagesResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Page  *v1.PageResponse       `protobuf:"bytes,1,opt,name=page,proto3" json:"page,omitempty"`
+	// Newest first, the letterbox's own order.
+	Messages []*Message `protobuf:"bytes,2,rep,name=messages,proto3" json:"messages,omitempty"`
+	// The same count the member's unread badge reads.
+	UnreadCount   int32 `protobuf:"varint,3,opt,name=unread_count,json=unreadCount,proto3" json:"unread_count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListUserMessagesResponse) Reset() {
+	*x = ListUserMessagesResponse{}
+	mi := &file_cyber_esports_v1_message_admin_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListUserMessagesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListUserMessagesResponse) ProtoMessage() {}
+
+func (x *ListUserMessagesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_esports_v1_message_admin_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListUserMessagesResponse.ProtoReflect.Descriptor instead.
+func (*ListUserMessagesResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_esports_v1_message_admin_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *ListUserMessagesResponse) GetPage() *v1.PageResponse {
+	if x != nil {
+		return x.Page
+	}
+	return nil
+}
+
+func (x *ListUserMessagesResponse) GetMessages() []*Message {
+	if x != nil {
+		return x.Messages
+	}
+	return nil
+}
+
+func (x *ListUserMessagesResponse) GetUnreadCount() int32 {
+	if x != nil {
+		return x.UnreadCount
+	}
+	return 0
+}
+
 var File_cyber_esports_v1_message_admin_proto protoreflect.FileDescriptor
 
 const file_cyber_esports_v1_message_admin_proto_rawDesc = "" +
 	"\n" +
-	"$cyber/esports/v1/message_admin.proto\x12\x10cyber.esports.v1\x1a\x1bbuf/validate/validate.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\x8a\x05\n" +
+	"$cyber/esports/v1/message_admin.proto\x12\x10cyber.esports.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1ecyber/esports/v1/message.proto\x1a'cyber/shared/common/v1/pagination.proto\x1a\x13ext/v1/access.proto\x1a\x11ext/v1/desc.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\x8a\x05\n" +
 	"\fAnnouncement\x12,\n" +
 	"\x02id\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x02id\x126\n" +
 	"\x04kind\x18\x02 \x01(\x0e2\".cyber.esports.v1.AnnouncementKindR\x04kind\x129\n" +
@@ -861,7 +979,14 @@ const file_cyber_esports_v1_message_admin_proto_rawDesc = "" +
 	"\x05_kindB\t\n" +
 	"\a_status\"a\n" +
 	"\x19ListAnnouncementsResponse\x12D\n" +
-	"\rannouncements\x18\x01 \x03(\v2\x1e.cyber.esports.v1.AnnouncementR\rannouncements*r\n" +
+	"\rannouncements\x18\x01 \x03(\v2\x1e.cyber.esports.v1.AnnouncementR\rannouncements\"x\n" +
+	"\x17ListUserMessagesRequest\x12$\n" +
+	"\auser_id\x18\x01 \x01(\tB\v\xbaH\b\xc8\x01\x01r\x03\x98\x01\x14R\x06userId\x127\n" +
+	"\x04page\x18\x02 \x01(\v2#.cyber.shared.common.v1.PageRequestR\x04page\"\xae\x01\n" +
+	"\x18ListUserMessagesResponse\x128\n" +
+	"\x04page\x18\x01 \x01(\v2$.cyber.shared.common.v1.PageResponseR\x04page\x125\n" +
+	"\bmessages\x18\x02 \x03(\v2\x19.cyber.esports.v1.MessageR\bmessages\x12!\n" +
+	"\funread_count\x18\x03 \x01(\x05R\vunreadCount*r\n" +
 	"\x10AnnouncementKind\x12!\n" +
 	"\x1dANNOUNCEMENT_KIND_UNSPECIFIED\x10\x00\x12\x1c\n" +
 	"\x18ANNOUNCEMENT_KIND_BANNER\x10\x01\x12\x1d\n" +
@@ -874,7 +999,7 @@ const file_cyber_esports_v1_message_admin_proto_rawDesc = "" +
 	"\x1fANNOUNCEMENT_STATUS_UNSPECIFIED\x10\x00\x12\x1d\n" +
 	"\x19ANNOUNCEMENT_STATUS_DRAFT\x10\x01\x12!\n" +
 	"\x1dANNOUNCEMENT_STATUS_PUBLISHED\x10\x02\x12\x1f\n" +
-	"\x1bANNOUNCEMENT_STATUS_OFFLINE\x10\x032\x9a\b\n" +
+	"\x1bANNOUNCEMENT_STATUS_OFFLINE\x10\x032\xe7\t\n" +
 	"\x13MessageAdminService\x12\xb9\x01\n" +
 	"\x12CreateAnnouncement\x12+.cyber.esports.v1.CreateAnnouncementRequest\x1a,.cyber.esports.v1.CreateAnnouncementResponse\"H\x88\xf1\x04\x02\x8a\xd3\x0e\x18\n" +
 	"\x14新建公告(草稿)\x10\x02\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/api/v1/esports/announcements\x12\xc6\x01\n" +
@@ -885,7 +1010,9 @@ const file_cyber_esports_v1_message_admin_proto_rawDesc = "" +
 	"\x13OfflineAnnouncement\x12,.cyber.esports.v1.OfflineAnnouncementRequest\x1a-.cyber.esports.v1.OfflineAnnouncementResponse\"Z\x88\xf1\x04\x02\x8a\xd3\x0e\x10\n" +
 	"\f下线公告\x10\x02\x82\xd3\xe4\x93\x02<:\x01*\"7/api/v1/esports/announcements/{announcement_id}/offline\x12\xab\x01\n" +
 	"\x11ListAnnouncements\x12*.cyber.esports.v1.ListAnnouncementsRequest\x1a+.cyber.esports.v1.ListAnnouncementsResponse\"=\x88\xf1\x04\x02\x8a\xd3\x0e\x10\n" +
-	"\f公告列表\x10\x01\x82\xd3\xe4\x93\x02\x1f\x12\x1d/api/v1/esports/announcements\x1a\x10\x8a\xe2\t\f公告管理B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
+	"\f公告列表\x10\x01\x82\xd3\xe4\x93\x02\x1f\x12\x1d/api/v1/esports/announcements\x12\xca\x01\n" +
+	"\x10ListUserMessages\x12).cyber.esports.v1.ListUserMessagesRequest\x1a*.cyber.esports.v1.ListUserMessagesResponse\"_\x88\xf1\x04\x02\x8a\xd3\x0e'\n" +
+	"#按用户列站内信(含已读态)\x10\x01\x82\xd3\xe4\x93\x02*\x12(/api/v1/esports/users/{user_id}/messages\x1a\x10\x8a\xe2\t\f公告管理B)Z'cyber-ecosystem/gen/go/cyber/esports/v1b\x06proto3"
 
 var (
 	file_cyber_esports_v1_message_admin_proto_rawDescOnce sync.Once
@@ -900,7 +1027,7 @@ func file_cyber_esports_v1_message_admin_proto_rawDescGZIP() []byte {
 }
 
 var file_cyber_esports_v1_message_admin_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_cyber_esports_v1_message_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_cyber_esports_v1_message_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_cyber_esports_v1_message_admin_proto_goTypes = []any{
 	(AnnouncementKind)(0),               // 0: cyber.esports.v1.AnnouncementKind
 	(AnnouncementScope)(0),              // 1: cyber.esports.v1.AnnouncementScope
@@ -916,21 +1043,26 @@ var file_cyber_esports_v1_message_admin_proto_goTypes = []any{
 	(*OfflineAnnouncementResponse)(nil), // 11: cyber.esports.v1.OfflineAnnouncementResponse
 	(*ListAnnouncementsRequest)(nil),    // 12: cyber.esports.v1.ListAnnouncementsRequest
 	(*ListAnnouncementsResponse)(nil),   // 13: cyber.esports.v1.ListAnnouncementsResponse
-	(*wrapperspb.StringValue)(nil),      // 14: google.protobuf.StringValue
-	(*timestamppb.Timestamp)(nil),       // 15: google.protobuf.Timestamp
+	(*ListUserMessagesRequest)(nil),     // 14: cyber.esports.v1.ListUserMessagesRequest
+	(*ListUserMessagesResponse)(nil),    // 15: cyber.esports.v1.ListUserMessagesResponse
+	(*wrapperspb.StringValue)(nil),      // 16: google.protobuf.StringValue
+	(*timestamppb.Timestamp)(nil),       // 17: google.protobuf.Timestamp
+	(*v1.PageRequest)(nil),              // 18: cyber.shared.common.v1.PageRequest
+	(*v1.PageResponse)(nil),             // 19: cyber.shared.common.v1.PageResponse
+	(*Message)(nil),                     // 20: cyber.esports.v1.Message
 }
 var file_cyber_esports_v1_message_admin_proto_depIdxs = []int32{
-	14, // 0: cyber.esports.v1.Announcement.id:type_name -> google.protobuf.StringValue
+	16, // 0: cyber.esports.v1.Announcement.id:type_name -> google.protobuf.StringValue
 	0,  // 1: cyber.esports.v1.Announcement.kind:type_name -> cyber.esports.v1.AnnouncementKind
 	1,  // 2: cyber.esports.v1.Announcement.scope:type_name -> cyber.esports.v1.AnnouncementScope
-	14, // 3: cyber.esports.v1.Announcement.title:type_name -> google.protobuf.StringValue
-	14, // 4: cyber.esports.v1.Announcement.content:type_name -> google.protobuf.StringValue
+	16, // 3: cyber.esports.v1.Announcement.title:type_name -> google.protobuf.StringValue
+	16, // 4: cyber.esports.v1.Announcement.content:type_name -> google.protobuf.StringValue
 	2,  // 5: cyber.esports.v1.Announcement.status:type_name -> cyber.esports.v1.AnnouncementStatus
-	15, // 6: cyber.esports.v1.Announcement.published_at:type_name -> google.protobuf.Timestamp
-	15, // 7: cyber.esports.v1.Announcement.offline_at:type_name -> google.protobuf.Timestamp
-	14, // 8: cyber.esports.v1.Announcement.published_by:type_name -> google.protobuf.StringValue
-	15, // 9: cyber.esports.v1.Announcement.created_at:type_name -> google.protobuf.Timestamp
-	15, // 10: cyber.esports.v1.Announcement.updated_at:type_name -> google.protobuf.Timestamp
+	17, // 6: cyber.esports.v1.Announcement.published_at:type_name -> google.protobuf.Timestamp
+	17, // 7: cyber.esports.v1.Announcement.offline_at:type_name -> google.protobuf.Timestamp
+	16, // 8: cyber.esports.v1.Announcement.published_by:type_name -> google.protobuf.StringValue
+	17, // 9: cyber.esports.v1.Announcement.created_at:type_name -> google.protobuf.Timestamp
+	17, // 10: cyber.esports.v1.Announcement.updated_at:type_name -> google.protobuf.Timestamp
 	0,  // 11: cyber.esports.v1.CreateAnnouncementRequest.kind:type_name -> cyber.esports.v1.AnnouncementKind
 	1,  // 12: cyber.esports.v1.CreateAnnouncementRequest.scope:type_name -> cyber.esports.v1.AnnouncementScope
 	3,  // 13: cyber.esports.v1.CreateAnnouncementResponse.announcement:type_name -> cyber.esports.v1.Announcement
@@ -940,21 +1072,26 @@ var file_cyber_esports_v1_message_admin_proto_depIdxs = []int32{
 	0,  // 17: cyber.esports.v1.ListAnnouncementsRequest.kind:type_name -> cyber.esports.v1.AnnouncementKind
 	2,  // 18: cyber.esports.v1.ListAnnouncementsRequest.status:type_name -> cyber.esports.v1.AnnouncementStatus
 	3,  // 19: cyber.esports.v1.ListAnnouncementsResponse.announcements:type_name -> cyber.esports.v1.Announcement
-	4,  // 20: cyber.esports.v1.MessageAdminService.CreateAnnouncement:input_type -> cyber.esports.v1.CreateAnnouncementRequest
-	6,  // 21: cyber.esports.v1.MessageAdminService.UpdateAnnouncement:input_type -> cyber.esports.v1.UpdateAnnouncementRequest
-	8,  // 22: cyber.esports.v1.MessageAdminService.PublishAnnouncement:input_type -> cyber.esports.v1.PublishAnnouncementRequest
-	10, // 23: cyber.esports.v1.MessageAdminService.OfflineAnnouncement:input_type -> cyber.esports.v1.OfflineAnnouncementRequest
-	12, // 24: cyber.esports.v1.MessageAdminService.ListAnnouncements:input_type -> cyber.esports.v1.ListAnnouncementsRequest
-	5,  // 25: cyber.esports.v1.MessageAdminService.CreateAnnouncement:output_type -> cyber.esports.v1.CreateAnnouncementResponse
-	7,  // 26: cyber.esports.v1.MessageAdminService.UpdateAnnouncement:output_type -> cyber.esports.v1.UpdateAnnouncementResponse
-	9,  // 27: cyber.esports.v1.MessageAdminService.PublishAnnouncement:output_type -> cyber.esports.v1.PublishAnnouncementResponse
-	11, // 28: cyber.esports.v1.MessageAdminService.OfflineAnnouncement:output_type -> cyber.esports.v1.OfflineAnnouncementResponse
-	13, // 29: cyber.esports.v1.MessageAdminService.ListAnnouncements:output_type -> cyber.esports.v1.ListAnnouncementsResponse
-	25, // [25:30] is the sub-list for method output_type
-	20, // [20:25] is the sub-list for method input_type
-	20, // [20:20] is the sub-list for extension type_name
-	20, // [20:20] is the sub-list for extension extendee
-	0,  // [0:20] is the sub-list for field type_name
+	18, // 20: cyber.esports.v1.ListUserMessagesRequest.page:type_name -> cyber.shared.common.v1.PageRequest
+	19, // 21: cyber.esports.v1.ListUserMessagesResponse.page:type_name -> cyber.shared.common.v1.PageResponse
+	20, // 22: cyber.esports.v1.ListUserMessagesResponse.messages:type_name -> cyber.esports.v1.Message
+	4,  // 23: cyber.esports.v1.MessageAdminService.CreateAnnouncement:input_type -> cyber.esports.v1.CreateAnnouncementRequest
+	6,  // 24: cyber.esports.v1.MessageAdminService.UpdateAnnouncement:input_type -> cyber.esports.v1.UpdateAnnouncementRequest
+	8,  // 25: cyber.esports.v1.MessageAdminService.PublishAnnouncement:input_type -> cyber.esports.v1.PublishAnnouncementRequest
+	10, // 26: cyber.esports.v1.MessageAdminService.OfflineAnnouncement:input_type -> cyber.esports.v1.OfflineAnnouncementRequest
+	12, // 27: cyber.esports.v1.MessageAdminService.ListAnnouncements:input_type -> cyber.esports.v1.ListAnnouncementsRequest
+	14, // 28: cyber.esports.v1.MessageAdminService.ListUserMessages:input_type -> cyber.esports.v1.ListUserMessagesRequest
+	5,  // 29: cyber.esports.v1.MessageAdminService.CreateAnnouncement:output_type -> cyber.esports.v1.CreateAnnouncementResponse
+	7,  // 30: cyber.esports.v1.MessageAdminService.UpdateAnnouncement:output_type -> cyber.esports.v1.UpdateAnnouncementResponse
+	9,  // 31: cyber.esports.v1.MessageAdminService.PublishAnnouncement:output_type -> cyber.esports.v1.PublishAnnouncementResponse
+	11, // 32: cyber.esports.v1.MessageAdminService.OfflineAnnouncement:output_type -> cyber.esports.v1.OfflineAnnouncementResponse
+	13, // 33: cyber.esports.v1.MessageAdminService.ListAnnouncements:output_type -> cyber.esports.v1.ListAnnouncementsResponse
+	15, // 34: cyber.esports.v1.MessageAdminService.ListUserMessages:output_type -> cyber.esports.v1.ListUserMessagesResponse
+	29, // [29:35] is the sub-list for method output_type
+	23, // [23:29] is the sub-list for method input_type
+	23, // [23:23] is the sub-list for extension type_name
+	23, // [23:23] is the sub-list for extension extendee
+	0,  // [0:23] is the sub-list for field type_name
 }
 
 func init() { file_cyber_esports_v1_message_admin_proto_init() }
@@ -962,6 +1099,7 @@ func file_cyber_esports_v1_message_admin_proto_init() {
 	if File_cyber_esports_v1_message_admin_proto != nil {
 		return
 	}
+	file_cyber_esports_v1_message_proto_init()
 	file_cyber_esports_v1_message_admin_proto_msgTypes[1].OneofWrappers = []any{}
 	file_cyber_esports_v1_message_admin_proto_msgTypes[3].OneofWrappers = []any{}
 	file_cyber_esports_v1_message_admin_proto_msgTypes[9].OneofWrappers = []any{}
@@ -971,7 +1109,7 @@ func file_cyber_esports_v1_message_admin_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_cyber_esports_v1_message_admin_proto_rawDesc), len(file_cyber_esports_v1_message_admin_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   11,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

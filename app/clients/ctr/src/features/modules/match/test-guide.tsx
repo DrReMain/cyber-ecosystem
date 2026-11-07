@@ -2,10 +2,13 @@ import { useQuery as useConnectQuery } from "@connectrpc/connect-query";
 import { getMatchSession } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/match-MatchService_connectquery";
 import { useNavigate } from "@tanstack/react-router";
 import { Repeat, Save, Sun, Timer, TriangleAlert, Trophy } from "lucide-react";
+import { useEffect } from "react";
 import type { AmbientOrb } from "#/features/app/ambient/ambient-backdrop";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
+import { StateScreen } from "#/features/app/states/state-screen";
 import { getGameModule } from "#/features/modules/test/registry";
 import { m } from "#/paraglide/messages";
+import { reasonGenreUndecided, reasonGenreUnknown, reasonNoDrawable } from "./session";
 import { FlowHeader } from "./ui/flow-header";
 
 /* The page's own orb (prototype test-guide): a single practice-orange blob. */
@@ -18,15 +21,54 @@ const guideOrbs: readonly AmbientOrb[] = [
  * head, the five rules, the scoring-basis card, and the ready CTA into the
  * flow. The first/second distinction and the step count ride the live
  * session; the face degrades to the first-assessment defaults until the
- * read lands.
+ * read lands. A genre verdict the server cannot make routes to the pick
+ * page; any other read error renders a retryable face.
  */
 export function TestGuidePage() {
   const navigate = useNavigate();
-  const sessionQuery = useConnectQuery(getMatchSession, {});
+  // The bare resume call shares its cache entry with the match page's — a
+  // cached undecided error from a pre-pick read must not boundary this page
+  // before the redirect below can act on it.
+  const sessionQuery = useConnectQuery(getMatchSession, {}, { throwOnError: false });
   const session = sessionQuery.data?.session ?? null;
   const steps = session?.steps ?? [];
   const first = (session?.firstSession as boolean | undefined) ?? true;
   const count = steps.length > 0 ? steps.length : 4;
+
+  // The same verdict routing the match page runs: a genre the server cannot
+  // decide belongs to the pick page, never to an error boundary here.
+  const errorReason = (sessionQuery.error as { reason?: string } | null)?.reason;
+  const undecided = errorReason === reasonGenreUndecided;
+  const emptyPool = errorReason === reasonGenreUnknown || errorReason === reasonNoDrawable;
+
+  useEffect(() => {
+    if (undecided) {
+      void navigate({ to: "/match/pick", search: { why: "tie" } });
+    } else if (emptyPool) {
+      void navigate({ to: "/match/pick", search: { why: "empty" } });
+    }
+  }, [undecided, emptyPool, navigate]);
+
+  if (sessionQuery.isError && !undecided && !emptyPool) {
+    return (
+      <AmbientLayout orbs={guideOrbs}>
+        <StateScreen
+          action={
+            <button
+              className="bg-cta-primary rounded-control cursor-pointer px-5 py-2.5 text-sm font-semibold text-white active:opacity-80"
+              onClick={() => void sessionQuery.refetch()}
+              type="button"
+            >
+              {m.common_retry()}
+            </button>
+          }
+          description={m.match_error_desc()}
+          title={m.match_error_title()}
+          variant="empty"
+        />
+      </AmbientLayout>
+    );
+  }
 
   // The ready CTA enters the first undone engine-backed step (prototype:
   // the first not-done step's intro). With nothing left it falls back to

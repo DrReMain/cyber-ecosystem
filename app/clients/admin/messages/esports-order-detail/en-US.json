@@ -13,5 +13,15 @@
   "esports_order_detail_unlock_closed": "Order closed, nothing unlocked",
   "esports_order_detail_unlock_trial": "Report {id} · unlocked permanently",
   "esports_order_detail_unlock_period": "Window {from} ~ {to} · {n} unlocked inside (kept forever)",
-  "esports_order_detail_refund_note": "Refund policy: no online or self-service refunds. Digital content counts as delivered once unlocked or in effect, non-refundable by default; exceptions are handled offline by support (with reason and proof), a refund reclaims the unlock (single) or the remaining window (membership), all audited."
+  "esports_order_detail_refund_note": "Refund policy: no online or self-service refunds. Digital content counts as delivered once unlocked or in effect, non-refundable by default; exceptions are handled offline by support (with reason and proof), a refund reclaims the unlock (single) or the remaining window (membership), all audited.",
+  "esports_order_detail_refund": "Refund",
+  "esports_order_detail_refund_reason": "Refund reason",
+  "esports_order_detail_refund_act": "Refund in full",
+  "esports_order_detail_refund_title": "Full refund",
+  "esports_order_detail_refund_desc": "Refunds {amount} in full to the original payment method — irreversible. Unlocks and the remaining membership window are not repossessed by this action; reclaim them on the member side as needed. All audited.",
+  "esports_order_detail_refund_label": "Reason (required, audited)",
+  "esports_order_detail_refund_ph": "Record the offline settlement, e.g. support ticket #123",
+  "esports_order_detail_refund_ok": "Confirm refund",
+  "esports_order_detail_refund_cancel": "Cancel",
+  "esports_order_detail_refund_done": "Refund accepted: {no}"
 }

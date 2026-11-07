@@ -100,7 +100,7 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 	lifecycle := bootstrap.NewLifecycle()
 	orderRP := order.NewOrderRP(logger, platformPlatform)
 	payChannelRP := order.NewPayChannelRP(logger, platformPlatform)
-	orderUC := order.NewOrderUC(logger, platformPlatform, lifecycle, eventSubscriptions, orderRP, skuRP, entitlementRP, testRP, payChannelRP, profileRP, complianceRP)
+	orderUC := order.NewOrderUC(logger, platformPlatform, lifecycle, eventSubscriptions, orderRP, skuRP, entitlementRP, testRP, payChannelRP, profileRP, complianceRP, systemClient)
 	orderService := order.NewOrderService(logger, orderUC)
 	entitlementService := entitle.NewEntitlementService(logger, entitleUC)
 	codeUC := entitle.NewCodeUC(logger, platformPlatform, activationCodeRP, profileRP)

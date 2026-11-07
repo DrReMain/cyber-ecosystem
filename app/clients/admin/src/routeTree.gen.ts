@@ -18,6 +18,7 @@ import { Route as DashboardAgentsRouteRouteImport } from './routes/dashboard/age
 import { Route as DashboardAssessmentRouteRouteImport } from './routes/dashboard/assessment/route'
 import { Route as DashboardChannelsRouteRouteImport } from './routes/dashboard/channels/route'
 import { Route as DashboardComplianceRouteRouteImport } from './routes/dashboard/compliance/route'
+import { Route as DashboardFeedbackRouteRouteImport } from './routes/dashboard/feedback/route'
 import { Route as DashboardFilesRouteRouteImport } from './routes/dashboard/files/route'
 import { Route as DashboardPeopleRouteRouteImport } from './routes/dashboard/people/route'
 import { Route as DashboardPlatformRouteRouteImport } from './routes/dashboard/platform/route'
@@ -27,6 +28,7 @@ import { Route as DashboardReportsRouteRouteImport } from './routes/dashboard/re
 import { Route as DashboardSystemRouteRouteImport } from './routes/dashboard/system/route'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as DashboardAgentsConnectionsRouteImport } from './routes/dashboard/agents/connections'
+import { Route as DashboardFeedbackTicketsRouteRouteImport } from './routes/dashboard/feedback/tickets/route'
 import { Route as DashboardFilesListRouteImport } from './routes/dashboard/files/list'
 import { Route as DashboardPeopleMembersRouteRouteImport } from './routes/dashboard/people/members/route'
 import { Route as DashboardPeopleUsersRouteRouteImport } from './routes/dashboard/people/users/route'
@@ -49,6 +51,9 @@ import { Route as DashboardChannelsActivationCodesBatchNoRouteImport } from './r
 import { Route as DashboardComplianceAgreementConsentsIndexRouteImport } from './routes/dashboard/compliance/agreement-consents/index'
 import { Route as DashboardComplianceAgreementVersionsIndexRouteImport } from './routes/dashboard/compliance/agreement-versions/index'
 import { Route as DashboardComplianceComplianceConfigIndexRouteImport } from './routes/dashboard/compliance/compliance-config/index'
+import { Route as DashboardFeedbackTicketsIndexRouteImport } from './routes/dashboard/feedback/tickets/index'
+import { Route as DashboardFeedbackTicketsFeedbackIdRouteImport } from './routes/dashboard/feedback/tickets/$feedbackId'
+import { Route as DashboardPeopleAnnouncementsIndexRouteImport } from './routes/dashboard/people/announcements/index'
 import { Route as DashboardPeopleMembersIndexRouteImport } from './routes/dashboard/people/members/index'
 import { Route as DashboardPeopleMembersIdRouteImport } from './routes/dashboard/people/members/$id'
 import { Route as DashboardPeopleUsersIndexRouteImport } from './routes/dashboard/people/users/index'
@@ -105,6 +110,11 @@ const DashboardComplianceRouteRoute =
     path: '/compliance',
     getParentRoute: () => DashboardRouteRoute,
   } as any)
+const DashboardFeedbackRouteRoute = DashboardFeedbackRouteRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
+  getParentRoute: () => DashboardRouteRoute,
+} as any)
 const DashboardFilesRouteRoute = DashboardFilesRouteRouteImport.update({
   id: '/files',
   path: '/files',
@@ -150,6 +160,12 @@ const DashboardAgentsConnectionsRoute =
     id: '/connections',
     path: '/connections',
     getParentRoute: () => DashboardAgentsRouteRoute,
+  } as any)
+const DashboardFeedbackTicketsRouteRoute =
+  DashboardFeedbackTicketsRouteRouteImport.update({
+    id: '/tickets',
+    path: '/tickets',
+    getParentRoute: () => DashboardFeedbackRouteRoute,
   } as any)
 const DashboardFilesListRoute = DashboardFilesListRouteImport.update({
   id: '/list',
@@ -274,6 +290,24 @@ const DashboardComplianceComplianceConfigIndexRoute =
     path: '/compliance-config/',
     getParentRoute: () => DashboardComplianceRouteRoute,
   } as any)
+const DashboardFeedbackTicketsIndexRoute =
+  DashboardFeedbackTicketsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardFeedbackTicketsRouteRoute,
+  } as any)
+const DashboardFeedbackTicketsFeedbackIdRoute =
+  DashboardFeedbackTicketsFeedbackIdRouteImport.update({
+    id: '/$feedbackId',
+    path: '/$feedbackId',
+    getParentRoute: () => DashboardFeedbackTicketsRouteRoute,
+  } as any)
+const DashboardPeopleAnnouncementsIndexRoute =
+  DashboardPeopleAnnouncementsIndexRouteImport.update({
+    id: '/announcements/',
+    path: '/announcements/',
+    getParentRoute: () => DashboardPeopleRouteRoute,
+  } as any)
 const DashboardPeopleMembersIndexRoute =
   DashboardPeopleMembersIndexRouteImport.update({
     id: '/',
@@ -331,6 +365,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/assessment': typeof DashboardAssessmentRouteRouteWithChildren
   '/dashboard/channels': typeof DashboardChannelsRouteRouteWithChildren
   '/dashboard/compliance': typeof DashboardComplianceRouteRouteWithChildren
+  '/dashboard/feedback': typeof DashboardFeedbackRouteRouteWithChildren
   '/dashboard/files': typeof DashboardFilesRouteRouteWithChildren
   '/dashboard/people': typeof DashboardPeopleRouteRouteWithChildren
   '/dashboard/platform': typeof DashboardPlatformRouteRouteWithChildren
@@ -340,6 +375,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/system': typeof DashboardSystemRouteRouteWithChildren
   '/dashboard/': typeof DashboardIndexRoute
   '/login/': typeof LoginIndexRoute
+  '/dashboard/feedback/tickets': typeof DashboardFeedbackTicketsRouteRouteWithChildren
   '/dashboard/people/members': typeof DashboardPeopleMembersRouteRouteWithChildren
   '/dashboard/people/users': typeof DashboardPeopleUsersRouteRouteWithChildren
   '/dashboard/pricing/orders': typeof DashboardPricingOrdersRouteRouteWithChildren
@@ -358,6 +394,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/system/users': typeof DashboardSystemUsersRoute
   '/dashboard/profile/': typeof DashboardProfileIndexRoute
   '/dashboard/channels/activation-codes/$batchNo': typeof DashboardChannelsActivationCodesBatchNoRoute
+  '/dashboard/feedback/tickets/$feedbackId': typeof DashboardFeedbackTicketsFeedbackIdRoute
   '/dashboard/people/members/$id': typeof DashboardPeopleMembersIdRoute
   '/dashboard/people/users/$id': typeof DashboardPeopleUsersIdRoute
   '/dashboard/pricing/orders/$id': typeof DashboardPricingOrdersIdRoute
@@ -366,6 +403,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/compliance/agreement-consents/': typeof DashboardComplianceAgreementConsentsIndexRoute
   '/dashboard/compliance/agreement-versions/': typeof DashboardComplianceAgreementVersionsIndexRoute
   '/dashboard/compliance/compliance-config/': typeof DashboardComplianceComplianceConfigIndexRoute
+  '/dashboard/feedback/tickets/': typeof DashboardFeedbackTicketsIndexRoute
+  '/dashboard/people/announcements/': typeof DashboardPeopleAnnouncementsIndexRoute
   '/dashboard/people/members/': typeof DashboardPeopleMembersIndexRoute
   '/dashboard/people/users/': typeof DashboardPeopleUsersIndexRoute
   '/dashboard/pricing/orders/': typeof DashboardPricingOrdersIndexRoute
@@ -380,6 +419,7 @@ export interface FileRoutesByTo {
   '/dashboard/assessment': typeof DashboardAssessmentRouteRouteWithChildren
   '/dashboard/channels': typeof DashboardChannelsRouteRouteWithChildren
   '/dashboard/compliance': typeof DashboardComplianceRouteRouteWithChildren
+  '/dashboard/feedback': typeof DashboardFeedbackRouteRouteWithChildren
   '/dashboard/files': typeof DashboardFilesRouteRouteWithChildren
   '/dashboard/people': typeof DashboardPeopleRouteRouteWithChildren
   '/dashboard/platform': typeof DashboardPlatformRouteRouteWithChildren
@@ -402,6 +442,7 @@ export interface FileRoutesByTo {
   '/dashboard/system/users': typeof DashboardSystemUsersRoute
   '/dashboard/profile': typeof DashboardProfileIndexRoute
   '/dashboard/channels/activation-codes/$batchNo': typeof DashboardChannelsActivationCodesBatchNoRoute
+  '/dashboard/feedback/tickets/$feedbackId': typeof DashboardFeedbackTicketsFeedbackIdRoute
   '/dashboard/people/members/$id': typeof DashboardPeopleMembersIdRoute
   '/dashboard/people/users/$id': typeof DashboardPeopleUsersIdRoute
   '/dashboard/pricing/orders/$id': typeof DashboardPricingOrdersIdRoute
@@ -410,6 +451,8 @@ export interface FileRoutesByTo {
   '/dashboard/compliance/agreement-consents': typeof DashboardComplianceAgreementConsentsIndexRoute
   '/dashboard/compliance/agreement-versions': typeof DashboardComplianceAgreementVersionsIndexRoute
   '/dashboard/compliance/compliance-config': typeof DashboardComplianceComplianceConfigIndexRoute
+  '/dashboard/feedback/tickets': typeof DashboardFeedbackTicketsIndexRoute
+  '/dashboard/people/announcements': typeof DashboardPeopleAnnouncementsIndexRoute
   '/dashboard/people/members': typeof DashboardPeopleMembersIndexRoute
   '/dashboard/people/users': typeof DashboardPeopleUsersIndexRoute
   '/dashboard/pricing/orders': typeof DashboardPricingOrdersIndexRoute
@@ -426,6 +469,7 @@ export interface FileRoutesById {
   '/dashboard/assessment': typeof DashboardAssessmentRouteRouteWithChildren
   '/dashboard/channels': typeof DashboardChannelsRouteRouteWithChildren
   '/dashboard/compliance': typeof DashboardComplianceRouteRouteWithChildren
+  '/dashboard/feedback': typeof DashboardFeedbackRouteRouteWithChildren
   '/dashboard/files': typeof DashboardFilesRouteRouteWithChildren
   '/dashboard/people': typeof DashboardPeopleRouteRouteWithChildren
   '/dashboard/platform': typeof DashboardPlatformRouteRouteWithChildren
@@ -435,6 +479,7 @@ export interface FileRoutesById {
   '/dashboard/system': typeof DashboardSystemRouteRouteWithChildren
   '/dashboard/': typeof DashboardIndexRoute
   '/login/': typeof LoginIndexRoute
+  '/dashboard/feedback/tickets': typeof DashboardFeedbackTicketsRouteRouteWithChildren
   '/dashboard/people/members': typeof DashboardPeopleMembersRouteRouteWithChildren
   '/dashboard/people/users': typeof DashboardPeopleUsersRouteRouteWithChildren
   '/dashboard/pricing/orders': typeof DashboardPricingOrdersRouteRouteWithChildren
@@ -453,6 +498,7 @@ export interface FileRoutesById {
   '/dashboard/system/users': typeof DashboardSystemUsersRoute
   '/dashboard/profile/': typeof DashboardProfileIndexRoute
   '/dashboard/channels/activation-codes/$batchNo': typeof DashboardChannelsActivationCodesBatchNoRoute
+  '/dashboard/feedback/tickets/$feedbackId': typeof DashboardFeedbackTicketsFeedbackIdRoute
   '/dashboard/people/members/$id': typeof DashboardPeopleMembersIdRoute
   '/dashboard/people/users/$id': typeof DashboardPeopleUsersIdRoute
   '/dashboard/pricing/orders/$id': typeof DashboardPricingOrdersIdRoute
@@ -461,6 +507,8 @@ export interface FileRoutesById {
   '/dashboard/compliance/agreement-consents/': typeof DashboardComplianceAgreementConsentsIndexRoute
   '/dashboard/compliance/agreement-versions/': typeof DashboardComplianceAgreementVersionsIndexRoute
   '/dashboard/compliance/compliance-config/': typeof DashboardComplianceComplianceConfigIndexRoute
+  '/dashboard/feedback/tickets/': typeof DashboardFeedbackTicketsIndexRoute
+  '/dashboard/people/announcements/': typeof DashboardPeopleAnnouncementsIndexRoute
   '/dashboard/people/members/': typeof DashboardPeopleMembersIndexRoute
   '/dashboard/people/users/': typeof DashboardPeopleUsersIndexRoute
   '/dashboard/pricing/orders/': typeof DashboardPricingOrdersIndexRoute
@@ -478,6 +526,7 @@ export interface FileRouteTypes {
     | '/dashboard/assessment'
     | '/dashboard/channels'
     | '/dashboard/compliance'
+    | '/dashboard/feedback'
     | '/dashboard/files'
     | '/dashboard/people'
     | '/dashboard/platform'
@@ -487,6 +536,7 @@ export interface FileRouteTypes {
     | '/dashboard/system'
     | '/dashboard/'
     | '/login/'
+    | '/dashboard/feedback/tickets'
     | '/dashboard/people/members'
     | '/dashboard/people/users'
     | '/dashboard/pricing/orders'
@@ -505,6 +555,7 @@ export interface FileRouteTypes {
     | '/dashboard/system/users'
     | '/dashboard/profile/'
     | '/dashboard/channels/activation-codes/$batchNo'
+    | '/dashboard/feedback/tickets/$feedbackId'
     | '/dashboard/people/members/$id'
     | '/dashboard/people/users/$id'
     | '/dashboard/pricing/orders/$id'
@@ -513,6 +564,8 @@ export interface FileRouteTypes {
     | '/dashboard/compliance/agreement-consents/'
     | '/dashboard/compliance/agreement-versions/'
     | '/dashboard/compliance/compliance-config/'
+    | '/dashboard/feedback/tickets/'
+    | '/dashboard/people/announcements/'
     | '/dashboard/people/members/'
     | '/dashboard/people/users/'
     | '/dashboard/pricing/orders/'
@@ -527,6 +580,7 @@ export interface FileRouteTypes {
     | '/dashboard/assessment'
     | '/dashboard/channels'
     | '/dashboard/compliance'
+    | '/dashboard/feedback'
     | '/dashboard/files'
     | '/dashboard/people'
     | '/dashboard/platform'
@@ -549,6 +603,7 @@ export interface FileRouteTypes {
     | '/dashboard/system/users'
     | '/dashboard/profile'
     | '/dashboard/channels/activation-codes/$batchNo'
+    | '/dashboard/feedback/tickets/$feedbackId'
     | '/dashboard/people/members/$id'
     | '/dashboard/people/users/$id'
     | '/dashboard/pricing/orders/$id'
@@ -557,6 +612,8 @@ export interface FileRouteTypes {
     | '/dashboard/compliance/agreement-consents'
     | '/dashboard/compliance/agreement-versions'
     | '/dashboard/compliance/compliance-config'
+    | '/dashboard/feedback/tickets'
+    | '/dashboard/people/announcements'
     | '/dashboard/people/members'
     | '/dashboard/people/users'
     | '/dashboard/pricing/orders'
@@ -572,6 +629,7 @@ export interface FileRouteTypes {
     | '/dashboard/assessment'
     | '/dashboard/channels'
     | '/dashboard/compliance'
+    | '/dashboard/feedback'
     | '/dashboard/files'
     | '/dashboard/people'
     | '/dashboard/platform'
@@ -581,6 +639,7 @@ export interface FileRouteTypes {
     | '/dashboard/system'
     | '/dashboard/'
     | '/login/'
+    | '/dashboard/feedback/tickets'
     | '/dashboard/people/members'
     | '/dashboard/people/users'
     | '/dashboard/pricing/orders'
@@ -599,6 +658,7 @@ export interface FileRouteTypes {
     | '/dashboard/system/users'
     | '/dashboard/profile/'
     | '/dashboard/channels/activation-codes/$batchNo'
+    | '/dashboard/feedback/tickets/$feedbackId'
     | '/dashboard/people/members/$id'
     | '/dashboard/people/users/$id'
     | '/dashboard/pricing/orders/$id'
@@ -607,6 +667,8 @@ export interface FileRouteTypes {
     | '/dashboard/compliance/agreement-consents/'
     | '/dashboard/compliance/agreement-versions/'
     | '/dashboard/compliance/compliance-config/'
+    | '/dashboard/feedback/tickets/'
+    | '/dashboard/people/announcements/'
     | '/dashboard/people/members/'
     | '/dashboard/people/users/'
     | '/dashboard/pricing/orders/'
@@ -687,6 +749,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardComplianceRouteRouteImport
       parentRoute: typeof DashboardRouteRoute
     }
+    '/dashboard/feedback': {
+      id: '/dashboard/feedback'
+      path: '/feedback'
+      fullPath: '/dashboard/feedback'
+      preLoaderRoute: typeof DashboardFeedbackRouteRouteImport
+      parentRoute: typeof DashboardRouteRoute
+    }
     '/dashboard/files': {
       id: '/dashboard/files'
       path: '/files'
@@ -749,6 +818,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/agents/connections'
       preLoaderRoute: typeof DashboardAgentsConnectionsRouteImport
       parentRoute: typeof DashboardAgentsRouteRoute
+    }
+    '/dashboard/feedback/tickets': {
+      id: '/dashboard/feedback/tickets'
+      path: '/tickets'
+      fullPath: '/dashboard/feedback/tickets'
+      preLoaderRoute: typeof DashboardFeedbackTicketsRouteRouteImport
+      parentRoute: typeof DashboardFeedbackRouteRoute
     }
     '/dashboard/files/list': {
       id: '/dashboard/files/list'
@@ -904,6 +980,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardComplianceComplianceConfigIndexRouteImport
       parentRoute: typeof DashboardComplianceRouteRoute
     }
+    '/dashboard/feedback/tickets/': {
+      id: '/dashboard/feedback/tickets/'
+      path: '/'
+      fullPath: '/dashboard/feedback/tickets/'
+      preLoaderRoute: typeof DashboardFeedbackTicketsIndexRouteImport
+      parentRoute: typeof DashboardFeedbackTicketsRouteRoute
+    }
+    '/dashboard/feedback/tickets/$feedbackId': {
+      id: '/dashboard/feedback/tickets/$feedbackId'
+      path: '/$feedbackId'
+      fullPath: '/dashboard/feedback/tickets/$feedbackId'
+      preLoaderRoute: typeof DashboardFeedbackTicketsFeedbackIdRouteImport
+      parentRoute: typeof DashboardFeedbackTicketsRouteRoute
+    }
+    '/dashboard/people/announcements/': {
+      id: '/dashboard/people/announcements/'
+      path: '/announcements'
+      fullPath: '/dashboard/people/announcements/'
+      preLoaderRoute: typeof DashboardPeopleAnnouncementsIndexRouteImport
+      parentRoute: typeof DashboardPeopleRouteRoute
+    }
     '/dashboard/people/members/': {
       id: '/dashboard/people/members/'
       path: '/'
@@ -1028,6 +1125,38 @@ const DashboardComplianceRouteRouteWithChildren =
     DashboardComplianceRouteRouteChildren,
   )
 
+interface DashboardFeedbackTicketsRouteRouteChildren {
+  DashboardFeedbackTicketsFeedbackIdRoute: typeof DashboardFeedbackTicketsFeedbackIdRoute
+  DashboardFeedbackTicketsIndexRoute: typeof DashboardFeedbackTicketsIndexRoute
+}
+
+const DashboardFeedbackTicketsRouteRouteChildren: DashboardFeedbackTicketsRouteRouteChildren =
+  {
+    DashboardFeedbackTicketsFeedbackIdRoute:
+      DashboardFeedbackTicketsFeedbackIdRoute,
+    DashboardFeedbackTicketsIndexRoute: DashboardFeedbackTicketsIndexRoute,
+  }
+
+const DashboardFeedbackTicketsRouteRouteWithChildren =
+  DashboardFeedbackTicketsRouteRoute._addFileChildren(
+    DashboardFeedbackTicketsRouteRouteChildren,
+  )
+
+interface DashboardFeedbackRouteRouteChildren {
+  DashboardFeedbackTicketsRouteRoute: typeof DashboardFeedbackTicketsRouteRouteWithChildren
+}
+
+const DashboardFeedbackRouteRouteChildren: DashboardFeedbackRouteRouteChildren =
+  {
+    DashboardFeedbackTicketsRouteRoute:
+      DashboardFeedbackTicketsRouteRouteWithChildren,
+  }
+
+const DashboardFeedbackRouteRouteWithChildren =
+  DashboardFeedbackRouteRoute._addFileChildren(
+    DashboardFeedbackRouteRouteChildren,
+  )
+
 interface DashboardFilesRouteRouteChildren {
   DashboardFilesListRoute: typeof DashboardFilesListRoute
 }
@@ -1074,12 +1203,15 @@ const DashboardPeopleUsersRouteRouteWithChildren =
 interface DashboardPeopleRouteRouteChildren {
   DashboardPeopleMembersRouteRoute: typeof DashboardPeopleMembersRouteRouteWithChildren
   DashboardPeopleUsersRouteRoute: typeof DashboardPeopleUsersRouteRouteWithChildren
+  DashboardPeopleAnnouncementsIndexRoute: typeof DashboardPeopleAnnouncementsIndexRoute
 }
 
 const DashboardPeopleRouteRouteChildren: DashboardPeopleRouteRouteChildren = {
   DashboardPeopleMembersRouteRoute:
     DashboardPeopleMembersRouteRouteWithChildren,
   DashboardPeopleUsersRouteRoute: DashboardPeopleUsersRouteRouteWithChildren,
+  DashboardPeopleAnnouncementsIndexRoute:
+    DashboardPeopleAnnouncementsIndexRoute,
 }
 
 const DashboardPeopleRouteRouteWithChildren =
@@ -1204,6 +1336,7 @@ interface DashboardRouteRouteChildren {
   DashboardAssessmentRouteRoute: typeof DashboardAssessmentRouteRouteWithChildren
   DashboardChannelsRouteRoute: typeof DashboardChannelsRouteRouteWithChildren
   DashboardComplianceRouteRoute: typeof DashboardComplianceRouteRouteWithChildren
+  DashboardFeedbackRouteRoute: typeof DashboardFeedbackRouteRouteWithChildren
   DashboardFilesRouteRoute: typeof DashboardFilesRouteRouteWithChildren
   DashboardPeopleRouteRoute: typeof DashboardPeopleRouteRouteWithChildren
   DashboardPlatformRouteRoute: typeof DashboardPlatformRouteRouteWithChildren
@@ -1219,6 +1352,7 @@ const DashboardRouteRouteChildren: DashboardRouteRouteChildren = {
   DashboardAssessmentRouteRoute: DashboardAssessmentRouteRouteWithChildren,
   DashboardChannelsRouteRoute: DashboardChannelsRouteRouteWithChildren,
   DashboardComplianceRouteRoute: DashboardComplianceRouteRouteWithChildren,
+  DashboardFeedbackRouteRoute: DashboardFeedbackRouteRouteWithChildren,
   DashboardFilesRouteRoute: DashboardFilesRouteRouteWithChildren,
   DashboardPeopleRouteRoute: DashboardPeopleRouteRouteWithChildren,
   DashboardPlatformRouteRoute: DashboardPlatformRouteRouteWithChildren,

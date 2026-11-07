@@ -1081,6 +1081,22 @@ func init() {
 	payorderDescTransactionID := payorderFields[11].Descriptor()
 	// payorder.TransactionIDValidator is a validator for the "transaction_id" field. It is called by the builders before save.
 	payorder.TransactionIDValidator = payorderDescTransactionID.Validators[0].(func(string) error)
+	// payorderDescRefundNo is the schema descriptor for refund_no field.
+	payorderDescRefundNo := payorderFields[14].Descriptor()
+	// payorder.RefundNoValidator is a validator for the "refund_no" field. It is called by the builders before save.
+	payorder.RefundNoValidator = payorderDescRefundNo.Validators[0].(func(string) error)
+	// payorderDescRefundID is the schema descriptor for refund_id field.
+	payorderDescRefundID := payorderFields[15].Descriptor()
+	// payorder.RefundIDValidator is a validator for the "refund_id" field. It is called by the builders before save.
+	payorder.RefundIDValidator = payorderDescRefundID.Validators[0].(func(string) error)
+	// payorderDescRefundedFen is the schema descriptor for refunded_fen field.
+	payorderDescRefundedFen := payorderFields[16].Descriptor()
+	// payorder.RefundedFenValidator is a validator for the "refunded_fen" field. It is called by the builders before save.
+	payorder.RefundedFenValidator = payorderDescRefundedFen.Validators[0].(func(int64) error)
+	// payorderDescRefundReason is the schema descriptor for refund_reason field.
+	payorderDescRefundReason := payorderFields[17].Descriptor()
+	// payorder.RefundReasonValidator is a validator for the "refund_reason" field. It is called by the builders before save.
+	payorder.RefundReasonValidator = payorderDescRefundReason.Validators[0].(func(string) error)
 	// payorderDescID is the schema descriptor for id field.
 	payorderDescID := payorderMixinFields0[0].Descriptor()
 	// payorder.DefaultID holds the default value on creation for the id field.

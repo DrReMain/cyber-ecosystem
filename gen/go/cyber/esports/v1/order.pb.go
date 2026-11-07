@@ -385,9 +385,6 @@ type CreateOrderRequest struct {
 	// The test record a trial sku unlocks — required for trial, must be
 	// absent for membership; the caller must own the record.
 	ScopeRef *string `protobuf:"bytes,3,opt,name=scope_ref,json=scopeRef,proto3,oneof" json:"scope_ref,omitempty"`
-	// OpenID for in-WeChat payment, supplied by the wechat binding;
-	// required when the channel pays by invoke.
-	PayerOpenid *string `protobuf:"bytes,4,opt,name=payer_openid,json=payerOpenid,proto3,oneof" json:"payer_openid,omitempty"`
 	// Post-payment landing page for jump channels.
 	ReturnUrl     *string `protobuf:"bytes,5,opt,name=return_url,json=returnUrl,proto3,oneof" json:"return_url,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -441,13 +438,6 @@ func (x *CreateOrderRequest) GetChannel() string {
 func (x *CreateOrderRequest) GetScopeRef() string {
 	if x != nil && x.ScopeRef != nil {
 		return *x.ScopeRef
-	}
-	return ""
-}
-
-func (x *CreateOrderRequest) GetPayerOpenid() string {
-	if x != nil && x.PayerOpenid != nil {
-		return *x.PayerOpenid
 	}
 	return ""
 }
@@ -922,22 +912,19 @@ const file_cyber_esports_v1_order_proto_rawDesc = "" +
 	"\apaid_at\x18\f \x01(\v2\x1a.google.protobuf.TimestampR\x06paidAt\"^\n" +
 	"\rPayCredential\x127\n" +
 	"\x04kind\x18\x01 \x01(\x0e2#.cyber.esports.v1.PayCredentialKindR\x04kind\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value\"\xc7\x02\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value\"\x82\x02\n" +
 	"\x12CreateOrderRequest\x12,\n" +
 	"\bsku_code\x18\x01 \x01(\tB\f\xbaH\t\xc8\x01\x01r\x04\x10\x01\x182H\x00R\askuCode\x88\x01\x01\x12+\n" +
 	"\achannel\x18\x02 \x01(\tB\f\xbaH\t\xc8\x01\x01r\x04\x10\x01\x18 H\x01R\achannel\x88\x01\x01\x12+\n" +
-	"\tscope_ref\x18\x03 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18 H\x02R\bscopeRef\x88\x01\x01\x122\n" +
-	"\fpayer_openid\x18\x04 \x01(\tB\n" +
-	"\xbaH\ar\x05\x10\x01\x18\x80\x01H\x03R\vpayerOpenid\x88\x01\x01\x12.\n" +
+	"\tscope_ref\x18\x03 \x01(\tB\t\xbaH\x06r\x04\x10\x01\x18 H\x02R\bscopeRef\x88\x01\x01\x12.\n" +
 	"\n" +
 	"return_url\x18\x05 \x01(\tB\n" +
-	"\xbaH\ar\x05\x10\x01\x18\xf4\x03H\x04R\treturnUrl\x88\x01\x01B\v\n" +
+	"\xbaH\ar\x05\x10\x01\x18\xf4\x03H\x03R\treturnUrl\x88\x01\x01B\v\n" +
 	"\t_sku_codeB\n" +
 	"\n" +
 	"\b_channelB\f\n" +
 	"\n" +
-	"_scope_refB\x0f\n" +
-	"\r_payer_openidB\r\n" +
+	"_scope_refB\r\n" +
 	"\v_return_url\"\x85\x01\n" +
 	"\x13CreateOrderResponse\x12-\n" +
 	"\x05order\x18\x01 \x01(\v2\x17.cyber.esports.v1.OrderR\x05order\x12?\n" +

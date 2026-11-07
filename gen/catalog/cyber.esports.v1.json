@@ -643,6 +643,19 @@
         "datascope": false
       },
       {
+        "name": "ListUserMessages",
+        "full_name": "cyber.esports.v1.MessageAdminService.ListUserMessages",
+        "request_name": "ListUserMessagesRequest",
+        "request_full_name": "cyber.esports.v1.ListUserMessagesRequest",
+        "response_name": "ListUserMessagesResponse",
+        "response_full_name": "cyber.esports.v1.ListUserMessagesResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/esports/users/{user_id}/messages",
+        "comment": "按用户列站内信(含已读态)",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
         "name": "OfflineAnnouncement",
         "full_name": "cyber.esports.v1.MessageAdminService.OfflineAnnouncement",
         "request_name": "OfflineAnnouncementRequest",
@@ -822,6 +835,19 @@
         "http_method": "GET",
         "http_path": "/api/v1/esports/payment-orders",
         "comment": "全量订单列表",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
+        "name": "RefundPaymentOrder",
+        "full_name": "cyber.esports.v1.OrderAdminService.RefundPaymentOrder",
+        "request_name": "RefundPaymentOrderRequest",
+        "request_full_name": "cyber.esports.v1.RefundPaymentOrderRequest",
+        "response_name": "RefundPaymentOrderResponse",
+        "response_full_name": "cyber.esports.v1.RefundPaymentOrderResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/esports/payment-orders/{order_no}/refund",
+        "comment": "全额退款",
         "access": "ADMIN",
         "datascope": false
       }

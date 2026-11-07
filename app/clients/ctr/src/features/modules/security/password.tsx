@@ -3,6 +3,7 @@ import { getSecurityStatus } from "@cyber-ecosystem/gen-connect-ts/cyber/system/
 import { System } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/error_reason_pb";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { systemReason } from "#/domains/error";
@@ -276,6 +277,7 @@ function NoPhoneCard() {
         to="/profile/security/bind-phone"
       >
         {m.security_pw_set_go_bind()}
+        <ChevronRight aria-hidden size={12} />
       </Link>
     </div>
   );

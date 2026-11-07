@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"slices"
 	"strings"
 	"time"
 
@@ -39,6 +40,12 @@ const (
 	StatePaid    = "paid"
 	StateClosed  = "closed"
 
+	RefundProcessing = "processing"
+	RefundSucceeded  = "succeeded"
+	RefundAbnormal   = "abnormal"
+
+	RefundNoPrefix = "R" // mints the refund's channel idempotency key from the order's own — one full refund per order makes it unique by construction
+
 	OrderNoPrefix = "P"
 	// The channel's own default deadline, carried explicitly so the row and
 	// the channel order can never disagree about expiry.
@@ -71,14 +78,22 @@ type Order struct {
 	CreatedAt       time.Time
 	ExpiresAt       time.Time
 	PaidAt          *time.Time
+	// The derived refund fact; nil RefundNo = never refunded. Paid stays
+	// terminal — these columns record what the channel did with the money
+	// after the fact, not a state the order machine moves through.
+	RefundNo     *string
+	RefundID     *string
+	RefundedFen  *int64
+	RefundReason *string
+	RefundState  *string
+	RefundedAt   *time.Time
 }
 
 type CreateIn struct {
-	SKUCode     string
-	Channel     payment.Channel
-	ScopeRef    *string
-	PayerOpenID *string
-	ReturnURL   *string
+	SKUCode   string
+	Channel   payment.Channel
+	ScopeRef  *string
+	ReturnURL *string
 	// The payer's wire address as the transport saw it — a server-derived
 	// fact the client never declares; the H5 channel requires it for risk
 	// control, so the service face extracts it and the channel validates.
@@ -112,6 +127,18 @@ type SettleIn struct {
 	TransactionID string
 	AmountFen     int64
 	PaidAt        time.Time
+}
+
+type RefundIn struct {
+	OrderNo   string
+	RefundNo  string
+	RefundID  string
+	AmountFen int64
+	Reason    string
+	State     string
+	// RefundedAt is the success stamp the refund answer or the refund query
+	// produced; nil while the refund is still processing.
+	RefundedAt *time.Time
 }
 
 type AdminOrderRow struct {
@@ -151,9 +178,11 @@ type UnlockView struct {
 // Port ----------------------------------------------------------------------------------------------------------------
 
 type OrderRP interface {
-	Create(ctx context.Context, o *Order) (*Order, error)             // a pending-unique conflict returns the surviving active order
-	ClosePending(ctx context.Context, orderNo string) (*Order, error) // nil, nil = no longer pending
-	Settle(ctx context.Context, in *SettleIn) (*Order, bool, error)   // the single write-paid entry; false = a rival settle already won
+	Create(ctx context.Context, o *Order) (*Order, error)                 // a pending-unique conflict returns the surviving active order
+	ClosePending(ctx context.Context, orderNo string) (*Order, error)     // nil, nil = no longer pending
+	Settle(ctx context.Context, in *SettleIn) (*Order, bool, error)       // the single write-paid entry; false = a rival settle already won
+	RefundPaid(ctx context.Context, in *RefundIn) (*Order, bool, error)   // the single write-refund entry; false = a rival refund already won
+	SettleRefund(ctx context.Context, in *RefundIn) (*Order, bool, error) // processing → terminal refund convergence; false = already terminal
 	List(ctx context.Context, in *ListIn) (*ListOut, error)
 	ListStalePending(ctx context.Context, olderThan time.Duration) ([]*Order, error)               // pending rows past the horizon; expiry is the converger's branch, not the query's
 	ListPaid(ctx context.Context, from, to time.Time) ([]*Order, error)                            // paid rows by paid_at window — the reconciliation's local side
@@ -165,12 +194,20 @@ type PayChannelRP interface { // routes to the configured provider's backend; ca
 	CreatePayment(ctx context.Context, provider string, in *payment.CreatePaymentInput) (*payment.PrepayResult, error)
 	ClosePayment(ctx context.Context, provider, outTradeNo string) error
 	QueryPayment(ctx context.Context, provider, outTradeNo string) (*payment.PaymentStatusResult, error)
+	Refund(ctx context.Context, provider string, in *payment.RefundInput) (*payment.RefundResult, error)
+	QueryRefund(ctx context.Context, provider, outRefundNo string) (*payment.RefundStatusResult, error)
 	ParseNotification(ctx context.Context, provider string, in *payment.NotificationInput) (*payment.NotificationEvent, error)
 	DownloadBill(ctx context.Context, provider string, in *payment.BillInput) (*payment.BillResult, error) // the day's raw statement; NotFound = the channel has not published it yet
 	ParseTradeBill(ctx context.Context, provider string, raw []byte) ([]payment.BillLine, error)           // neutralized statement rows in the contract's vocabulary
 	Channels(provider string) ([]payment.Channel, error)
 	DefaultProvider() string
 	NotifyBaseURL() string
+}
+
+type SystemRP interface {
+	// The caller's own wechat openid via the forwarded session — nil = the
+	// payer never bound wechat, which the invoke channel refuses at create.
+	WechatOpenID(ctx context.Context) (*string, error)
 }
 
 // UC ------------------------------------------------------------------------------------------------------------------
@@ -184,13 +221,14 @@ type OrderUC struct {
 	channelRP     PayChannelRP
 	profileRP     profile.ProfileRP
 	complianceRP  compliance.ComplianceRP
+	systemRP      SystemRP
 	eventBus      shared.DomainEventBus
 	loopCancels   []context.CancelFunc
 	nextBillDay   time.Time // the day the next reconcile sweep must still see; owned by the reconcile loop's goroutine
 	nextBillRetry int
 }
 
-func NewOrderUC(logger *slog.Logger, tm shared.Transaction, hooks shared.HookRegistry, eventBus shared.DomainEventBus, orderRP OrderRP, skuRP sku.SkuRP, entRP entitle.EntitlementRP, testRP test.TestRP, channelRP PayChannelRP, profileRP profile.ProfileRP, complianceRP compliance.ComplianceRP) *OrderUC {
+func NewOrderUC(logger *slog.Logger, tm shared.Transaction, hooks shared.HookRegistry, eventBus shared.DomainEventBus, orderRP OrderRP, skuRP sku.SkuRP, entRP entitle.EntitlementRP, testRP test.TestRP, channelRP PayChannelRP, profileRP profile.ProfileRP, complianceRP compliance.ComplianceRP, systemRP SystemRP) *OrderUC {
 	uc := &OrderUC{
 		UC:           shared.NewUC(logger.With("module", "module/order"), tm),
 		orderRP:      orderRP,
@@ -200,6 +238,7 @@ func NewOrderUC(logger *slog.Logger, tm shared.Transaction, hooks shared.HookReg
 		channelRP:    channelRP,
 		profileRP:    profileRP,
 		complianceRP: complianceRP,
+		systemRP:     systemRP,
 		eventBus:     eventBus,
 	}
 	hooks.OnStart(uc.runLoop("converge", convergeInterval, uc.ConvergeOnce))
@@ -299,12 +338,39 @@ func (uc *OrderUC) Create(ctx context.Context, in *CreateIn) (*CreateOut, error)
 	orderNo := OrderNoPrefix + xid.New().String()
 	expireAt := time.Now().Add(payWindow)
 	var payer *payment.Payer
-	if in.PayerOpenID != nil || in.ReturnURL != nil || in.ClientIP != "" {
-		payer = &payment.Payer{
-			OpenID:    utils.Deref(in.PayerOpenID, ""),
-			ClientIP:  in.ClientIP,
-			ReturnURL: utils.Deref(in.ReturnURL, ""),
+	if strings.HasSuffix(string(in.Channel), "_jsapi") {
+		// The invoke channel's payer openid is the caller's wechat binding,
+		// never a request field — the client has no way to know one, so the
+		// order server resolves it from identity at the only hop that needs
+		// it. An account that never bound wechat has nothing to pay with.
+		openid, err := uc.systemRP.WechatOpenID(ctx)
+		if err != nil {
+			return nil, err
 		}
+		if openid == nil {
+			return nil, esportspb.ErrorEsportsPayWechatUnbound("")
+		}
+		payer = &payment.Payer{OpenID: *openid}
+	}
+	if in.ReturnURL != nil || in.ClientIP != "" {
+		// The caller's landing URL cannot name the order — the number is
+		// minted right here — so the caller sends the receipt URL with its
+		// own params and this side appends the one fact only it owns; the
+		// channel's post-payment redirect then lands on a receipt that
+		// reads its own row.
+		returnURL := utils.Deref(in.ReturnURL, "")
+		if returnURL != "" {
+			sep := "?"
+			if strings.Contains(returnURL, "?") {
+				sep = "&"
+			}
+			returnURL += sep + "order=" + orderNo
+		}
+		if payer == nil {
+			payer = &payment.Payer{}
+		}
+		payer.ClientIP = in.ClientIP
+		payer.ReturnURL = returnURL
 	}
 	prepay, err := uc.channelRP.CreatePayment(ctx, provider, &payment.CreatePaymentInput{
 		Channel:     in.Channel,
@@ -596,6 +662,74 @@ func (uc *OrderAdminUC) Close(ctx context.Context, orderNo string) (*AdminOrderR
 	return rows[0], nil
 }
 
+func (uc *OrderAdminUC) Refund(ctx context.Context, orderNo, reason string) (*AdminOrderRow, error) {
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok || subject == nil {
+		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("order refund requires an admin session"))
+	}
+	o, err := uc.orderRP.ByNo(ctx, orderNo)
+	if err != nil {
+		return nil, err
+	}
+	if o == nil {
+		return nil, esportspb.ErrorEsportsOrderNotFound("")
+	}
+	if o.State != StatePaid {
+		// Only a paid order carries a refundable fact — a pending one has
+		// taken no money (close it instead), a closed one never will.
+		return nil, esportspb.ErrorEsportsOrderStateConflict("")
+	}
+	if o.RefundNo != nil {
+		return nil, esportspb.ErrorEsportsOrderAlreadyRefunded("")
+	}
+	// The full-refund tool: both amounts are the order's own — the channel
+	// requires the original total beside the refund figure, and a partial
+	// refund is not a product shape. No NotifyURL: the refund converges
+	// through the refund query, the same authority shape the settle loop
+	// already runs on.
+	refundNo := RefundNoPrefix + o.OrderNo
+	res, err := uc.channelRP.Refund(ctx, o.Provider, &payment.RefundInput{
+		OutTradeNo:     o.OrderNo,
+		OutRefundNo:    refundNo,
+		AmountFen:      payment.Fen(o.AmountFen),
+		TotalAmountFen: payment.Fen(o.AmountFen),
+		Reason:         reason,
+	})
+	if err != nil {
+		return nil, err
+	}
+	in := &RefundIn{
+		OrderNo:   o.OrderNo,
+		RefundNo:  refundNo,
+		RefundID:  res.RefundID,
+		AmountFen: o.AmountFen,
+		Reason:    reason,
+		State:     string(res.State),
+	}
+	if res.State == payment.RefundStateSucceeded {
+		// The sync answer carries no success time; the observation moment is
+		// the fallback fact — the same rule the settle path applies to a
+		// channel that stamps none.
+		now := time.Now()
+		in.RefundedAt = &now
+	}
+	refunded, won, err := uc.orderRP.RefundPaid(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	if won {
+		uc.Log.Info("order refunded by operator", "order_no", orderNo, "user_id", o.UserID, "refund_no", refundNo, "state", in.State, "by", subject.UserID)
+	}
+	// A lost arbitration is the idempotent answer, not an error: the rival
+	// call minted the same channel refund (the out_refund_no is derived
+	// from the order), so the row it left is this caller's truth too.
+	rows, err := uc.hydrate(ctx, []*Order{refunded})
+	if err != nil {
+		return nil, err
+	}
+	return rows[0], nil
+}
+
 func (uc *OrderAdminUC) List(ctx context.Context, in *AdminListIn) (*AdminListOut, error) {
 	listIn := &ListIn{PageRequest: in.PageRequest}
 	if in.State != nil {
@@ -643,6 +777,7 @@ func (uc *OrderAdminUC) Get(ctx context.Context, orderNo string) (*AdminOrderRow
 	if o == nil {
 		return nil, nil, esportspb.ErrorEsportsOrderNotFound("")
 	}
+	o = uc.convergeRefund(ctx, o)
 	rows, err := uc.hydrate(ctx, []*Order{o})
 	if err != nil {
 		return nil, nil, err
@@ -767,17 +902,46 @@ func (uc *OrderUC) reconcileSweep(ctx context.Context) error {
 }
 
 func (uc *OrderUC) reconcileDay(ctx context.Context, day time.Time) error {
-	provider := uc.channelRP.DefaultProvider()
+	// One bill per provider, not one bill for the world: a day's paid rows
+	// carry the provider they were paid on, and each provider's rows meet
+	// that provider's own statement — the mock's snapshot bill and WeChat's
+	// day bill meet under one rule, never under each other's.
+	start, end := billDayWindow(day)
+	orders, err := uc.orderRP.ListPaid(ctx, start, end)
+	if err != nil {
+		return err
+	}
+	byProvider := make(map[string][]*Order, 1)
+	for _, o := range orders {
+		byProvider[o.Provider] = append(byProvider[o.Provider], o)
+	}
+	providers := make([]string, 0, len(byProvider))
+	for p := range byProvider {
+		providers = append(providers, p)
+	}
+	slices.Sort(providers)
+	for _, provider := range providers {
+		rows := byProvider[provider]
+		if err := uc.reconcileProviderDay(ctx, day, start, end, provider, rows); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (uc *OrderUC) reconcileProviderDay(ctx context.Context, day, start, end time.Time, provider string, orders []*Order) error {
 	bill, err := uc.channelRP.DownloadBill(ctx, provider, &payment.BillInput{Date: day, Kind: payment.BillKindTrade})
 	if err != nil {
+		if errorspb.IsInfraErrorPaymentUnavailable(err) {
+			// Rows paid on a provider this deployment does not serve sit
+			// outside this reconciler's authority — the deployment that
+			// configures the provider owns their reconciliation.
+			uc.Log.Warn("payment bill provider not served; rows skipped", "provider", provider, "rows", len(orders), "day", day.Format("2006-01-02"))
+			return nil
+		}
 		return err
 	}
 	lines, err := uc.channelRP.ParseTradeBill(ctx, provider, bill.Raw)
-	if err != nil {
-		return err
-	}
-	start, end := billDayWindow(day)
-	orders, err := uc.orderRP.ListPaid(ctx, start, end)
 	if err != nil {
 		return err
 	}
@@ -785,9 +949,6 @@ func (uc *OrderUC) reconcileDay(ctx context.Context, day time.Time) error {
 	for _, o := range orders {
 		local[o.OrderNo] = o
 	}
-	// The reconciliation compares day facts: channel rows the bill dates into
-	// this window against local rows paid in it — the mock's snapshot bill and
-	// WeChat's day bill meet under one rule.
 	billed := make(map[string]payment.BillLine, len(lines))
 	for _, l := range lines {
 		if (l.State == payment.BillLinePaid || l.State == payment.BillLineRefund) && !l.At.Before(start) && l.At.Before(end) {
@@ -799,7 +960,7 @@ func (uc *OrderUC) reconcileDay(ctx context.Context, day time.Time) error {
 		l, ok := billed[o.OrderNo]
 		switch {
 		case !ok:
-			uc.Log.Error("paid order missing from bill", "order_no", o.OrderNo, "day", day.Format("2006-01-02"))
+			uc.Log.Error("paid order missing from bill", "order_no", o.OrderNo, "provider", o.Provider, "day", day.Format("2006-01-02"))
 			mismatch++
 		case int64(l.AmountFen) != o.AmountFen:
 			uc.Log.Error("bill amount mismatch", "order_no", o.OrderNo, "row_fen", o.AmountFen, "bill_fen", int64(l.AmountFen))
@@ -821,7 +982,7 @@ func (uc *OrderUC) reconcileDay(ctx context.Context, day time.Time) error {
 		}
 		mismatch++
 	}
-	uc.Log.Info("payment bill reconciled", "day", day.Format("2006-01-02"), "local", len(orders), "billed", len(billed), "mismatch", mismatch)
+	uc.Log.Info("payment bill reconciled", "provider", provider, "day", day.Format("2006-01-02"), "local", len(orders), "billed", len(billed), "mismatch", mismatch)
 	return nil
 }
 
@@ -936,6 +1097,46 @@ func (uc *OrderAdminUC) foldUnlock(ctx context.Context, o *Order) (*UnlockView, 
 	// A paid membership order without its grant row — a state no write
 	// path can produce; the honest answer is the empty view.
 	return &UnlockView{}, nil
+}
+
+func (uc *OrderAdminUC) convergeRefund(ctx context.Context, o *Order) *Order {
+	// Folds a still-processing refund onto its channel truth; the query is
+	// the authority (no refund notification is subscribed). A refused or
+	// unchanged answer serves the row as-is — a stale processing tag is
+	// honest, a blocked read is not.
+	if o.RefundNo == nil || o.RefundState == nil || *o.RefundState != RefundProcessing {
+		return o
+	}
+	status, err := uc.channelRP.QueryRefund(ctx, o.Provider, *o.RefundNo)
+	if err != nil {
+		uc.Log.Warn("refund converge query failed", "order_no", o.OrderNo, "refund_no", *o.RefundNo, "err", err)
+		return o
+	}
+	if status.State == payment.RefundStateProcessing {
+		return o
+	}
+	in := &RefundIn{
+		OrderNo:  o.OrderNo,
+		RefundNo: *o.RefundNo,
+		RefundID: status.RefundID,
+		State:    string(status.State),
+	}
+	if status.State == payment.RefundStateSucceeded {
+		at := status.SuccessAt
+		if at.IsZero() {
+			at = time.Now()
+		}
+		in.RefundedAt = &at
+	}
+	refunded, _, err := uc.orderRP.SettleRefund(ctx, in)
+	if err != nil {
+		uc.Log.Warn("refund converge settle failed", "order_no", o.OrderNo, "refund_no", *o.RefundNo, "err", err)
+		return o
+	}
+	if refunded != nil {
+		return refunded
+	}
+	return o
 }
 
 func retirePending(ctx context.Context, channelRP PayChannelRP, orderRP OrderRP, order *Order) (*Order, error) {

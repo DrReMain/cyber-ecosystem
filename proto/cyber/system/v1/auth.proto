@@ -132,6 +132,14 @@ service AuthService {
     option (cyber.ext.v1.access) = ACCESS_BUILTIN;
     option (google.api.http) = {get: "/api/v1/system/me/security"};
   }
+  rpc GetWechatOpenId(GetWechatOpenIdRequest) returns (GetWechatOpenIdResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "自读微信支付身份（openid），服务端下单富集专用"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {get: "/api/v1/system/me/wechat-openid"};
+  }
   rpc Logout(LogoutRequest) returns (LogoutResponse) {
     option (cyber.ext.v1.method) = {
       comment: "登出"
@@ -475,6 +483,18 @@ message GetSecurityStatusResponse {
 message SecurityCredential {
   string kind = 1;
   string masked_identifier = 2;
+}
+
+// getWechatOpenId --------------------------------------------------------------------
+
+message GetWechatOpenIdRequest {}
+
+// The caller's wechat openid, raw — the one credential value that crosses
+// unmasked: the JSAPI unified order takes it as a payer fact, and only the
+// consuming service's server-side enrichment reads this face (display
+// surfaces keep the masked form). Null = the caller never bound wechat.
+message GetWechatOpenIdResponse {
+  google.protobuf.StringValue openid = 1;
 }
 
 message LogoutRequest {}

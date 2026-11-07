@@ -14,4 +14,5 @@ func RegisterMessageAdminServiceConnectServer(srv *connect.Server, svc MessageAd
 	connect.HandleUnary(srv, "/cyber.esports.v1.MessageAdminService/PublishAnnouncement", svc.PublishAnnouncement)
 	connect.HandleUnary(srv, "/cyber.esports.v1.MessageAdminService/OfflineAnnouncement", svc.OfflineAnnouncement)
 	connect.HandleUnary(srv, "/cyber.esports.v1.MessageAdminService/ListAnnouncements", svc.ListAnnouncements)
+	connect.HandleUnary(srv, "/cyber.esports.v1.MessageAdminService/ListUserMessages", svc.ListUserMessages)
 }
