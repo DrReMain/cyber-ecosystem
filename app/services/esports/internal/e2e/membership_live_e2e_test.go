@@ -269,6 +269,32 @@ func TestMembershipLiveE2E(t *testing.T) {
 	if d := digestOf(userC); d.MembershipUnlockedReports != 1 || d.LastMembershipUntil == nil || !d.LastMembershipUntil.Before(time.Now()) {
 		t.Fatalf("digest lapsed member: count=%d until=%v (a lapsed window keeps its end date, the unlock survives it)", d.MembershipUnlockedReports, d.LastMembershipUntil)
 	}
+
+	// Repurchase after termination (the rehearsal's ring-7 shape): with no
+	// live window left, the seam starts the period at the purchase moment,
+	// and the fold's GrantedAt must say the same — the terminated rows'
+	// dead expiries never masquerade as the new window's head.
+	repurchase, err := uc.Grant(adminCtx, userA, "member_month")
+	if err != nil {
+		t.Fatalf("repurchase grant: %v", err)
+	}
+	grace := time.Now()
+	if repurchase.PeriodCount != 3 || repurchase.Status != "active" {
+		t.Fatalf("repurchase fold: %+v", repurchase)
+	}
+	if repurchase.GrantedAt.Before(grace.Add(-time.Minute)) || repurchase.GrantedAt.After(grace.Add(time.Minute)) {
+		t.Fatalf("repurchase window head must be its own purchase moment, not a dead row's expiry: %+v", repurchase)
+	}
+	if out, err := accessUC.GetReportAccess(userCtx, shared.ReportCognitive); err != nil || !out.Allowed || out.Reason != esportspb.ReportAccessReason_REPORT_ACCESS_REASON_MEMBERSHIP_ACTIVE {
+		t.Fatalf("access after repurchase: out=%+v err=%v", out, err)
+	}
+	repurchaseDetail, err := uc.Get(adminCtx, userA)
+	if err != nil || len(repurchaseDetail.History) != 3 {
+		t.Fatalf("repurchase history: detail=%+v err=%v", repurchaseDetail, err)
+	}
+	if !repurchaseDetail.History[0].GrantedAt.Equal(repurchase.GrantedAt) || repurchaseDetail.History[0].Status != "active" {
+		t.Fatalf("history head must carry the purchase moment as its window start: %+v", repurchaseDetail.History[0])
+	}
 }
 
 func cleanMembershipE2E(t *testing.T, db *ent.Client) {

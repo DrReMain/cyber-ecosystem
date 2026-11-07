@@ -457,15 +457,30 @@ func foldAll(rows []*entitle.EntitlementRow, now time.Time) []*MembershipFacts {
 }
 
 func periodStart(run []*entitle.EntitlementRow, i int) time.Time {
-	// A row's window start: the first period starts at its creation
-	// moment, every renewal at the prior period's expiry — the seam the
-	// grant read. The row's own created_at stays the operator-action
-	// timestamp (an audit fact), so the timeline's start is derived from
-	// the chain, never stored twice.
-	if i == 0 {
-		return run[0].CreatedAt
+	// The grant seam's mirror (Grant's window read): a period starts at
+	// the furthest window still live at this row's birth. A prior row
+	// terminated before the birth, or whose window had already closed by
+	// then, never set the start — the period began at its own creation
+	// (a lapsed renewal buys forward from purchase, never backfilled).
+	// Termination is dated, so a row terminated after the birth still
+	// counts: it was live when the seam read it.
+	born := run[i].CreatedAt
+	var furthest *time.Time
+	for j := i - 1; j >= 0; j-- {
+		prior := run[j]
+		if prior.Status == shared.StatusTerminated &&
+			(prior.TerminatedAt == nil || !prior.TerminatedAt.After(born)) {
+			continue // dead paper before the birth — the seam skipped it
+		}
+		if prior.ExpiresAt != nil && prior.ExpiresAt.After(born) &&
+			(furthest == nil || prior.ExpiresAt.After(*furthest)) {
+			furthest = prior.ExpiresAt
+		}
 	}
-	return derefTime(run[i-1].ExpiresAt)
+	if furthest != nil {
+		return *furthest
+	}
+	return born
 }
 
 func rowStatus(row *entitle.EntitlementRow, now time.Time) string {
