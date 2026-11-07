@@ -133,3 +133,10 @@
 - 三裁定全落:①tab 筛选族灭——feedback-tickets/members/orders/skus 四列表页迁基座 Filter(状态/来源/订单号=Select;line Tabs 禁形绝迹;URL search 可分享性保留=Filter 写 status/tab/state/scope/shelf 入 URL 且过滤即归页);②drawer 降级——tests 题库 drawer 重表 DataTable→朴素 Table(零嵌卡/零工具栏钮,character_counter 10 行+分页实证);③容器逐页审计(17 面)——四页 gap-3→gap-4、feedback/order 两详情页补 p-4、announcements 双卡拆、tests/activation-codes/agreement-consents 卡内 Select 与 activation-batch Segmented=例外形判合规。
 - ActionIconButton href locale 前缀族组件缝一次修六实例:锚点侧 localizeUrl(router input rewrite 自剥前缀,左键导航不变;/ar-SA/ members 实证锚点带前缀=复制/新标签保语言)。
 - 门禁:admin build+typecheck+check 三绿;6 新词键×5 locale(usage-prefix 律);live 走查 5 面存证 $TMPDIR/cyber-dev/u3-1107/。
+
+## 2026-11-07 U2 片A · B-6 done 页三差修(hzy,用户「推完咋们继续」令)
+
+- ①收据行:计数改已玩口径(attemptDetails 去重 ability,与 match guide 同律——一场一真相;hzypw 实测 2/4 诚实)+用时行=首末 attempt 跨度(实测 59 秒=DB 真跨度 58s;**session.started_at=场次铸造时刻非播放钟,跨天场污染实证后弃用**);WKT Timestamp 双形状读法(Q4 律)。
+- ②CTA 族对齐原型 27c/test-done.html:69:分享主(G-202 占位先例 toast「即将开放」——share-invite 页=demand-ledger 裁归 MSG-2/P23 前置,不建死链)+个人中心次(live 跳 /profile 实证)+尾注;报告入口撤(原型明令在报告中心/历史)。
+- ③三球氛围:AmbientLayout orbs 显式传入(原型 test-done trio=共享 loginOrbs 同值,purple/blue/cyan 260/220/200px blur70 op.26,DOM 3 球实证)。
+- 门禁:ctr build+typecheck+check 三绿(途中复杂度拆手+两 noUncheckedIndexedAccess 守卫);词档 +5 键×2 locale,-2 死键(test_result_report/report_session_cta_home),paraglide 强再生;存证 u3-1107/r7/r8。

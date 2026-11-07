@@ -44,7 +44,6 @@
   "test_result_retry_disabled": "重新测试（机会已用完）",
   "test_result_next": "继续 · {ability}",
   "test_result_finish": "完成测评",
-  "test_result_report": "查看能力报告",
   "test_result_first": "首局成绩",
   "test_result_prev": "较上局 {delta}",
   "test_result_best": "历史最佳 {score}",

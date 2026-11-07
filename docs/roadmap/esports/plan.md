@@ -30,7 +30,7 @@
 | MSG-1 余面(lzx,D-BB 全片) | 窄化裁决落地(PM-13..20=prd 待裁区;全维持=零改动,裁翻契约面小改随改);banner ctr 消费面未建(随 MSG-2/精修带评估);定时发布=已裁非特性 | W6 ljr 裁决 | S |
 | PAY2 通道联调(lzx) | 已毕=行政件全清+Native 腿全生命周期+0.01 真钱闭环+全额退款腿+NO_STATEMENT_EXIST 修(11-05..06)。余=JSAPI 腿真实 appid+绑定域(上线清单);微信侧活证(G-402/403/404 尾);微信外降级「引导微信内打开」(D-BF);XFF 信任拨盘台账收口;query 无触发器(convergeStaleAfter=10m)与 boot 放弃日 ERROR 两裁点随刀 | W4 起 | M |
 | MIG1 冻结件+预演(lzx 专职,D-BB) | 已毕=五阶段+生产副本直载+谱系三源互证+census+回滚腿彩排+密码面实数定谳(11-06)。余=snapshot 承载表(P26)+recompute 口径标与重放窗口(P26.1,含曲线入码 sizing ⑧);**预演 11-15**(D-BE 绿门含回滚腿);预演前过 D-MIG-1(school 域处置)/D-MIG-2(账号冲突消解);cutover 迁移执行同专职 | P26/P26.1+D-MIG-1/2 | M |
-| U2 ctr 原型对齐(harness 重激活) | 渲染可达已毕(U1);余=按 HARNESS-SOP 重激活保真 harness 对原型核视觉;**B-6(done 页三差)修法在此**;趋势进阶 CTA 偏离处置随本片(见 prd 待裁) | 走查轮前 | M |
+| U2 ctr 原型对齐(harness 重激活) | **B-6 done 页三差 ✅ 修毕 11-07(片A:收据行改已玩计数[attemptDetails 去重]+用时行[首末 attempt 跨度,session.started_at=铸造时刻弃用]/CTA 族=分享主[share-invite 归 MSG-2,G-202 占位先例]+个人中心次,报告入口撤/三球 orbs 显式)**;渲染可达已毕(U1);余=按 HARNESS-SOP 重激活保真 harness 对原型核视觉;趋势进阶 CTA 偏离处置随本片(N-1=prd 待裁) | 走查轮前 | M |
 | M2-4 trace Tab | 暂缓后置(11-03 用户裁;P22 否决窗 11-14 后复评) | P22 | S |
 | Q 线尾(役毕残件) | ⑧曲线入码 sizing(随 P26.1);consent 渠道列契约微欠(一句裁,可并 P23);E4 三配置模块=P4;隐私真文「7 天保留」句 vs 反推续用任意龄=ljr/法务车道 | P26.1/P4/P23 | S |
 
@@ -43,7 +43,6 @@
 | B-3 | Terminate×竞速授予复活窗:Grant tx 内窗读与插入间 Terminate 可先提交→终止成功而新行自旧到期复活 | 高 | G-421②(entitle/biz.go:173,亲手复核) | 同上 |
 | B-4 | esports(及 agent)全部 WRITE 面零审计行:kratos §5a 三兄弟缺一+proto/UI「入审计」承诺落空;修形=esports 生产者三件(MQ+Sink+ladder 双块,镜像 system server.go:38-58) | 高(cutover 审计合规) | G-417;消费侧已在(system/audit 订阅 audit_log 实锤) | lzx+用户裁定后落片;**并行会话已在途,落片时核对** |
 | B-5 | pay 墙过期会员灰 banner 无生产者:MembershipWindow GT-now 恒滤→expired 态三死面;两形待裁(墙补读 digest LastMembershipUntil / 删死面三件) | 中 | G-416(SQL 造态活跑) | 随下片裁 |
-| B-6 | session-done 页三差:已测收据行=评级口径非原型已玩口径;CTA 族反转(报告入口为主,原型明令不在本页);blob 氛围缺失 | 中 | G-410(用户裁定「视觉低质」) | U2 |
 | B-7 | G-420 F4-F6 待复核定级:同单复用忽略渠道切换/对账游标内存态重启归昨/sku 丢 PeriodDays 结算零授予仅 ERROR | 待核 | G-420(代理引证) | 下片复核 |
 | B-8 | pay result fail 卡「我的→订单」死指路(ListOrders 零客户端消费方,订单列表页原型未画) | 低 | coverage D5(pay/zh-CN.json:54;order/service.go:75) | 随 PAY2/C3-3 走查裁 |
 | B-9 | entitlement.proto 幂等注文滞后:注文 per-(member,code) vs 实现 per-(member,family) 族宽形 | 低 | coverage D6-5(entitlement.proto:13-15;X3-4 宽形活证) | 契约注释一行修 |
