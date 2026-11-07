@@ -46,6 +46,13 @@
         "command": "pnpm exec playwright test"
       }
     },
+    "fixtures": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{projectRoot}",
+        "command": "GEN_FIXTURES=1 pnpm exec playwright test e2e/prototype/gen-fixtures.spec.ts && pnpm exec biome format --write e2e/prototype/fixtures"
+      }
+    },
     "format": {
       "executor": "nx:run-commands",
       "options": {

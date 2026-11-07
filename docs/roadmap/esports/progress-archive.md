@@ -142,3 +142,11 @@
 - 门禁:ctr build+typecheck+check 三绿(途中复杂度拆手+两 noUncheckedIndexedAccess 守卫);词档 +5 键×2 locale,-2 死键(test_result_report/report_session_cta_home),paraglide 强再生;存证 u3-1107/r7/r8。
 - **用户复检轮(「跟原型设计不一样吧」令)整页对照补五处**:页头(FlowHeader 增 trailing 槽+「{done}/{total} 完成」绿徽)/hero 词回原型「本次测评完成」/网格卡三缺(百分位降序+最强项金边 style[biome 类序法 bypass]+「{score} 分」键+「超过 {pct}% 同龄」行,cohort 无答=诚实省略)/金卡与网格统一百分位冠军(无答回退最高分)/分享钮换 cta-success 绿渐变 token(=原型 btn-grn 同值)+ghost 1.5px;hzytm 1/2 评级场满分态活证(r9:页头+徽+金卡+19.5 分卡+绿渐变钮);词档 +3 键×2 locale。
 - **用户二连复检轮(「我咋感觉不一样」令)→ 原型渲染态并排实比**:preset=tested-fps 播种原型(4 卡满分态)vs 建成页同视口双截,视觉分析器逐块读出两处真差并修——①hero 背板 `bg-ambient-cyan`(实色!)叠半透明径向=整幅亮青矩形(原型=30% 透明径向光晕),拆实色类留纯径向;②金卡 pad 全居中(原型 .pad text-align:center),补 text-center。复截分析器判「subtle glow/全居中/nothing looks wrong」。**教训:bg-<tone> 是实色工具类(球体靠 opacity-26 压),叠透明渐变必穿帮;原型对齐必须渲染态并排眼见,DOM 断言不替代视觉**。注:本 dev 库 lzx 走查会话活改数据,金卡档位/百分位在两次读间翻动(S·97%→C),金边/同龄行随数诚实显隐非 bug。
+
+## 2026-11-07 U2 片B · 保真 harness 重激活(hzy,用户「那现在开始吧」令)
+
+- HARNESS-SOP 照抄落盘(禁记忆重写律遵守,三件套逐字):e2e/prototype/{text.mjs, gen-fixtures.spec.ts, login.fidelity.spec.ts} + project.json `fixtures` target(GEN_FIXTURES=1 门控+链尾 biome format=生成物出生即合规)。
+- 锚再生:`ESPORTS_PROTO_DIR=<本机原型根> ./nx run ctr:fixtures` 绿——4 枚(login/home ready/resume/tested-fps;SOP 默认语料根=shijiao lab 路径,本机必经 env 注入,此命令形=本片交付的一部分)。
+- `./nx run ctr:e2e`:skeleton 1 绿/门控 6 跳/**login fidelity 常红复活(SOP 预期态)=新鲜读数 4 组,全数在案或等价形**——①ICP 带「备」=D-AO① 已裁(q-line A1/integration-matrix C1-1 在案);②非微信预告行=G-005 已裁(C4-3 非微信腿 11-07 毕时互证);③⚡=应用 lucide Zap SVG vs 原型字符(innerText 不见 SVG,视觉等价,视觉轴待铺开轮并排核);④tab 行形=div/button flex 子项 innerText 分行差(同为并排分段钮,视觉轴待铺开核)。10-28 样板红 9 条→今 4 组=G 伤单修复实收 5 条。
+- 门禁:ctr build+typecheck+check 三绿(--skip-nx-cache)+paraglide:check 绿;新文件入 tsconfig include("e2e" glob 自覆盖)。
+- 余=铺开(home/profile/report 逐页逐预设 fidelity spec,序=ctr-prototype-matrix ✅/◐ 19 页先;E5-f3 已落 home 面,样板可直接跑)+N-1 趋势 CTA(prd 待裁)。

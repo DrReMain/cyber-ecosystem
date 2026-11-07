@@ -30,7 +30,7 @@
 | MSG-1 余面(lzx,D-BB 全片) | 窄化裁决落地(PM-13..20=prd 待裁区;全维持=零改动,裁翻契约面小改随改);banner ctr 消费面未建(随 MSG-2/精修带评估);定时发布=已裁非特性 | W6 ljr 裁决 | S |
 | PAY2 通道联调(lzx) | 已毕=行政件全清+Native 腿全生命周期+0.01 真钱闭环+全额退款腿+NO_STATEMENT_EXIST 修(11-05..06)。余=JSAPI 腿真实 appid+绑定域(上线清单);微信侧活证(G-402/403/404 尾);微信外降级「引导微信内打开」(D-BF);XFF 信任拨盘台账收口;query 无触发器(convergeStaleAfter=10m)与 boot 放弃日 ERROR 两裁点随刀 | W4 起 | M |
 | MIG1 冻结件+预演(lzx 专职,D-BB) | 已毕=五阶段+生产副本直载+谱系三源互证+census+回滚腿彩排+密码面实数定谳(11-06)。余=snapshot 承载表(P26)+recompute 口径标与重放窗口(P26.1,含曲线入码 sizing ⑧);**预演 11-15**(D-BE 绿门含回滚腿);预演前过 D-MIG-1(school 域处置)/D-MIG-2(账号冲突消解);cutover 迁移执行同专职 | P26/P26.1+D-MIG-1/2 | M |
-| U2 ctr 原型对齐(harness 重激活) | **B-6 done 页三差 ✅ 修毕 11-07(片A+用户复检轮:页头 FlowHeader+「N/N 完成」绿徽/hero 词回「本次测评完成」/网格卡=百分位排序+最强项金边+「分」尾+「超过 X% 同龄」行(pending 诚实省略)/分享钮=btn-grn 绿渐变 token cta-success/ghost 1.5px——整页对照原型 test-done.html 逐块核;收据行改已玩计数[attemptDetails 去重]+用时行[首末 attempt 跨度,session.started_at=铸造时刻弃用]/CTA 族=分享主[share-invite 归 MSG-2,G-202 占位先例]+个人中心次,报告入口撤/三球 orbs 显式)**;渲染可达已毕(U1);余=按 HARNESS-SOP 重激活保真 harness 对原型核视觉;趋势进阶 CTA 偏离处置随本片(N-1=prd 待裁) | 走查轮前 | M |
+| U2 ctr 原型对齐(harness 重激活) | **片A B-6 done 页 ✅ 11-07 三轮毕(三差→复检五差→渲染并排轮;详=archive+git proven-by)**;**片B 保真 harness 重激活 ✅ 11-07(HARNESS-SOP 照抄三件套+fixtures target;锚再生 4 枚,本机语料根经 `ESPORTS_PROTO_DIR` 注入;`ctr:e2e` login 常红复活=新鲜 4 组全在案/等价形:ICP 备=D-AO①、非微信预告=G-005、⚡=Zap SVG vs 字符、tab 行形=innerText 分行差,后二组视觉轴待铺开核;10-28 红 9→今 4=G 伤单实收 5)**;渲染可达已毕(U1);余=铺开(home/profile/report 逐页逐预设 fidelity spec,序=ctr-prototype-matrix ✅/◐ 19 页)+N-1(prd 待裁) | 走查轮前 | M |
 | M2-4 trace Tab | 暂缓后置(11-03 用户裁;P22 否决窗 11-14 后复评) | P22 | S |
 | Q 线尾(役毕残件) | ⑧曲线入码 sizing(随 P26.1);consent 渠道列契约微欠(一句裁,可并 P23);E4 三配置模块=P4;隐私真文「7 天保留」句 vs 反推续用任意龄=ljr/法务车道 | P26.1/P4/P23 | S |
 
