@@ -29,19 +29,19 @@ e2e-only 承载 5 清单(R2 后):GetTestAttempt(测评 tab 只读面)/ListBanner
 C1 冷启动=R1 承接在案;C2 报告族/C3 支付面/C4 账号族/C5 消息反馈/C6 变体扫尾全毕(C6-2 前批毕)。**发现入账**:B-10 高优(手机号+密码登录假承诺,plan 工单)+反馈 10 下界静默拦截(P4 轻缺,N-5 族)+UpdateProfile/POLICY 双「客户端拦截纵深防御形」判层。
 **余=造态依赖(P3 批)**:C2-2 解锁态+C2-3 两点态/混类/N-1(cohort 造态)+C3-1 会员隐单次/X1-5 未成年红卡(R-minor)+C4-2 KEEP_*/C4-4 可合并(R-empty)+C4-1 NoPhoneCard+C4-6 双凭证(真微信)+C6-4 断网暖卡+P3-7 服务端直探族。
 
-### P3 造态依赖与专项腿
+### P3 造态依赖与专项腿——R3 轮 2026-11-08 收割 P3-1/P3-2/P3-4 全删+P3-3/P3-7 主体(毕证:matrix C1-2/X1-5/C3-1/C4-1/C4-2/C4-4/C6-6 行注;wt-* 四号净清零残留)
 | # | 缺口 | 依据 |
 |---|---|---|
-| P3-1 | 空号角色缺位(KEEP_* 升级 merge CTA 支零证据)——矩阵 §2 增 R-empty | bind-phone.tsx:37-49 |
-| P3-2 | u13 监护闸三腿(未勾拒/勾选落库/服务端 6100)零覆盖 | age.tsx:80-233;biz.go:186-190;C1-2 补步 |
-| P3-3 | 换账号钮(LOGIN_SEAT_REQUIRED,需 R-multi)/WechatCallback DISABLED 两支/密码 reason 词表族(POLICY 可造=执法已落 88ada92a) | C4-1 补步 |
-| P3-4 | Logout 登出链归属(C4-5 补步;U1 已活证) | logout.fn.ts:13 |
+| P3-3 余 | WechatCallback DISABLED 两支(换账号钮+密码 reason 词表族已毕:R2 词表+R3 LOGIN_SEAT_REQUIRED 红行/更换账号钮,零 R-multi 依赖=admin 号即可造态) | C4-1 行注 |
 | P3-5 | 真微信腿族:登录授权腿/merge KEEP_OTHER 换边+切换尾页/bind 6005 竞态——随真通道窗标注 | C4-3/C4-4 例注 |
 | P3-6 | pick 空池 why=empty 活体/切后台记无效面/较上局 delta 芯 | C1-4/C1-5/C6-2 补步 |
-| P3-7 | 服务端拒绝腿族:UpdateProfile 拒绝面(biz.go:200-215)/GetMatchSession GENRE_UNKNOWN·no-drawable 拒答 | C1-2/C1-4 补步 |
+| P3-7 余 | GetMatchSession no-drawable 拒答造态支(UpdateProfile 6100+GENRE_UNDECIDED/GENRE_UNKNOWN 已直探毕@R3) | C6-6 行注 |
 
 ### P4 轻缺与变体(顺路收割)
-昵称 emoji(**毕@R2**:「昵称暂不支持 emoji 表情」行内)/偏好重复 toast·满 3 态·平票字面/出生不完整拒/13-18 黄条/profile 总览九区无主走例/digest 空兜底 toast/center covered≥6 full 支/趋势进阶 CTA(见 §三)/admin 码表两筛·分页·空态·「复制未核销码」/admin 反馈详情 closed 送框移除/公告时间列(§三)/X2-2 home 红点句复走证(毕@R2)/断网暖卡。反馈 10 下界=R2 入账后 11-08 复核**翻案销案**(行内红行「描述至少 10 个字,便于我们定位问题」真实渲染+SubmitFeedback 未发——R2「零反馈面」系 toast 单观测漏持久红行的误判,§2.2 立法实证案例)。
+昵称 emoji(**毕@R2**:「昵称暂不支持 emoji 表情」行内)/偏好重复 toast·满 3 态·平票字面(**毕@R3**:「已经添加过了」toast+「已添加 3 / 3」添加钮 disabled+「类型投票 FPS 1 / MOBA 1 · 默认类型：平票 → 需手动选类型」)/出生不完整拒(age.tsx complete=false 行内分支,R3 未走维持)/13-18 黄条(**毕@R3**:「未满 18 周岁——可以测评，但无法购买付费报告/会员（付费时会再次拦截）」无 checkbox)/profile 总览九区无主走例/digest 空兜底 toast/center covered≥6 full 支/趋势进阶 CTA(见 §三)/admin 码表两筛·分页·空态·「复制未核销码」/admin 反馈详情 closed 送框移除/公告时间列(§三)/X2-2 home 红点句复走证(毕@R2)/断网暖卡。反馈 10 下界=R2 入账后 11-08 复核**翻案销案**(行内红行「描述至少 10 个字,便于我们定位问题」真实渲染+SubmitFeedback 未发——R2「零反馈面」系 toast 单观测漏持久红行的误判,§2.2 立法实证案例)。
+
+### R3 即修记录(2026-11-08 走查中发现,面级当场修毕;非偏离不入 §三)
+①**D-AN⑤ 落地漏**:「命中偏好的能力池内权重 ×1.5」句 D-AN(10-25)已裁弃但两 locale 文案仍在+live 渲染在场——两 locale 删尾子句,HMR 上页亲证;②**merge 成功页文案错指**:security_merge_success_body/line_credential 静态写死「微信」按微信冲突升级场景而作,keepCallerSms(手机号吸收空号)腿下失真——四键两 locale 改中性形(「全新账号已注销 · 其登录方式已并入当前账号」/「登录方式已并入当前账号(手机号/微信均可用于登录)」),HMR 上页亲证。附带判层:SessionCounts 按 test_record 口径(仅 done 场 match_session 不计入),两空号对走 absorb-other 支方向不变。
 
 ## 三) 新登记偏离(本次核验发现,未入任何台账;全数转 prd 待裁区 R 系)
 | # | 偏离 | 依据 |

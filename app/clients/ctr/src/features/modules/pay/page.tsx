@@ -267,11 +267,19 @@ function qrActionsOf(onCheck: () => void, onCancel: () => void): SheetAction[] {
   ];
 }
 
-function degradeActionsOf(copied: boolean, onCopy: () => void, onCancel: () => void): SheetAction[] {
+function degradeActionsOf(
+  copied: boolean,
+  onCopy: () => void,
+  onCancel: () => void,
+): SheetAction[] {
   return [
     // The label swap is the copy's own receipt — only the write's success
     // arm turns it, so the button never claims a copy that did not happen.
-    { label: copied ? m.pay_degrade_copied() : m.pay_degrade_copy(), kind: "primary", onPress: onCopy },
+    {
+      label: copied ? m.pay_degrade_copied() : m.pay_degrade_copy(),
+      kind: "primary",
+      onPress: onCopy,
+    },
     { label: m.pay_degrade_cancel(), kind: "ghost", onPress: onCancel },
   ];
 }
