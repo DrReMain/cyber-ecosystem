@@ -208,6 +208,7 @@ function multisetMinus(a: string[], b: string[]): string[] {
 - **钉钟拨过窗口另一侧=SSR/CSR 双钟差**(11-08 pay 片实锤):SSR 按真钟渲染态②、hydration 按钉钟渲染态③→树重建+window capture 吐「未知错误」toast(capture 无 opts=默认弹,4s 瞬态);处方=collectFace 加 linger(等瞬态走完,oracle 只收稳定面),不剥 DOM。
 - **innerText 的 flex 分行律**(11-08 pay 片实锤):flex 容器的直接子项各占一行(flex item=块级);「文字+badge 同行」=外层 span 去 flex、badge 内联+**字面空格文本节点**(`{" "}`),P7 的「专属会员 · 月卡 更划算」与 member 卡「已解锁 1 份报告 永久保留」皆此律。
 - **P7 稿与 flags 注入型 oracle 采集**(11-08 pay 片):oracle=仓内三态稿时,gen-fixtures 走 file://+evaluate show(i) 切态+.tabs 评审壳剥离;页面渲染期读 localStorage 的状态(pay-result 的 flags.lastOrder)注入后**必须去掉 preset 参数再 reload**(reset() 会 re-merge 覆盖,纯 load() 恢复完整存储含登录态过 guard)。
+- **静态数据页(无预设)采集**(11-08 message 片):原型页自持演示数据且不读 `_state.js` 预设时,面=纯 URL 参数(`?t=` 段选/`?kind=` 双形),`preset=ready` 只为过 login guard 不改面;多行信体种子=content 里 `\n` 逐段落(应用 whitespace-pre-line 渲染,innerText 一行一段=oracle 行,normalizeLines 收空行)。
 - 写文件一律绝对路径+落完即 ls:并行 tool 调用 cwd 快照可能不一致(实测落进幽灵嵌套路径)。
 - 退出码重定向到文件后单独取,禁管道尾(`|tail;$?` 恒 0)。
 - `pnpm exec node` 被本环境策略拒绝:提取一律走 Playwright spec 形态(本档三件套即是)。

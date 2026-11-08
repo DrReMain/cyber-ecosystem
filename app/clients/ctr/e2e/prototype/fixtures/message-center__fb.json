@@ -1,0 +1,31 @@
+{
+  "page": "message-center",
+  "preset": "ready",
+  "source": "message-center.html?preset=ready&t=fb",
+  "title": "ctr · 消息中心",
+  "lines": [
+    "消息",
+    "👤",
+    "消息",
+    "我的反馈",
+    "匹配总是崩",
+    "管理员已回复 · 09-08",
+    "已回复",
+    "›",
+    "希望增加难度选项",
+    "处理中 · 09-05",
+    "处理中",
+    "›",
+    "我要反馈",
+    "状态机：pending（处理中）→ replied（已回复）；用户追问 → 回到 pending",
+    "🏠",
+    "首页",
+    "📊",
+    "记录",
+    "💬",
+    "消息",
+    "👤",
+    "我的"
+  ],
+  "placeholders": []
+}

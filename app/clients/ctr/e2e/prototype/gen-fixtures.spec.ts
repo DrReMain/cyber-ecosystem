@@ -19,7 +19,13 @@ const REVIEW_CHROME = ".vchip, .ckbtn, #__ck, .envsw";
 // password's three faces share one shell: the m= param picks the copy, and
 // an explicit #key suffix keeps three fixtures apart where the preset alone
 // would collide; the forget face's rebuild lives at /login/forgot (G2's
-// pre-login-context split). The report family rides the same member-data
+// pre-login-context split). The message family rides static demo data the
+// pages own — the faces are URL params alone: message-center's two tabs
+// (?t=, the seg's own state) and feedback-detail's two shapes (?kind=
+// notice | fb, one page two subjects); feedback-submit is one stateless
+// form. All three pages guard login, so preset=ready opens the guard
+// without touching the faces (none of them reads preset state).
+// The report family rides the same member-data
 // states: tested-fps (single/center/trend — one scored fps session), and
 // cognitive at unlocked-single — tested-fps plus the purchased cognitive
 // unlock, the preset whose app-side shape is a report_type grant. Career's
@@ -57,6 +63,11 @@ const PAGES = [
   "pay-result?preset=ready&r=member#member",
   "pay-result?preset=ready&r=fail#fail",
   "pay-result?preset=ready&r=cancel#cancel",
+  "message-center?preset=ready&t=msg#msg",
+  "message-center?preset=ready&t=fb#fb",
+  "feedback-submit?preset=ready#submit",
+  "feedback-detail?preset=ready&kind=notice#notice",
+  "feedback-detail?preset=ready&kind=fb#fb",
 ];
 
 // pay-result draws its receipt card off flags.lastOrder — the settle flow's
@@ -143,7 +154,7 @@ test("regenerate prototype text fixtures", async ({ browser }) => {
     // "#key" names the fixture when the query alone cannot (password's
     // three m= faces, pay-result's four r= verdicts).
     const [specNoKey = spec, key = ""] = spec.split("#");
-    const [pageName, query = ""] = specNoKey.split("?");
+    const [pageName = "", query = ""] = specNoKey.split("?");
     const url = `file://${PROTO}/${pageName}.html${query ? `?${query}` : ""}`;
     const context = await browser.newContext(); // fresh storage per page
     const page = await context.newPage();
@@ -164,7 +175,13 @@ test("regenerate prototype text fixtures", async ({ browser }) => {
       // restores the stored state whole — logged flag included, so the
       // login guard still clears.
       await page.evaluate((o) => {
-        CTR.set("flags.lastOrder", o);
+        // CTR is the prototype's own page global — the shell's state pen;
+        // typed through the window because tsc never sees the page's
+        // script scope.
+        (window as unknown as { CTR: { set: (key: string, value: unknown) => void } }).CTR.set(
+          "flags.lastOrder",
+          o,
+        );
         const u = new URL(location.href);
         u.searchParams.delete("preset");
         history.replaceState(null, "", u);
@@ -202,7 +219,9 @@ test("regenerate prototype text fixtures", async ({ browser }) => {
     // then show(i) picks the state before the capture.
     await page.evaluate((idx) => {
       document.querySelector(".tabs")?.remove();
-      show(idx);
+      // show(i) is the draft's own tab switcher — same page-global law
+      // as CTR above.
+      (window as unknown as { show: (i: number) => void }).show(idx);
     }, state.show);
     const title = await page.title();
     writeFixture(

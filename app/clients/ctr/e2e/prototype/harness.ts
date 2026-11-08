@@ -369,6 +369,68 @@ export function seedPayOrder(
   return orderNo;
 }
 
+/** Seeds one letterbox row — the message center's msg tab and the notice
+ * detail read exactly this row (a letter has no other home: no delete
+ * face, no single-letter read — the list is a letter's only address).
+ * read stays the row's own column: the center's unread banner counts the
+ * false rows, and opening the notice detail flips one server-side. */
+export function seedLetter(
+  tag: string,
+  userId: string,
+  o: {
+    suffix: string;
+    type: "announcement" | "report" | "membership" | "feedback_reply";
+    title: string;
+    content: string;
+    refId?: string;
+    read?: boolean;
+    at: string;
+  },
+): string {
+  const id = `${tag}L${o.suffix}`;
+  sql(
+    "esports",
+    `INSERT INTO user_message (id, created_at, updated_at, user_id, type, title, content, ref_id, is_read)
+     VALUES ('${id}', '${o.at}', '${o.at}', '${userId}', '${o.type}', '${o.title}', '${o.content}',
+             ${o.refId === undefined ? "NULL" : `'${o.refId}'`}, ${o.read === true});`,
+  );
+  return id;
+}
+
+/** Seeds one feedback ticket — the root row plus its turns, the exact
+ * shape Submit and the two append moves write: the root's content IS the
+ * first turn's text (the denormalization the list rows read), a replied
+ * root carries its admin turn, and a pending one stands on the opening
+ * turn alone. createdAt feeds the detail's 提交于 line; updatedAt feeds
+ * the queue's order and its meta stamp. */
+export function seedTicket(
+  tag: string,
+  userId: string,
+  o: {
+    suffix: string;
+    category: "feature_bug" | "assessment" | "report" | "payment" | "account" | "other";
+    status: "pending" | "replied" | "closed";
+    content: string;
+    createdAt: string;
+    updatedAt: string;
+    turns: { sender: "user" | "admin"; content: string; at: string }[];
+  },
+): string {
+  const id = `${tag}F${o.suffix}`;
+  const turns = o.turns
+    .map(
+      (turn, i) =>
+        `('${tag}T${o.suffix}${i}', '${turn.at}', '${turn.at}', '${id}', '${turn.sender}', '${turn.content}', ${turn.sender === "admin" ? "'e2e-seed'" : "NULL"})`,
+    )
+    .join(",");
+  sql(
+    "esports",
+    `INSERT INTO user_feedback (id, created_at, updated_at, user_id, category, content, contact, status)
+     VALUES ('${id}', '${o.createdAt}', '${o.updatedAt}', '${userId}', '${o.category}', '${o.content}', NULL, '${o.status}');${o.turns.length > 0 ? ` INSERT INTO feedback_message (id, created_at, updated_at, feedback_id, sender, content, admin_id) VALUES ${turns};` : ""}`,
+  );
+  return id;
+}
+
 /** Seeds one report-family unlock grant — the app-side shape of the
  * prototype's unlocked.cognitive flag (the unlocked-single preset): an
  * active report_type entitlement, which the kernel's verdict lets
@@ -418,6 +480,10 @@ export function cleanup(tag: string): void {
      DELETE FROM report_snapshot WHERE id LIKE '${tag}sn%';
      DELETE FROM test_record WHERE id LIKE '${tag}r%' OR id LIKE '${tag}m%' OR id LIKE '${tag}c%' OR user_id LIKE '${tag}c%';
      DELETE FROM match_session WHERE id LIKE '${tag}s%';
+     DELETE FROM feedback_message WHERE id LIKE '${tag}T%' OR feedback_id LIKE '${tag}F%'
+       OR feedback_id IN (SELECT id FROM user_feedback WHERE user_id = '${tag}u');
+     DELETE FROM user_feedback WHERE id LIKE '${tag}F%' OR user_id = '${tag}u';
+     DELETE FROM user_message WHERE id LIKE '${tag}L%' OR user_id = '${tag}u';
      DELETE FROM entitlement WHERE user_id = '${tag}u';
      DELETE FROM profile WHERE id LIKE '${tag}%' OR user_id LIKE '${tag}%';`,
   );
