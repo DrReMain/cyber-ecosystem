@@ -1,0 +1,17 @@
+{
+  "page": "bind-phone",
+  "preset": "phone-unbound",
+  "source": "bind-phone.html?preset=phone-unbound",
+  "title": "ctr · 绑定手机号",
+  "lines": [
+    "‹",
+    "绑定手机号",
+    "绑定手机号",
+    "微信登录的账号绑手机后，可用手机号验证码登录，换设备也不丢数据。",
+    "发送验证码",
+    "入口：完善资料 · 当前账号：龘好久（微信登录，未绑手机）",
+    "确认绑定",
+    "跳过"
+  ],
+  "placeholders": ["手机号", "6 位验证码"]
+}

@@ -86,7 +86,14 @@ test.use({ locale: "zh-CN" });
 // (3−2=1, 3−1=2), exactly the preset's own numbers.
 const RESUME_RECORDS = [
   { suffix: "r1", code: "red_dot", attempt: 1, score: 71, at: "2026-09-11 21:09:30+08" },
-  { suffix: "r2", code: "red_dot", attempt: 2, score: 78, grade: "B", at: "2026-09-11 21:11:00+08" },
+  {
+    suffix: "r2",
+    code: "red_dot",
+    attempt: 2,
+    score: 78,
+    grade: "B",
+    at: "2026-09-11 21:11:00+08",
+  },
   { suffix: "r3", code: "flash_aiming", attempt: 1, score: 86, at: "2026-09-11 21:14:10+08" },
 ];
 
@@ -191,10 +198,38 @@ test("session done (closing ceremony) matches the prototype snapshot", async ({ 
     const { sessionId } = seedTestSession(tag, userId, {
       startedAt: "2026-09-15 21:00:00+08",
       records: [
-        { suffix: "r1", code: "red_dot", attempt: 1, score: 75, grade: "B", at: "2026-09-15 21:04:30+08" },
-        { suffix: "r2", code: "flash_aiming", attempt: 1, score: 82, grade: "A", at: "2026-09-15 21:06:20+08" },
-        { suffix: "r3", code: "moving_target", attempt: 1, score: 69, grade: "B", at: "2026-09-15 21:07:40+08" },
-        { suffix: "r4", code: "skill_trajectory", attempt: 1, score: 63, grade: "B", at: "2026-09-15 21:08:10+08" },
+        {
+          suffix: "r1",
+          code: "red_dot",
+          attempt: 1,
+          score: 75,
+          grade: "B",
+          at: "2026-09-15 21:04:30+08",
+        },
+        {
+          suffix: "r2",
+          code: "flash_aiming",
+          attempt: 1,
+          score: 82,
+          grade: "A",
+          at: "2026-09-15 21:06:20+08",
+        },
+        {
+          suffix: "r3",
+          code: "moving_target",
+          attempt: 1,
+          score: 69,
+          grade: "B",
+          at: "2026-09-15 21:07:40+08",
+        },
+        {
+          suffix: "r4",
+          code: "skill_trajectory",
+          attempt: 1,
+          score: 63,
+          grade: "B",
+          at: "2026-09-15 21:08:10+08",
+        },
       ],
       snapshot: { anchorSuffix: "r4", percentiles: [78, 86, 71, 64] },
     });

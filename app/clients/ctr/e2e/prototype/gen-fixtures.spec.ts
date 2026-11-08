@@ -77,6 +77,22 @@ const PAGES = [
   "test-intro?preset=resume&ab=reactionSpeed#intro",
   "test-running?preset=resume&ab=reactionSpeed#running",
   "test-result?preset=resume&ab=reactionSpeed#result",
+  // The security family rides the corpus's own two subject shapes:
+  // phone-unbound (wechat bound, phone free — the bind-phone page's own
+  // caller, the hub's richest three-chip face) for the hub and both
+  // bind-phone faces, and ready (the phone-carrying member) for the
+  // bind-wechat faces — the bind pages' faces are URL params alone
+  // (from= picks the entry word, err=conflict the occupied card). The
+  // merge pair rides tested-fps: the rich card's records line reads the
+  // session count; the blocked state is the page's own seg switch (DOM
+  // state, no URL shape — the dedicated pass after the PAGES loop clicks
+  // it).
+  "account-security?preset=phone-unbound#security",
+  "bind-phone?preset=phone-unbound#phone",
+  "bind-phone?preset=phone-unbound&err=conflict#phone-conflict",
+  "bind-wechat?preset=ready#wechat",
+  "bind-wechat?preset=ready&err=conflict#wechat-conflict",
+  "account-merge-confirm?preset=tested-fps#merge",
 ];
 
 // pay-result draws its receipt card off flags.lastOrder — the settle flow's
@@ -275,14 +291,14 @@ test("regenerate prototype text fixtures", async ({ browser }) => {
           { ab: "trackingStability", code: "moving_target" },
           { ab: "skillReleaseAccuracy", code: "skill_trajectory" },
         ],
-        done: [
-          "reactionSpeed",
-          "aimingAccuracy",
-          "trackingStability",
-          "skillReleaseAccuracy",
-        ],
+        done: ["reactionSpeed", "aimingAccuracy", "trackingStability", "skillReleaseAccuracy"],
         retestLeft: { red_dot: 1, flash_aiming: 2, moving_target: 3, skill_trajectory: 3 },
-        attempts: { red_dot: [78], flash_aiming: [86], moving_target: [71], skill_trajectory: [64] },
+        attempts: {
+          red_dot: [78],
+          flash_aiming: [86],
+          moving_target: [71],
+          skill_trajectory: [64],
+        },
         startedAt: "2026-09-15 21:04",
         resumable: true,
       },
@@ -310,4 +326,36 @@ test("regenerate prototype text fixtures", async ({ browser }) => {
     await collect(donePage),
   );
   await doneContext.close();
+
+  // The merge page's blocked state: the prototype's own seg demo switcher
+  // is DOM state with no URL shape, so its capture clicks the second tab
+  // after load — the same dedicated-pass law as the done face above (the
+  // click handler swaps the pane; no reload, no state injection).
+  const blockContext = await browser.newContext();
+  const blockPage = await blockContext.newPage();
+  await blockPage.goto(`file://${PROTO}/account-merge-confirm.html?preset=tested-fps`, {
+    waitUntil: "load",
+  });
+  await blockPage.waitForTimeout(300);
+  await blockPage.evaluate(() => {
+    (document.querySelector('[data-m="block"]') as HTMLElement | null)?.click();
+  });
+  await blockPage.waitForTimeout(300);
+  await blockPage.evaluate((sel) => {
+    document.querySelectorAll(sel).forEach((n) => {
+      n.remove();
+    });
+  }, REVIEW_CHROME);
+  writeFixture(
+    outDir,
+    {
+      page: "account-merge-confirm",
+      key: "block",
+      preset: null,
+      source: "account-merge-confirm.html#seg-block",
+      title: await blockPage.title(),
+    },
+    await collect(blockPage),
+  );
+  await blockContext.close();
 });

@@ -102,7 +102,7 @@ export function sql(db: "system" | "esports", statements: string): void {
  * would eat them as shell variables. */
 export function seedBareMember(
   tag: string,
-  opts: { phone?: string; wechat?: string } = {},
+  opts: { phone?: string; wechat?: string; passwordless?: boolean } = {},
 ): { account: string; userId: string } {
   const userId = `${tag}u`;
   const account = `${tag}a`;
@@ -120,10 +120,18 @@ export function seedBareMember(
          ]
            .filter((row): row is string => row !== null)
            .join(",")};`;
+  // passwordless mints the merge flow's empty side: the mergeable bar
+  // (system half) demands no password and no second credential — the
+  // absorbed account's whole shape. The column is NOT NULL, and the
+  // reader's own law (Deref(hash, "") != "") names the no-password
+  // storage shape: the empty string, the wechat-born member's row.
+  // Such a member cannot log in through this harness (the login leg is
+  // account+password); only the preview ever reads it, never a session.
+  const passwordHash = opts.passwordless === true ? "''" : `'${PASSWORD_HASH}'`;
   sql(
     "system",
     `INSERT INTO "user" (id, created_at, updated_at, account, password_hash, enabled)
-     VALUES ('${userId}', now(), now(), '${account}', '${PASSWORD_HASH}', true);
+     VALUES ('${userId}', now(), now(), '${account}', ${passwordHash}, true);
      INSERT INTO membership (id, created_at, updated_at, user_id, tenant_id, population)
      VALUES ('${tag}m', now(), now(), '${userId}', 'default', 'member');
      ${credentials}`,
@@ -295,14 +303,21 @@ export function seedTestSession(
       `('${tag}${r.suffix}', '${r.at}', '${r.at}', 'default', '${r.code}', '${userId}', ${r.attempt}, '${sessionId}',
               '${r.at}', '${r.at}', '{}', ${r.score}, ${r.score}, ${r.grade === undefined ? "NULL" : `'${r.grade}'`}, true, NULL)`,
   );
-  const snap =
-    o.snapshot === undefined
-      ? ""
-      : ` INSERT INTO report_snapshot (id, created_at, updated_at, tenant_id, record_id, user_id, tier, composite_percentile, abilities, cohort_basis)
-         VALUES ('${tag}sn', now(), now(), 'default', '${tag}${o.snapshot.anchorSuffix}', '${userId}', 'B', 75, '[${FPS_STEPS.map(
+  // The IIFE narrows before the map: a callback cannot inherit the
+  // ternary's own narrowing of o.snapshot (control flow stops at the
+  // function boundary), while a const narrowed in scope keeps it inside
+  // the closure.
+  const snap = (() => {
+    const spec = o.snapshot;
+    if (spec === undefined) {
+      return "";
+    }
+    return ` INSERT INTO report_snapshot (id, created_at, updated_at, tenant_id, record_id, user_id, tier, composite_percentile, abilities, cohort_basis)
+         VALUES ('${tag}sn', now(), now(), 'default', '${tag}${spec.anchorSuffix}', '${userId}', 'B', 75, '[${FPS_STEPS.map(
            (step, i) =>
-             `{"Ability":"${step.ability}","GameCode":"${step.test_code}","Best":${o.records[i]?.score ?? 0},"Attempts":[${o.records[i]?.score ?? 0}],"BestGrade":null,"Percentile":${o.snapshot.percentiles[i]},"PrevSession":null,"HistoryBest":null}`,
+             `{"Ability":"${step.ability}","GameCode":"${step.test_code}","Best":${o.records[i]?.score ?? 0},"Attempts":[${o.records[i]?.score ?? 0}],"BestGrade":null,"Percentile":${spec.percentiles[i]},"PrevSession":null,"HistoryBest":null}`,
          ).join(",")}]'::jsonb, 'same-age-same-sex');`;
+  })();
   sql(
     "esports",
     `INSERT INTO match_session (id, created_at, updated_at, tenant_id, user_id, genre, difficulty, seed, steps, retest_budget, status)
