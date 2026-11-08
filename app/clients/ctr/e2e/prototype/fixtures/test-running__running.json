@@ -1,0 +1,17 @@
+{
+  "page": "test-running",
+  "preset": "resume",
+  "source": "test-running.html?preset=resume&ab=reactionSpeed",
+  "title": "ctr · 测试中",
+  "lines": [
+    "×",
+    "测试中 · 随机红点触摸测试",
+    "🔆 保持屏幕常亮 · 不要切后台或锁屏（切走会中断采样，该次记为无效）",
+    "反应速度 · 1 / 4",
+    "采样中… 0",
+    "5",
+    "剩余时间（演示压缩为 5 秒，真实约 30 秒）",
+    "跳过演示（直接出分）"
+  ],
+  "placeholders": []
+}

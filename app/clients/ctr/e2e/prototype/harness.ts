@@ -264,6 +264,56 @@ export function seedScoredSession(tag: string, userId: string): { anchorId: stri
   return { anchorId };
 }
 
+/** Seeds one in-flight fps session with its attempt rows — the test
+ * family's own substrate (prototype preset resume: the lineup's two
+ * played games, their attempts, and the retake budget the view derives
+ * as budget-minus-used). No snapshot and no cohort pool ride this seed:
+ * every face it feeds (guide / intro / running / the review result)
+ * renders no percentile line, so the live branch's null cohort answer is
+ * invisible. The done face wants the frozen branch instead — pass the
+ * snapshot and the session report reads its percentiles verbatim, again
+ * pool-free. */
+export function seedTestSession(
+  tag: string,
+  userId: string,
+  o: {
+    startedAt: string;
+    records: {
+      suffix: string;
+      code: string;
+      attempt: number;
+      score: number;
+      grade?: string;
+      at: string;
+    }[];
+    snapshot?: { anchorSuffix: string; percentiles: number[] };
+  },
+): { sessionId: string } {
+  const sessionId = `${tag}s`;
+  const rows = o.records.map(
+    (r) =>
+      `('${tag}${r.suffix}', '${r.at}', '${r.at}', 'default', '${r.code}', '${userId}', ${r.attempt}, '${sessionId}',
+              '${r.at}', '${r.at}', '{}', ${r.score}, ${r.score}, ${r.grade === undefined ? "NULL" : `'${r.grade}'`}, true, NULL)`,
+  );
+  const snap =
+    o.snapshot === undefined
+      ? ""
+      : ` INSERT INTO report_snapshot (id, created_at, updated_at, tenant_id, record_id, user_id, tier, composite_percentile, abilities, cohort_basis)
+         VALUES ('${tag}sn', now(), now(), 'default', '${tag}${o.snapshot.anchorSuffix}', '${userId}', 'B', 75, '[${FPS_STEPS.map(
+           (step, i) =>
+             `{"Ability":"${step.ability}","GameCode":"${step.test_code}","Best":${o.records[i]?.score ?? 0},"Attempts":[${o.records[i]?.score ?? 0}],"BestGrade":null,"Percentile":${o.snapshot.percentiles[i]},"PrevSession":null,"HistoryBest":null}`,
+         ).join(",")}]'::jsonb, 'same-age-same-sex');`;
+  sql(
+    "esports",
+    `INSERT INTO match_session (id, created_at, updated_at, tenant_id, user_id, genre, difficulty, seed, steps, retest_budget, status)
+     VALUES ('${sessionId}', '${o.startedAt}', '${o.startedAt}', 'default', '${userId}', 'fps', 'experience', 1,
+             '${JSON.stringify(FPS_STEPS)}'::jsonb, 3, 'active');
+     INSERT INTO test_record (id, created_at, updated_at, tenant_id, test_code, user_id, attempt_no, session_id, started_at, ended_at, raw_detail, raw_score, authoritative_score, grade, valid, invalid_reason)
+     VALUES ${rows.join(",")};${snap}`,
+  );
+  return { sessionId };
+}
+
 /** Seeds the member's standing membership window — the app-side shape of
  * the prototype presets' member.status: one 'membership' entitlement row
  * whose expires_at is the preset's endTime. An active window and an

@@ -68,6 +68,15 @@ const PAGES = [
   "feedback-submit?preset=ready#submit",
   "feedback-detail?preset=ready&kind=notice#notice",
   "feedback-detail?preset=ready&kind=fb#fb",
+  // The test family rides preset resume — the only preset with an
+  // in-flight session (attempts on two of the four lineup games). The
+  // running face is captured in its t=0 window: the page's own demo
+  // timers first tick at 1000ms, and the loop's 300ms settle lands
+  // safely before it, so cd reads its total and the sample counter 0.
+  "test-guide?preset=resume#guide",
+  "test-intro?preset=resume&ab=reactionSpeed#intro",
+  "test-running?preset=resume&ab=reactionSpeed#running",
+  "test-result?preset=resume&ab=reactionSpeed#result",
 ];
 
 // pay-result draws its receipt card off flags.lastOrder — the settle flow's
@@ -237,4 +246,68 @@ test("regenerate prototype text fixtures", async ({ browser }) => {
     );
     await context.close();
   }
+
+  // The test-done face (prototype test-done.html): its own script
+  // CONSUMES the storage session (finishSession folds it into a record
+  // the moment the page runs), so the first load with ?preset=resume
+  // would fold the preset's own half-played session. The face the
+  // corpus wants is the fully-played one — a session whose every
+  // lineup game carries an attempt — injected the same way the P7
+  // states inject theirs: write it, drop the preset param (reset()
+  // would re-apply the preset over it on the next load), reload, and
+  // the page folds the injected truth instead. The attempt values are
+  // the percentiles the face prints (the prototype's own demo
+  // semantics); its score lines derive them as round(0.9·pct+5).
+  const doneContext = await browser.newContext();
+  const donePage = await doneContext.newPage();
+  await donePage.goto(`file://${PROTO}/test-done.html?preset=resume`, {
+    waitUntil: "load",
+  });
+  await donePage.waitForTimeout(300);
+  await donePage.evaluate(() => {
+    (window as unknown as { CTR: { set: (key: string, value: unknown) => void } }).CTR.set(
+      "session",
+      {
+        genre: "fps",
+        steps: [
+          { ab: "reactionSpeed", code: "red_dot" },
+          { ab: "aimingAccuracy", code: "flash_aiming" },
+          { ab: "trackingStability", code: "moving_target" },
+          { ab: "skillReleaseAccuracy", code: "skill_trajectory" },
+        ],
+        done: [
+          "reactionSpeed",
+          "aimingAccuracy",
+          "trackingStability",
+          "skillReleaseAccuracy",
+        ],
+        retestLeft: { red_dot: 1, flash_aiming: 2, moving_target: 3, skill_trajectory: 3 },
+        attempts: { red_dot: [78], flash_aiming: [86], moving_target: [71], skill_trajectory: [64] },
+        startedAt: "2026-09-15 21:04",
+        resumable: true,
+      },
+    );
+    const u = new URL(location.href);
+    u.searchParams.delete("preset");
+    history.replaceState(null, "", u);
+  });
+  await donePage.reload({ waitUntil: "load" });
+  await donePage.waitForTimeout(300);
+  await donePage.evaluate((sel) => {
+    document.querySelectorAll(sel).forEach((n) => {
+      n.remove();
+    });
+  }, REVIEW_CHROME);
+  writeFixture(
+    outDir,
+    {
+      page: "test-done",
+      key: "done",
+      preset: null,
+      source: "test-done.html#injected",
+      title: await donePage.title(),
+    },
+    await collect(donePage),
+  );
+  await doneContext.close();
 });
