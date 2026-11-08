@@ -15,4 +15,4 @@ export const ordersSearchSchema = z.looseObject({
 
 export type OrdersSearch = z.output<typeof ordersSearchSchema>;
 
-export const parseOrdersSearch = makeSearchParser(ordersSearchSchema, ["keyword"]);
+export const parseOrdersSearch = makeSearchParser(ordersSearchSchema);

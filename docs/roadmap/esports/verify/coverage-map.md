@@ -32,6 +32,8 @@ C1 冷启动=R1 承接在案;C2 报告族/C3 支付面/C4 账号族/C5 消息反
 ### P3 造态依赖与专项腿——R3 轮 2026-11-08 收割 P3-1/P3-2/P3-4 全删+P3-3/P3-7 主体(毕证:matrix C1-2/X1-5/C3-1/C4-1/C4-2/C4-4/C6-6 行注;wt-* 四号净清零残留)
 
 **R4 轮 2026-11-08(同日第二场)**:X3 激活码全生命周期五例全收(X3-1..X3-5,拒绝序 INVALID→族幂等→EXPIRED→DISABLED 实证)+X2-1 反馈六腿全闭环+X2-3 半(feedback_reply 形+admin 信箱五列表毕,report/纯公告 CTA 形欠)+A2-1 详情六 Tab 顺路;毕证=matrix X2-1/X2-3/X3 族/A2-1 行注;wt-rich3-306/wt-fb-307 两号+批次 B-2611-HS8U+过期造态批+两票反馈+扇出信端到端净清零残留。走查坑三枚回灌 CONVENTIONS(§1.5 造号 id 须 20 字符 xid 形/§1.6 ant 表固定列克隆行/§2.3 跨端写后读须 reload)。
+
+**R5 轮 2026-11-08(同日第三场,A 套扫尾+X2-3 收口)**:A 套 11 例全收(A1-1 改价 DB 互价/A1-2 上下架 ctr「¥—」禁用同步/A1-3 新建条件字段/A2-1 列表筛出生行/A2-2 筛形+两观察/A3-1 三筛+空态/A3-2 关闭腿 O-3/A4-1 版本三腿/A4-2 预填昵称 CSV 掩码/A4-4 开关往返/A6-1 23 项清点无死链)+X2-3 三形全收(report/纯公告/feedback_reply CTA 键控)+C6-4 断网暖卡(initScript fetch hook 造态法,CDP offline 不合 dev server 场景)。**即修一件**:esports-orders search.ts 把 keyword 误传 makeSearchParser coerce 参(Number(NaN) 击穿 zod 路由层崩,筛不存在单号整页 ERR·UNKNOWN)——一行修+20 调用方全审仅此一处。**清偿一件**:历史 e2e 短 id 残留 agreement_consent→roster len:20 拒→同意记录页整页 400(fixture 污染非产品缺陷,删 10 行非 20 字符 consent 复活)。**新观察入账**:members 提醒列缺失(anchor 列集含而 live 无,偏离候选)+汇总行三数不含已终止态。毕证=matrix A 套/X2-3/C6-4 行注;R5 公告+投递信+report 造态信端到端净清零残留;admin 四门禁亲见绿。
 | # | 缺口 | 依据 |
 |---|---|---|
 | P3-3 余 | WechatCallback DISABLED 两支(换账号钮+密码 reason 词表族已毕:R2 词表+R3 LOGIN_SEAT_REQUIRED 红行/更换账号钮,零 R-multi 依赖=admin 号即可造态) | C4-1 行注 |
