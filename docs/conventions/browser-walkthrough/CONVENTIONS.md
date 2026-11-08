@@ -62,6 +62,16 @@ Reflect.deleteProperty(document, "hidden"); // restore
 - **Anti-trap:** a backend that validates fact plausibility rejects too-perfect synthesized timing as invalid attempts — the seam drives the real engine's clock; it never fabricates the record.
 - **Ruling — MUST raise:** a new time-critical surface without such a seam is a walkthrough gap against its owning feature, not something to fake through timing luck.
 
+### 1.5 Fixture-born ids obey the wire contract
+
+- **Symptom:** a SQL-planted account renders a full-page error face (`ERR · BUSINESS · 请求未成功`) on an admin detail route, while real accounts load fine. The service log shows a 400 `validation error: user_id: must be 20 characters` — the RPC validates proto field rules (here: the xid-shaped 20-char id), and the fixture's readable short id (`wt-rich3-306`) violates the contract. (Case 2026-11-08: a user-detail hydration RPC, first misread as a product defect.)
+- **Prescription:** SQL-planted `user` rows carry contract-shaped ids (20-char xid-like strings), or the walk must avoid contract-validating reads against them. Read the owning proto's field rules before minting fixture ids.
+
+### 1.6 Ant-table fixed columns clone the row
+
+- **Symptom:** `querySelectorAll('tr')` finds the row, but its action buttons come back textless or absent — antd Table renders cloned measure/fixed cells alongside the real row, and the clone lacks the interactive column.
+- **Prescription — MUST** drive row actions by the a11y snapshot's uid (real CDP click), never by scripted row-scoped queries. (Case 2026-11-08: a batch-disable and a feedback-close button both invisible to DOM queries, both fine via snapshot uids.)
+
 ## §2 Observing transient feedback
 
 ### 2.1 One script: trigger → wait → observe (toast law)
@@ -81,6 +91,11 @@ const toasts = [...document.querySelectorAll("[data-sonner-toast]")].map(t => t.
 ### 2.2 The "silent" verdict discipline
 
 - **Prescription:** a UI judged "no reaction" is presumed an observation false-negative until every feedback surface has been enumerated empty: toast container, inline error rows (form `p`/`span`), control state flips (`disabled`, countdown text), button label changes. Only then may "silent" be recorded — ideally with a no-console-error check beside it.
+
+### 2.3 Cross-client reads are stale until reloaded
+
+- **Symptom:** after a write on one client (admin replies, a code is redeemed), the other client's list chip still shows the old state (待处理 instead of 已回复; 已核销 0 instead of 1) — the SPA's query cache serves the previous page inside its staleTime, and in-app navigation does not refetch. (Case 2026-11-08: three stale reads in one walk — batch progress, feedback chips, unread badge — each "wrong" only until a hard reload.)
+- **Prescription:** a cross-client write→read verdict requires a hard `location.reload()` (or a cache-busting refetch) between the write and the read; a stale chip is an observation artifact, not a sync defect, until proven fresh-page.
 
 ## §3 Observation-plane fallbacks
 
