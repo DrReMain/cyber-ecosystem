@@ -13,6 +13,12 @@ export const CREDENTIAL_INVOKE = "PAY_CREDENTIAL_KIND_INVOKE";
 export const CREDENTIAL_JUMP_URL = "PAY_CREDENTIAL_KIND_JUMP_URL";
 export const CREDENTIAL_QR_CODE = "PAY_CREDENTIAL_KIND_QR_CODE";
 
+// Not a channel: a mobile browser outside WeChat cannot pay — the H5
+// permission is deferred by the provider, and a QR shown on the same phone
+// has nothing to scan it. The wall routes this value to the "open inside
+// WeChat" guide instead of ordering on a channel the provider would refuse.
+export const CHANNEL_DEGRADED = "wechat_degraded";
+
 export interface PurchaseFace {
   row?: Sku;
   yuan: string;
@@ -45,7 +51,9 @@ export function channelOf(userAgent: string): string {
     return "wechat_jsapi";
   }
   if (/Android|iPhone|iPad|Mobile/i.test(userAgent)) {
-    return "wechat_h5";
+    // The H5 leg stays reachable to the server; while the provider's H5
+    // permission is deferred this branch degrades instead of sending it.
+    return CHANNEL_DEGRADED;
   }
   return "wechat_native";
 }

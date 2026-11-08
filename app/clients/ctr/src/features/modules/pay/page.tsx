@@ -19,6 +19,7 @@ import { BottomConfirmSheet, type SheetAction } from "#/features/app/dialog/bott
 import { sessionQuery } from "#/features/auth/session.fn";
 import { m } from "#/paraglide/messages";
 import {
+  CHANNEL_DEGRADED,
   CREDENTIAL_INVOKE,
   CREDENTIAL_JUMP_URL,
   CREDENTIAL_QR_CODE,
@@ -222,11 +223,18 @@ async function createAndContinue(
   onMockSheet: (state: SheetState) => void,
   onInvokePaid: (orderNo: string) => void,
   onQr: (state: QrState) => void,
+  onDegrade: () => void,
 ): Promise<void> {
   if (face.row === undefined) {
     return;
   }
   const channel = channelOf(navigator.userAgent);
+  if (channel === CHANNEL_DEGRADED) {
+    // No order is minted: the guide sheet is the whole leg, an unpaid row
+    // would only expire behind it.
+    onDegrade();
+    return;
+  }
   try {
     const res = await mutate({
       skuCode: face.row.skuCode ?? "",
@@ -256,6 +264,15 @@ function qrActionsOf(onCheck: () => void, onCancel: () => void): SheetAction[] {
   return [
     { label: m.pay_qr_check(), kind: "primary", onPress: onCheck },
     { label: m.pay_sheet_cancel(), kind: "ghost", onPress: onCancel },
+  ];
+}
+
+function degradeActionsOf(copied: boolean, onCopy: () => void, onCancel: () => void): SheetAction[] {
+  return [
+    // The label swap is the copy's own receipt — only the write's success
+    // arm turns it, so the button never claims a copy that did not happen.
+    { label: copied ? m.pay_degrade_copied() : m.pay_degrade_copy(), kind: "primary", onPress: onCopy },
+    { label: m.pay_degrade_cancel(), kind: "ghost", onPress: onCancel },
   ];
 }
 
@@ -379,6 +396,11 @@ function usePayFlow(faces: ReturnType<typeof purchaseFaces>, search: PaySearch) 
   const queryClient = useQueryClient();
   const [sheet, setSheet] = useState<SheetState | null>(null);
   const [qr, setQr] = useState<QrState | null>(null);
+  // The degraded-environment guide: outside WeChat on a phone the copy-link
+  // sheet replaces the cashier entirely. `copied` rides the sheet's own
+  // lifetime — closing resets it so a reopen quotes the honest first label.
+  const [degrade, setDegrade] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [polling, setPolling] = useState<{
     kind: PurchaseKind;
     orderNo: string;
@@ -463,6 +485,7 @@ function usePayFlow(faces: ReturnType<typeof purchaseFaces>, search: PaySearch) 
       setSheet,
       (orderNo) => setPolling({ kind, orderNo, face }),
       setQr,
+      () => setDegrade(true),
     );
   }
 
@@ -486,6 +509,29 @@ function usePayFlow(faces: ReturnType<typeof purchaseFaces>, search: PaySearch) 
 
   const closeSheet = () => setSheet(null);
   const closeQr = () => setQr(null);
+  const closeDegrade = () => {
+    setDegrade(false);
+    setCopied(false);
+  };
+
+  // The clipboard write needs a secure context and a user gesture; a
+  // refusal leaves the uncopied label standing — the address bar stays the
+  // manual fallback, so the sheet never claims a copy that did not happen.
+  // The try arm guards the non-secure context, where the clipboard API is
+  // absent and the property access itself throws synchronously — a throw
+  // the promise chain's catch can never see.
+  function copyPageLink() {
+    try {
+      navigator.clipboard
+        .writeText(window.location.href)
+        .then(() => setCopied(true))
+        .catch(() => {});
+    } catch {
+      // Same honest outcome as a refused write.
+    }
+  }
+
+  const degradeActions = degrade ? degradeActionsOf(copied, copyPageLink, closeDegrade) : [];
 
   const sheetActions =
     sheet !== null
@@ -523,12 +569,15 @@ function usePayFlow(faces: ReturnType<typeof purchaseFaces>, search: PaySearch) 
   return {
     sheet,
     qr,
+    degrade,
     sheetActions,
     qrActions,
+    degradeActions,
     createOrderMut,
     pay,
     closeSheet,
     closeQr,
+    closeDegrade,
   };
 }
 
@@ -685,6 +734,15 @@ export function PayConfirmPage() {
           onDismiss={flow.closeQr}
           title={m.pay_qr_title()}
           visual={<QrTile value={flow.qr.value} />}
+        />
+      ) : null}
+
+      {flow.degrade ? (
+        <BottomConfirmSheet
+          actions={flow.degradeActions}
+          body={m.pay_degrade_body()}
+          onDismiss={flow.closeDegrade}
+          title={m.pay_degrade_title()}
         />
       ) : null}
     </AmbientLayout>
