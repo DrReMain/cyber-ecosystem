@@ -88,7 +88,7 @@ export function TabBar({ active }: Readonly<{ active: TabKey }>) {
                 {tab.key === "messages" && unreadUp ? (
                   <span
                     aria-hidden
-                    className="absolute top-[-2px] right-[-3px] size-[6px] rounded-full bg-[#EF4444]"
+                    className="absolute -top-0.5 -right-0.75 size-1.5 rounded-full bg-[#EF4444]"
                   />
                 ) : null}
               </span>

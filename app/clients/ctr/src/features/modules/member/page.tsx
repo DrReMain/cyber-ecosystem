@@ -16,7 +16,7 @@ import { m } from "#/paraglide/messages";
 // this page's own arrangement (the receipt page hangs its verdict orb
 // left).
 const DETAIL_ORBS: readonly AmbientOrb[] = [
-  { className: "top-[-80px] right-[-70px] size-[250px]", tone: "purple" },
+  { className: "-top-20 -right-17.5 size-62.5", tone: "purple" },
 ];
 
 // The glass card the whole page speaks in.
@@ -63,20 +63,20 @@ function MonthCard({
           </div>
         </div>
         <div className="text-right">
-          <div className="text-[24px] leading-none font-black text-[#FDE047] tabular-nums">
+          <div className="text-grade-s text-[24px] leading-none font-black tabular-nums">
             ¥{priceYuan}
           </div>
           <div className="text-ink-tertiary mt-1 text-[10px]">{m.member_card_per_month()}</div>
         </div>
       </div>
       {windowState.kind === "active" ? (
-        <div className="mt-3.5 flex items-center gap-1.5 rounded-[12px] border border-[rgba(126,34,206,0.5)] bg-[rgba(126,34,206,0.12)] px-3 py-2.5 text-[12px] text-[#E9D5FF]">
+        <div className="text-status-member mt-3.5 flex items-center gap-1.5 rounded-[12px] border border-[rgba(126,34,206,0.5)] bg-[rgba(126,34,206,0.12)] px-3 py-2.5 text-[12px]">
           <Crown aria-hidden size={13} />
           {m.member_status_active({ date: localDateOf(windowState.untilMs) })}
         </div>
       ) : null}
       {windowState.kind === "expired" ? (
-        <div className="border-line bg-surface-input mt-3.5 rounded-[12px] border px-3 py-2.5 text-[12px] text-[#9CA3AF]">
+        <div className="border-line bg-surface-input text-status-lock mt-3.5 rounded-[12px] border px-3 py-2.5 text-[12px]">
           {m.member_status_expired({ date: localDateOf(windowState.untilMs) })}
         </div>
       ) : null}
@@ -106,13 +106,11 @@ function BenefitCard({ periodDays }: Readonly<{ periodDays: number | undefined }
       <div className="text-ink mb-1 text-[13px] font-bold">{m.member_benefit_title()}</div>
       <div className="divide-y divide-[rgba(55,65,81,0.4)]">
         {rows.map((row) => (
-          <div className="flex gap-2.5 py-[9px]" key={row.title}>
-            <Crown aria-hidden className="mt-[3px] shrink-0 text-[#A855F7]" size={14} />
+          <div className="flex gap-2.5 py-2.25" key={row.title}>
+            <Crown aria-hidden className="mt-0.75 shrink-0 text-[#A855F7]" size={14} />
             <div>
               <div className="text-[12.5px] font-bold text-[#E5E7EB]">{row.title}</div>
-              <div className="text-ink-tertiary mt-[3px] text-[10.5px] leading-[1.6]">
-                {row.sub}
-              </div>
+              <div className="text-ink-tertiary mt-0.75 text-[10.5px] leading-[1.6]">{row.sub}</div>
             </div>
           </div>
         ))}
@@ -137,7 +135,7 @@ function FaqCard() {
         {rows.map((row) => (
           <div className="py-2.5" key={row.q}>
             <div className="text-[12.5px] font-bold text-[#E5E7EB]">{row.q}</div>
-            <div className="text-ink-muted mt-[5px] text-[11.5px] leading-[1.85]">{row.a}</div>
+            <div className="text-ink-muted mt-1.25 text-[11.5px] leading-[1.85]">{row.a}</div>
           </div>
         ))}
       </div>
@@ -223,7 +221,7 @@ export function MemberDetailPage() {
         <BenefitCard periodDays={periodDays} />
         <FaqCard />
         <Button
-          className="w-full rounded-[12px] bg-[#7C3AED] py-[14px] text-[15px] font-bold text-white active:opacity-80 disabled:opacity-50"
+          className="bg-ambient-purple w-full rounded-[12px] py-3.5 text-[15px] font-bold text-white active:opacity-80 disabled:opacity-50"
           isDisabled={member.row === undefined}
           onPress={() => void navigate({ to: "/pay", search: { from: "/member" } })}
         >

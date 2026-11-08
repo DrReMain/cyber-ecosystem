@@ -27,7 +27,7 @@ function SeatChip({
   }
   if (isSub) {
     return (
-      <span className="rounded-full bg-[rgba(255,255,255,0.06)] px-2 py-0.5 text-[10px] font-semibold text-[#9CA3AF]">
+      <span className="text-status-lock rounded-full bg-[rgba(255,255,255,0.06)] px-2 py-0.5 text-[10px] font-semibold">
         {m.report_row_sub()}
       </span>
     );
@@ -92,7 +92,7 @@ export function AbilityRow({
           {pct !== null ? (
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#111827]">
               <div
-                className="h-full rounded-full bg-linear-to-r from-[#22D3EE] to-[#22C55E]"
+                className="from-link to-status-ok h-full rounded-full bg-linear-to-r"
                 style={{ width: `${Math.min(100, Math.max(2, pct))}%` }}
               />
             </div>

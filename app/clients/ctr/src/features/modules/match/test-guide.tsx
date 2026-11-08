@@ -13,7 +13,7 @@ import { FlowHeader } from "./ui/flow-header";
 
 /* The page's own orb (prototype test-guide): a single practice-orange blob. */
 const guideOrbs: readonly AmbientOrb[] = [
-  { className: "top-[-60px] right-[-60px] size-[220px]", tone: "orange" },
+  { className: "-top-15 -right-15 size-55", tone: "orange" },
 ];
 
 /**
@@ -126,7 +126,7 @@ export function TestGuidePage() {
           <div className="mt-2">
             {rules.map(({ Icon, key, title, desc }) => (
               <div
-                className="flex gap-[11px] border-b border-[rgba(55,65,81,0.45)] py-[9px] last:border-b-0"
+                className="flex gap-2.75 border-b border-[rgba(55,65,81,0.45)] py-2.25 last:border-b-0"
                 key={key}
               >
                 <Icon aria-hidden className="text-ink-secondary mt-0.5 shrink-0" size={17} />
@@ -141,7 +141,7 @@ export function TestGuidePage() {
           </div>
         </div>
 
-        <div className="border-line bg-surface-content text-ink-muted rounded-control border px-3.5 py-[13px] text-[11.5px] leading-[1.85]">
+        <div className="border-line bg-surface-content text-ink-muted rounded-control border px-3.5 py-3.25 text-[11.5px] leading-[1.85]">
           <span className="font-bold text-[#e5e7eb]">{m.match_guide_score_t()}</span>
           {m.match_guide_score_lead()}
           <span className="font-bold">{m.match_guide_score_best()}</span>
@@ -151,7 +151,7 @@ export function TestGuidePage() {
         </div>
 
         <button
-          className="bg-cta-primary rounded-control w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80"
+          className="bg-cta-primary rounded-control w-full px-4 py-3.5 text-[15px] font-bold text-white active:opacity-80"
           onClick={() => {
             if (start?.testCode != null) {
               void navigate({ to: "/test/$code", params: { code: start.testCode } });

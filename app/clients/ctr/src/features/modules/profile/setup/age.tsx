@@ -90,7 +90,7 @@ export function SetupAgePage() {
   }
 
   const selectClass =
-    "w-full appearance-none rounded-control border border-line bg-surface-input px-2.5 py-[13px] text-[15px] text-ink outline-none focus:border-focus";
+    "w-full appearance-none rounded-control border border-line bg-surface-input px-2.5 py-3.25 text-[15px] text-ink outline-none focus:border-focus";
 
   return (
     <StepFrame onBack={() => void navigate({ to: "/profile/setup/nickname" })} step={2}>
@@ -205,7 +205,7 @@ export function SetupAgePage() {
           <label className="text-ink-muted flex cursor-pointer items-start gap-2.25 text-[12px] leading-[1.6]">
             <input
               checked={guardian}
-              className="mt-px h-4 w-4 shrink-0 accent-[#2563eb]"
+              className="accent-ambient-blue mt-px h-4 w-4 shrink-0"
               onChange={(event) => {
                 setGuardian(event.target.checked);
                 setError(null);

@@ -3,13 +3,13 @@ import { m } from "#/paraglide/messages";
 import type { SmsLogin } from "../sms";
 
 export const inputClass =
-  "w-full rounded-control border border-line bg-surface-input px-3.5 py-[13px] text-[15px] text-ink outline-none placeholder:text-ink-tertiary focus:border-focus";
+  "w-full rounded-control border border-line bg-surface-input px-3.5 py-3.25 text-[15px] text-ink outline-none placeholder:text-ink-tertiary focus:border-focus";
 export const badInputClass = inputClass.replace("border-line", "border-danger-text");
 
 // The prototype's outline-blue send rail: fixed width, full row height,
 // dimming while the countdown owns it.
 const sendBtnClass =
-  "border-focus text-link bg-transparent rounded-control w-[116px] shrink-0 border px-3 text-[13px] font-bold active:opacity-60 disabled:opacity-60";
+  "border-focus text-link bg-transparent rounded-control w-29 shrink-0 border px-3 text-[13px] font-bold active:opacity-60 disabled:opacity-60";
 
 // The code tab's field group: phone with the prototype's live verdict, and
 // the code row — input plus the send rail on one line. Pure presentational:

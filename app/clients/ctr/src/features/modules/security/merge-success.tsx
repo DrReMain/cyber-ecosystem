@@ -10,7 +10,7 @@ export function MergeSuccessPage() {
   return (
     <AmbientLayout>
       <div className="flex w-full flex-col items-center gap-4 pt-14">
-        <span className="bg-cta-success shadow-cta-success flex h-[72px] w-[72px] items-center justify-center rounded-full">
+        <span className="bg-cta-success shadow-cta-success flex h-18 w-18 items-center justify-center rounded-full">
           <Check aria-hidden className="text-white" size={34} strokeWidth={3} />
         </span>
         <div className="text-center">
@@ -42,8 +42,8 @@ export function MergeSuccessPage() {
 
 function CheckRow({ text }: { text: string }) {
   return (
-    <div className="flex items-center gap-2.5 py-[11px]">
-      <span className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[rgba(34,197,94,0.2)]">
+    <div className="flex items-center gap-2.5 py-2.75">
+      <span className="flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full bg-[rgba(34,197,94,0.2)]">
         <Check aria-hidden className="text-[#4ADE80]" size={12} strokeWidth={3.5} />
       </span>
       <span className="text-ink-secondary text-[13px]">{text}</span>

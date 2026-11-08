@@ -130,7 +130,7 @@ export function MessageDetailPage() {
 
         {reportCta ? (
           <Button
-            className="bg-cta-primary w-full rounded-[12px] py-[13px] text-[15px] font-bold text-white active:opacity-80"
+            className="bg-cta-primary w-full rounded-[12px] py-3.25 text-[15px] font-bold text-white active:opacity-80"
             onPress={() =>
               void navigate({
                 to: "/report/$recordId",
@@ -143,7 +143,7 @@ export function MessageDetailPage() {
         ) : null}
         {feedbackCta ? (
           <Button
-            className="bg-cta-primary w-full rounded-[12px] py-[13px] text-[15px] font-bold text-white active:opacity-80"
+            className="bg-cta-primary w-full rounded-[12px] py-3.25 text-[15px] font-bold text-white active:opacity-80"
             onPress={() =>
               void navigate({
                 to: "/feedback/$feedbackId",

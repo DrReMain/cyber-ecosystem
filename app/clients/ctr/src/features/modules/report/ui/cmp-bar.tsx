@@ -22,14 +22,14 @@ export function CmpBar({ score, best }: Readonly<{ score: number; best: number |
           {m.report_cmp_best({ score: Math.round(best * 10) / 10 })}
         </span>
       </div>
-      <div className="relative mt-1.5 h-[6px] overflow-hidden rounded-full bg-[#111827]">
+      <div className="relative mt-1.5 h-1.5 overflow-hidden rounded-full bg-[#111827]">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-[#22D3EE] to-[#22C55E]"
+          className="from-link to-status-ok h-full rounded-full bg-gradient-to-r"
           style={{ width: `${Math.round((score / hi) * 100)}%` }}
         />
         <span
           aria-hidden
-          className="absolute top-0 h-full w-[2px] bg-[#6EE7B7]"
+          className="absolute top-0 h-full w-0.5 bg-[#6EE7B7]"
           style={{ left: `${Math.round((best / hi) * 100)}%` }}
         />
       </div>

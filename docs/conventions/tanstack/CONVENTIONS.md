@@ -240,9 +240,13 @@ nested subpaths per the ≥4-graduation rule below).
 never stick inside one; keep sticky elements outside the watermark. antd v6
 `Drawer` sizes via `size` presets — numeric `width` is the retired v5
 vocabulary. antdx composition pieces (`Creation` regions, `Sender` attachments)
-mount through their declared slots, never children injection. Tailwind v4's
-class extractor tokenizes on dots — arbitrary values containing decimal points
-split into dead classes; prefer scale values or CSS variables.
+mount through their declared slots, never children injection. Tailwind v4
+prefers its native vocabulary over arbitrary values where one exists —
+scale steps (`gap-2.75`, not `gap-[11px]`) and standing palette/token
+classes (`bg-gray-500/18`, not `bg-[rgba(107,114,128,0.18)]`). Where no
+native form exists (font sizes, gradients, shadows, `clamp()`), the
+arbitrary value is the canonical form — do not mint theme variables to
+avoid it. Container-query variants keep their bracket forms.
 
 **Skin presets** (`shared-ts/antd/src/skin-presets/**`) are business-agnostic and low-frequency — they have their own doc: `docs/conventions/skin/CONVENTIONS.md`.
 

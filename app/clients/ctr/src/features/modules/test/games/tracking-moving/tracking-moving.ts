@@ -180,7 +180,7 @@ function buildFace(dotSizePx: number): FaceParts {
   fireBox.className = "absolute right-5 bottom-6 z-30 flex flex-col items-center gap-1";
   const fireBtn = document.createElement("div");
   fireBtn.className =
-    "flex h-[88px] w-[88px] cursor-pointer items-center justify-center rounded-full border-4 border-white/50 bg-danger shadow-2xl active:scale-90";
+    "flex h-22 w-22 cursor-pointer items-center justify-center rounded-full border-4 border-white/50 bg-danger shadow-2xl active:scale-90";
   fireBtn.appendChild(createLucideIcon(TARGET, 40));
   const fireCaption = document.createElement("span");
   fireCaption.className = "text-ink-tertiary text-[10px]";

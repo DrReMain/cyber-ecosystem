@@ -25,7 +25,7 @@ export function NetworkErrorFace({ homePath, http, kind, onRetry }: Readonly<Net
   const retry = onRetry ?? (() => router.invalidate());
   return (
     <div className="w-full max-w-md">
-      <div className="border-line bg-surface-card shadow-card rounded-card border px-5 py-[30px] text-center backdrop-blur-md">
+      <div className="border-line bg-surface-card shadow-card rounded-card border px-5 py-7.5 text-center backdrop-blur-md">
         <RadioTower aria-hidden className="text-ink-tertiary mx-auto" size={34} strokeWidth={1.5} />
         <div className="text-ink mt-3 text-[14.5px] font-extrabold">
           {m.error_network_card_title()}
@@ -40,21 +40,21 @@ export function NetworkErrorFace({ homePath, http, kind, onRetry }: Readonly<Net
         </div>
       </div>
       <button
-        className="bg-cta-primary shadow-cta-primary rounded-control mt-3 w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80"
+        className="bg-cta-primary shadow-cta-primary rounded-control mt-3 w-full px-4 py-3.5 text-[15px] font-bold text-white active:opacity-80"
         onClick={retry}
         type="button"
       >
         {m.common_retry()}
       </button>
       <button
-        className="bg-surface-input text-ink-secondary rounded-control mt-2.25 w-full border-[1.5px] border-[#4b5563] px-4 py-[11px] text-center text-[12.5px] font-medium active:opacity-60"
+        className="bg-surface-input text-ink-secondary rounded-control border-ambient-slate mt-2.25 w-full border-[1.5px] px-4 py-2.75 text-center text-[12.5px] font-medium active:opacity-60"
         onClick={() => router.history.back()}
         type="button"
       >
         {m.error_back()}
       </button>
       <Link
-        className="bg-surface-input text-ink-secondary rounded-control mt-2.25 block w-full border-[1.5px] border-[#4b5563] px-4 py-[11px] text-center text-[12.5px] font-medium active:opacity-60"
+        className="bg-surface-input text-ink-secondary rounded-control border-ambient-slate mt-2.25 block w-full border-[1.5px] px-4 py-2.75 text-center text-[12.5px] font-medium active:opacity-60"
         to={homePath as never}
       >
         {m.error_home()}

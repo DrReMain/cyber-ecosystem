@@ -107,7 +107,7 @@ export function FeedbackSubmitPage() {
           <div className="flex [scrollbar-width:none] gap-2.5 overflow-x-auto pb-1">
             {CATEGORY_PICKS.map((pick) => (
               <button
-                className={`shrink-0 rounded-[10px] px-[13px] py-2 text-[12px] whitespace-nowrap ${
+                className={`shrink-0 rounded-[10px] px-3.25 py-2 text-[12px] whitespace-nowrap ${
                   picked === pick.value
                     ? "bg-cta-primary font-semibold text-white"
                     : "border-line bg-surface-input/50 text-ink-tertiary border"
@@ -125,7 +125,7 @@ export function FeedbackSubmitPage() {
         <div className={GLASS_CLASS}>
           <div className="text-ink-tertiary mb-2.5 text-[11.5px]">{m.feedback_content_label()}</div>
           <textarea
-            className="bg-surface-input text-ink placeholder:text-ink-tertiary min-h-[110px] w-full resize-none rounded-[10px] border-0 p-3 text-[13px] leading-[1.7] outline-none"
+            className="bg-surface-input text-ink placeholder:text-ink-tertiary min-h-27.5 w-full resize-none rounded-[10px] border-0 p-3 text-[13px] leading-[1.7] outline-none"
             maxLength={CONTENT_MAX}
             onChange={(e) => setContent(e.target.value)}
             placeholder={m.feedback_content_placeholder()}
@@ -133,7 +133,7 @@ export function FeedbackSubmitPage() {
           />
           <div
             className={`mt-1.5 text-right text-[10.5px] ${
-              content.length >= CONTENT_MAX ? "text-[#F87171]" : "text-ink-tertiary"
+              content.length >= CONTENT_MAX ? "text-danger-text" : "text-ink-tertiary"
             }`}
           >
             {m.feedback_content_count({ used: String(content.length), max: String(CONTENT_MAX) })}
@@ -155,14 +155,14 @@ export function FeedbackSubmitPage() {
           </div>
         </div>
 
-        {err !== null ? <div className="text-[11px] text-[#F87171]">{err}</div> : null}
+        {err !== null ? <div className="text-danger-text text-[11px]">{err}</div> : null}
 
         <div className="text-ink-tertiary text-center text-[10.5px] leading-[1.7]">
           {m.feedback_lifecycle_note()}
         </div>
 
         <Button
-          className="bg-cta-primary w-full rounded-[12px] py-[13px] text-[15px] font-bold text-white active:opacity-80 disabled:opacity-50"
+          className="bg-cta-primary w-full rounded-[12px] py-3.25 text-[15px] font-bold text-white active:opacity-80 disabled:opacity-50"
           isDisabled={submit.isPending}
           onPress={onSubmit}
         >

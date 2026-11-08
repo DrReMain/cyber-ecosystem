@@ -34,19 +34,19 @@ export function IdentityCard({
     .filter((part): part is string => part !== null && part !== undefined)
     .join(" · ");
   return (
-    <div className="border-line-accent-blue bg-identity rounded-card border px-4 py-[15px]">
+    <div className="border-line-accent-blue bg-identity rounded-card border px-4 py-3.75">
       <div className="flex items-center gap-3">
-        <div className="bg-logo shadow-inset-ring flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-xl">
+        <div className="bg-logo shadow-inset-ring flex h-11.5 w-11.5 shrink-0 items-center justify-center rounded-xl">
           <User aria-hidden className="text-white" size={20} />
         </div>
         <div className="min-w-0 flex-1">
           <div className="text-ink truncate text-base font-black">
             {profile?.nickname ?? m.profile_unset_nick()}
           </div>
-          <div className="mt-[7px] flex gap-[7px]">
+          <div className="mt-1.75 flex gap-1.75">
             {[m.profile_msg(), m.profile_feedback()].map((label) => (
               <button
-                className="tap-zone bg-ink/8 text-ink-secondary rounded-full px-2.5 py-[3px] text-[10.5px] font-semibold active:opacity-60"
+                className="tap-zone bg-ink/8 text-ink-secondary rounded-full px-2.5 py-0.75 text-[10.5px] font-semibold active:opacity-60"
                 key={label}
                 onClick={() => toast.info(m.common_soon())}
                 type="button"
@@ -57,11 +57,11 @@ export function IdentityCard({
           </div>
         </div>
       </div>
-      {meta !== "" && <p className="text-ink-tertiary mt-[11px] text-[11px]">{meta}</p>}
+      {meta !== "" && <p className="text-ink-tertiary mt-2.75 text-[11px]">{meta}</p>}
       {/* The prototype's four-stat strip, riding the digest and the latest
        * scored session's verdict read; the improvement count keeps its
        * dash — no composite-sequence read face exists yet. */}
-      <div className="mt-3 flex border-t border-[rgba(55,65,81,0.55)] pt-[11px]">
+      <div className="mt-3 flex border-t border-[rgba(55,65,81,0.55)] pt-2.75">
         {[
           {
             color: "text-ink",
@@ -74,7 +74,7 @@ export function IdentityCard({
             value: stats.compTop === null ? "—" : m.profile_stat_top({ pct: stats.compTop }),
           },
           {
-            color: "text-[#fde047]",
+            color: "text-grade-s",
             label: m.profile_stat_best(),
             value:
               stats.best === null
@@ -87,7 +87,7 @@ export function IdentityCard({
             <div className={`text-[19px] leading-[1.15] font-black ${cell.color}`}>
               {cell.value}
             </div>
-            <div className="text-ink-tertiary mt-[3px] text-[10.5px]">{cell.label}</div>
+            <div className="text-ink-tertiary mt-0.75 text-[10.5px]">{cell.label}</div>
           </div>
         ))}
       </div>

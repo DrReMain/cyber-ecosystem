@@ -11,8 +11,8 @@ import type { AbilityOverviewRow } from "../overview";
 export function AbilityOverviewCard({ rows }: Readonly<{ rows: readonly AbilityOverviewRow[] }>) {
   const tested = rows.filter((r) => r.best !== undefined).length;
   return (
-    <div className="border-line-accent-blue bg-identity rounded-card border px-4 py-[15px]">
-      <div className="mb-[11px] flex items-center justify-between">
+    <div className="border-line-accent-blue bg-identity rounded-card border px-4 py-3.75">
+      <div className="mb-2.75 flex items-center justify-between">
         <span className="text-ink text-[14.5px] font-extrabold">{m.profile_ability_title()}</span>
         <span className="text-ink-tertiary text-[10.5px]">
           {m.profile_ability_sub({ n: tested })}
@@ -20,13 +20,13 @@ export function AbilityOverviewCard({ rows }: Readonly<{ rows: readonly AbilityO
       </div>
       {rows.map((row) =>
         row.best !== undefined ? (
-          <div className="py-[7px]" key={row.ability}>
+          <div className="py-1.75" key={row.ability}>
             <div className="mb-1.5 flex items-center gap-2">
               {/* The prototype's identity block is a bare gradient chip —
                * no text rides inside it (the row's name carries the word). */}
               <div
                 aria-hidden
-                className={`${row.gradient} shadow-inset-ring h-[26px] w-[26px] shrink-0 rounded-[9px]`}
+                className={`${row.gradient} shadow-inset-ring h-6.5 w-6.5 shrink-0 rounded-[9px]`}
               />
               <span className="text-ink text-[12.5px] font-extrabold">{row.abilityCn}</span>
               <TierChip grade={row.grade} />
@@ -34,26 +34,26 @@ export function AbilityOverviewCard({ rows }: Readonly<{ rows: readonly AbilityO
                 {m.profile_ability_best({ score: Math.round(row.best * 10) / 10 })}
               </span>
             </div>
-            <div className="h-[6px] w-full overflow-hidden rounded-full bg-[rgba(55,65,81,0.6)]">
+            <div className="bg-line-soft h-1.5 w-full overflow-hidden rounded-full">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-[#2563EB] to-[#06B6D4]"
+                className="from-ambient-blue to-ambient-cyan h-full rounded-full bg-gradient-to-r"
                 style={{ width: `${row.pct ?? 0}%` }}
               />
             </div>
           </div>
         ) : (
-          <div className="py-[7px] opacity-70" key={row.ability}>
+          <div className="py-1.75 opacity-70" key={row.ability}>
             <div className="mb-1 flex items-center gap-2">
               <div
                 aria-hidden
-                className={`${row.gradient} shadow-inset-ring h-[26px] w-[26px] shrink-0 rounded-[9px] opacity-40`}
+                className={`${row.gradient} shadow-inset-ring h-6.5 w-6.5 shrink-0 rounded-[9px] opacity-40`}
               />
-              <span className="text-[12.5px] font-extrabold text-[#6b7280]">{row.abilityCn}</span>
-              <span className="rounded-full bg-[rgba(255,255,255,0.06)] px-2 py-0.5 text-[9.5px] font-semibold text-[#6b7280]">
+              <span className="text-status-off text-[12.5px] font-extrabold">{row.abilityCn}</span>
+              <span className="text-status-off rounded-full bg-[rgba(255,255,255,0.06)] px-2 py-0.5 text-[9.5px] font-semibold">
                 {m.profile_ability_untested()}
               </span>
             </div>
-            <div className="text-ink-tertiary pl-[34px] text-[10px]">{row.hint}</div>
+            <div className="text-ink-tertiary pl-8.5 text-[10px]">{row.hint}</div>
           </div>
         ),
       )}

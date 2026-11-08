@@ -164,7 +164,7 @@ export function SetupNicknamePage() {
         </p>
         <input
           aria-label={m.profile_nickname_label()}
-          className="border-line bg-surface-input text-ink placeholder:text-ink-tertiary focus:border-focus rounded-control w-full border px-3.5 py-[13px] text-[15px] outline-none"
+          className="border-line bg-surface-input text-ink placeholder:text-ink-tertiary focus:border-focus rounded-control w-full border px-3.5 py-3.25 text-[15px] outline-none"
           // Double the contract cap in characters so the counter can show
           // the over-limit state instead of silently truncating input.
           maxLength={24}
@@ -178,9 +178,9 @@ export function SetupNicknamePage() {
           value={value}
         />
         {showPill ? (
-          <div className="mt-[11px] text-center">
+          <div className="mt-2.75 text-center">
             <button
-              className="text-status-ok inline-flex items-center gap-1.5 rounded-full border-[1.5px] border-[rgba(74,222,128,0.55)] bg-[rgba(34,197,94,0.10)] px-[17px] py-2 text-[12.5px] font-bold"
+              className="text-status-ok inline-flex items-center gap-1.5 rounded-full border-[1.5px] border-[rgba(74,222,128,0.55)] bg-[rgba(34,197,94,0.10)] px-4.25 py-2 text-[12.5px] font-bold"
               onClick={() => void onWechatPill()}
               type="button"
             >
@@ -190,7 +190,7 @@ export function SetupNicknamePage() {
           </div>
         ) : null}
         {wechatPrefill != null && wechatPrefill !== "" ? (
-          <div className="text-status-ok mt-[11px] flex items-center justify-center gap-1 text-[11px]">
+          <div className="text-status-ok mt-2.75 flex items-center justify-center gap-1 text-[11px]">
             <Check aria-hidden size={13} />
             {m.profile_setup_wechat_from()}
           </div>
@@ -201,7 +201,7 @@ export function SetupNicknamePage() {
             {wechatNote}
           </div>
         ) : null}
-        <div className="mt-[7px] flex min-h-[15px] items-start justify-between">
+        <div className="mt-1.75 flex min-h-3.75 items-start justify-between">
           {error !== null && (
             <span className="text-danger-text text-[11.5px]" role="alert">
               {error}
@@ -228,7 +228,7 @@ export function SetupNicknamePage() {
       </div>
 
       <Button
-        className="bg-cta-primary shadow-cta-primary rounded-control px-4 py-[14px] text-[15px] font-bold text-white disabled:opacity-50"
+        className="bg-cta-primary shadow-cta-primary rounded-control px-4 py-3.5 text-[15px] font-bold text-white disabled:opacity-50"
         isDisabled={updateMutation.isPending}
         onPress={() => void onNext()}
       >

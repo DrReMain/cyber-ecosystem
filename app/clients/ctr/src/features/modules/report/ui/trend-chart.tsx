@@ -6,10 +6,10 @@ import type { WireTrendSeries } from "../trend";
 // delta reads green, a downward one amber, a flat line grey.
 function deltaChipClass(delta: number): string {
   if (delta > 0) {
-    return "bg-[rgba(34,197,94,0.15)] text-status-ok";
+    return "bg-status-ok-bg text-status-ok";
   }
   if (delta < 0) {
-    return "bg-[rgba(234,179,8,0.18)] text-[#FDE047]";
+    return "bg-[rgba(234,179,8,0.18)] text-grade-s";
   }
   return "bg-[rgba(107,114,128,0.15)] text-ink-tertiary";
 }

@@ -18,8 +18,7 @@ import { m } from "#/paraglide/messages";
 const CARD_CLASS = "border-line-accent-blue bg-identity rounded-card border px-4 py-3.75";
 
 // The bound chip, the prototype's st-ok.
-const OK_CHIP =
-  "bg-[rgba(34,197,94,0.15)] text-[#6EE7B7] rounded-full px-2.5 py-1 text-[10px] font-semibold";
+const OK_CHIP = "bg-status-ok-bg text-[#6EE7B7] rounded-full px-2.5 py-1 text-[10px] font-semibold";
 
 // The binding surface as status rows — each row shows what is
 // bound (masked server-side) and routes to the bind page only when it can

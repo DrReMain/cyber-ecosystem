@@ -83,7 +83,7 @@ export function BindWechatPage() {
             <MessageCircle aria-hidden className="text-white" size={26} />
           </span>
           <div className="text-ink text-base font-extrabold">{m.security_bind_wechat_head()}</div>
-          <div className="text-ink-secondary mx-auto mt-2 max-w-[300px] text-[12.5px] leading-[1.8]">
+          <div className="text-ink-secondary mx-auto mt-2 max-w-75 text-[12.5px] leading-[1.8]">
             {m.security_bind_wechat_pitch()}
           </div>
         </div>

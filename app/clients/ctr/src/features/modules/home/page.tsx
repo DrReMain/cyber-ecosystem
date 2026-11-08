@@ -29,8 +29,8 @@ import { StatsCard } from "./ui/stats-card";
 
 /* The home page's orb pair (prototype home). */
 const homeOrbs: readonly AmbientOrb[] = [
-  { className: "top-[-60px] left-[-70px] size-[240px]", tone: "blue" },
-  { className: "top-[280px] right-[-70px] size-[200px]", tone: "purple" },
+  { className: "-top-15 -left-17.5 size-60", tone: "blue" },
+  { className: "top-70 -right-17.5 size-50", tone: "purple" },
 ];
 
 // The read-back cards' own gates: each renders only when its read
@@ -91,7 +91,7 @@ function BellEntry() {
         {dot ? (
           <span
             aria-hidden
-            className="absolute top-[-2px] right-[-4px] size-[7px] rounded-full bg-[#EF4444]"
+            className="absolute -top-0.5 -right-1 size-1.75 rounded-full bg-[#EF4444]"
           />
         ) : null}
       </span>

@@ -13,11 +13,11 @@ const PROGRESS_SEGS = [1, 2, 3] as const;
  * pages: nickname carries two, age and games one each. */
 const STEP_ORBS = {
   1: [
-    { className: "top-[-60px] right-[-70px] size-[240px]", tone: "blue" },
-    { className: "bottom-[-30px] left-[-50px] size-[200px]", tone: "cyan" },
+    { className: "-top-15 -right-17.5 size-60", tone: "blue" },
+    { className: "-bottom-7.5 -left-12.5 size-50", tone: "cyan" },
   ],
-  2: [{ className: "top-[-60px] left-[-60px] size-[220px]", tone: "purple" }],
-  3: [{ className: "top-[-60px] right-[-60px] size-[220px]", tone: "cyan" }],
+  2: [{ className: "-top-15 -left-15 size-55", tone: "purple" }],
+  3: [{ className: "-top-15 -right-15 size-55", tone: "cyan" }],
 } as const satisfies Record<1 | 2 | 3, readonly AmbientOrb[]>;
 
 interface StepFrameProps {
@@ -37,7 +37,7 @@ export function StepFrame({ step, onBack, children }: Readonly<StepFrameProps>) 
   return (
     <AmbientLayout orbs={STEP_ORBS[step]} scroll="inside">
       <div className="flex w-full flex-col pb-6">
-        <div className="flex items-center gap-3 pb-[10px]">
+        <div className="flex items-center gap-3 pb-2.5">
           <button
             aria-label={m.common_back()}
             className="bg-surface-input text-ink-secondary flex h-10 w-10 shrink-0 items-center justify-center rounded-full active:opacity-60"
@@ -51,10 +51,10 @@ export function StepFrame({ step, onBack, children }: Readonly<StepFrameProps>) 
             {m.profile_setup_step({ n: step, total: TOTAL_STEPS })}
           </span>
         </div>
-        <div className="mb-[14px] flex gap-[5px]">
+        <div className="mb-3.5 flex gap-1.25">
           {PROGRESS_SEGS.map((seg) => (
             <span
-              className={`h-[5px] flex-1 rounded-full ${
+              className={`h-1.25 flex-1 rounded-full ${
                 seg < step
                   ? "bg-progress-done"
                   : seg === step

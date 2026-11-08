@@ -8,12 +8,12 @@ import { STATUS_CLOSED, STATUS_PENDING, STATUS_REPLIED } from "../wire";
 export function StatusBadge({ status }: Readonly<{ status: string | undefined }>) {
   const badge =
     status === STATUS_REPLIED
-      ? { cls: "bg-[rgba(34,197,94,0.15)] text-[#22C55E]", label: m.feedback_status_replied() }
+      ? { cls: "bg-status-ok-bg text-status-ok", label: m.feedback_status_replied() }
       : status === STATUS_CLOSED
-        ? { cls: "bg-[rgba(107,114,128,0.12)] text-[#6B7280]", label: m.feedback_status_closed() }
+        ? { cls: "bg-status-off-bg text-status-off", label: m.feedback_status_closed() }
         : status === STATUS_PENDING
           ? {
-              cls: "bg-[rgba(245,158,11,0.18)] text-[#FCD34D]",
+              cls: "bg-status-pending-bg text-status-pending",
               label: m.feedback_status_pending(),
             }
           : null;
@@ -22,7 +22,7 @@ export function StatusBadge({ status }: Readonly<{ status: string | undefined }>
   }
   return (
     <span
-      className={`shrink-0 rounded-full px-2.5 py-[3px] text-[10.5px] font-semibold ${badge.cls}`}
+      className={`shrink-0 rounded-full px-2.5 py-0.75 text-[10.5px] font-semibold ${badge.cls}`}
     >
       {badge.label}
     </span>

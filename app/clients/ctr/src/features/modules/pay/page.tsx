@@ -41,8 +41,8 @@ import { StateBanner } from "./ui/state-banner";
 // 态②'s two-orb art direction — the membership tint up top, the cyan
 // floor — the dual-option states ride the shared login trio instead.
 const RENEW_ORBS: readonly AmbientOrb[] = [
-  { className: "top-[-60px] left-[-40px] size-[280px]", tone: "purple" },
-  { className: "bottom-[-40px] right-[-60px] size-[220px]", tone: "cyan" },
+  { className: "-top-15 -left-10 size-70", tone: "purple" },
+  { className: "-bottom-10 -right-15 size-55", tone: "cyan" },
 ];
 
 type PurchaseKind = "member" | "trial";

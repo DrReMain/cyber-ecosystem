@@ -23,13 +23,13 @@ export function MinorCard({
         {copy}
       </div>
       <Button
-        className="bg-cta-primary shadow-cta-primary w-full rounded-[12px] py-[14px] text-[15px] font-bold text-white active:opacity-80"
+        className="bg-cta-primary shadow-cta-primary w-full rounded-[12px] py-3.5 text-[15px] font-bold text-white active:opacity-80"
         onPress={onFree}
       >
         {freeLabel}
       </Button>
       <Button
-        className="bg-surface-input text-ink-secondary w-full rounded-[12px] border-[1.5px] border-[#4B5563] py-[14px] text-[15px] font-medium active:opacity-80"
+        className="bg-surface-input text-ink-secondary border-ambient-slate w-full rounded-[12px] border-[1.5px] py-3.5 text-[15px] font-medium active:opacity-80"
         onPress={onHome}
       >
         {homeLabel}

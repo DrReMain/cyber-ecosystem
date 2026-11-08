@@ -17,7 +17,7 @@ import { genreLabel, narrowGenre } from "./vocabulary";
 /* The confirm page's own single orb (prototype match-switch-confirm): one
  * purple sphere bleeding off the top-right corner — not the login trio. */
 const switchOrbs: readonly AmbientOrb[] = [
-  { className: "top-[-60px] right-[-60px] size-[220px]", tone: "purple" },
+  { className: "-top-15 -right-15 size-55", tone: "purple" },
 ];
 
 /**
@@ -82,7 +82,7 @@ export function SwitchConfirmPage() {
         )}
 
         <button
-          className="bg-cta-primary rounded-control w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80 disabled:opacity-40"
+          className="bg-cta-primary rounded-control w-full px-4 py-3.5 text-[15px] font-bold text-white active:opacity-80 disabled:opacity-40"
           disabled={doSwitch.isPending}
           onClick={() => doSwitch.mutate({ genre: tgt })}
           type="button"
@@ -90,7 +90,7 @@ export function SwitchConfirmPage() {
           {m.match_switch_ok()}
         </button>
         <button
-          className="border-line bg-surface-content text-ink rounded-control w-full border px-4 py-[14px] text-[15px] font-bold active:opacity-60"
+          className="border-line bg-surface-content text-ink rounded-control w-full border px-4 py-3.5 text-[15px] font-bold active:opacity-60"
           onClick={() => void navigate({ to: "/match" })}
           type="button"
         >

@@ -31,7 +31,7 @@ export function ComparisonCard({ lines }: Readonly<{ lines: ComparisonLine[] }>)
                   line.delta.tone === "up"
                     ? "text-status-ok"
                     : line.delta.tone === "down"
-                      ? "text-[#F87171]"
+                      ? "text-danger-text"
                       : "text-ink-tertiary"
                 }`}
               >

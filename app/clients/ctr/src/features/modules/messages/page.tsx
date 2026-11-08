@@ -77,16 +77,16 @@ function MessageRow({ row }: Readonly<{ row: WireMessage }>) {
       }}
       type="button"
     >
-      <div className="flex items-start gap-[11px]">
-        <Icon aria-hidden className="text-ink-secondary mt-[2px] shrink-0" size={17} />
+      <div className="flex items-start gap-2.75">
+        <Icon aria-hidden className="text-ink-secondary mt-0.5 shrink-0" size={17} />
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-[7px]">
+          <div className="flex items-center gap-1.75">
             <span className="text-ink truncate text-[13px] font-bold">{row.title}</span>
             {row.isRead === false ? (
-              <span aria-hidden className="size-[6px] shrink-0 rounded-full bg-[#EF4444]" />
+              <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-[#EF4444]" />
             ) : null}
           </div>
-          <div className="text-ink-tertiary mt-[5px] line-clamp-2 text-[11.5px] leading-[1.7]">
+          <div className="text-ink-tertiary mt-1.25 line-clamp-2 text-[11.5px] leading-[1.7]">
             {row.content}
           </div>
         </div>
@@ -160,12 +160,12 @@ function TabPane({ leg }: Readonly<{ leg: TabLeg }>) {
     return (
       <>
         {leg.unread !== undefined && leg.unread > 0 ? (
-          <div className="bg-surface-input text-ink-tertiary rounded-card px-[13px] py-2.5 text-[11.5px]">
+          <div className="bg-surface-input text-ink-tertiary rounded-card px-3.25 py-2.5 text-[11.5px]">
             <b className="text-ink">{leg.unread}</b> {m.messages_unread_unit()}
           </div>
         ) : null}
         {leg.messages.length === 0 ? (
-          <div className={`${GLASS_CLASS} py-[22px] text-center`}>
+          <div className={`${GLASS_CLASS} py-5.5 text-center`}>
             <div className="text-ink-tertiary text-[12px]">{m.messages_empty()}</div>
           </div>
         ) : (
@@ -177,14 +177,14 @@ function TabPane({ leg }: Readonly<{ leg: TabLeg }>) {
   return (
     <>
       {leg.feedbacks.length === 0 ? (
-        <div className={`${GLASS_CLASS} py-[22px] text-center`}>
+        <div className={`${GLASS_CLASS} py-5.5 text-center`}>
           <div className="text-ink-tertiary text-[12px]">{m.messages_feedback_empty()}</div>
         </div>
       ) : (
         leg.feedbacks.map((row) => <FeedbackRow key={row.id ?? row.content} row={row} />)
       )}
       <Button
-        className="bg-cta-primary w-full rounded-[12px] py-[13px] text-[15px] font-bold text-white active:opacity-80"
+        className="bg-cta-primary w-full rounded-[12px] py-3.25 text-[15px] font-bold text-white active:opacity-80"
         onPress={() => void navigate({ to: "/feedback" })}
       >
         {m.messages_feedback_new()}
@@ -251,7 +251,7 @@ export function MessagesPage() {
             ] as const
           ).map(([key, label]) => (
             <button
-              className={`flex-1 rounded-[9px] py-[11px] text-[13.5px] ${
+              className={`flex-1 rounded-[9px] py-2.75 text-[13.5px] ${
                 key === tab ? "bg-cta-primary font-bold text-white" : "text-ink-tertiary"
               }`}
               key={key}

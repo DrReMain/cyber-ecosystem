@@ -34,8 +34,8 @@ import { SecurityCard } from "./ui/security-card";
 
 /* The overview page's orb pair (prototype profile-overview). */
 const overviewOrbs: readonly AmbientOrb[] = [
-  { className: "top-[-70px] left-[-60px] size-[240px]", tone: "purple" },
-  { className: "bottom-[-50px] right-[-60px] size-[200px]", tone: "cyan" },
+  { className: "-top-17.5 -left-15 size-60", tone: "purple" },
+  { className: "-bottom-12.5 -right-15 size-50", tone: "cyan" },
 ];
 
 // The digest's all-time unlock count — null while the digest read is
@@ -153,7 +153,7 @@ export function ProfilePage() {
         {/* Training trend — the prototype's own Phase-2 placeholder, dashed. */}
         <div className="rounded-card border border-dashed border-[rgba(107,114,128,0.6)] bg-[rgba(17,23,41,0.5)] px-4 py-3.75">
           <div className="mb-1.5 flex items-center justify-between">
-            <span className="text-[14.5px] font-extrabold text-[#9ca3af]">
+            <span className="text-status-lock text-[14.5px] font-extrabold">
               {m.profile_training_title()}
             </span>
             <span className="text-grade-s rounded-full bg-[rgba(234,179,8,0.18)] px-2.5 py-0.75 text-[10px] font-semibold">

@@ -16,8 +16,8 @@ import { abilityWord, type Genre, genreLabel, genreMeta, narrowGenre } from "./v
 
 /* The guide page's own orb pair (prototype match-guide). */
 const guideOrbs: readonly AmbientOrb[] = [
-  { className: "top-[-70px] left-[-50px] size-[240px]", tone: "blue" },
-  { className: "bottom-[-60px] right-[-70px] size-[210px]", tone: "cyan" },
+  { className: "-top-17.5 -left-12.5 size-60", tone: "blue" },
+  { className: "-bottom-15 -right-17.5 size-52.5", tone: "cyan" },
 ];
 
 interface StepRowProps {
@@ -53,13 +53,13 @@ function StepRow({
   const tappable = ready && (done || left > 0);
   return (
     <button
-      className={`${done ? "border-[rgba(34,197,94,0.55)]" : "border-line"} bg-surface-card shadow-card rounded-card flex w-full items-center gap-[11px] border px-[13px] py-[11px] text-start backdrop-blur-md ${ready ? "" : "opacity-60"} ${tappable ? "cursor-pointer active:opacity-80" : "cursor-default"}`}
+      className={`${done ? "border-[rgba(34,197,94,0.55)]" : "border-line"} bg-surface-card shadow-card rounded-card flex w-full items-center gap-2.75 border px-3.25 py-2.75 text-start backdrop-blur-md ${ready ? "" : "opacity-60"} ${tappable ? "cursor-pointer active:opacity-80" : "cursor-default"}`}
       disabled={!tappable}
       onClick={tappable ? onEnter : undefined}
       type="button"
     >
       <div
-        className={`${word.gradient} shadow-inset-ring rounded-control flex h-[38px] w-[38px] shrink-0 items-center justify-center text-[15px] font-bold text-white`}
+        className={`${word.gradient} shadow-inset-ring rounded-control flex h-9.5 w-9.5 shrink-0 items-center justify-center text-[15px] font-bold text-white`}
       >
         {index + 1}
       </div>
@@ -297,7 +297,7 @@ export function MatchPage() {
               </span>
             </div>
 
-            <div className="flex flex-col gap-[9px]">
+            <div className="flex flex-col gap-2.25">
               {steps.map((step, i) => {
                 const code = step.testCode ?? "";
                 const done = doneCodes.includes(code);
@@ -326,7 +326,7 @@ export function MatchPage() {
             </div>
 
             <button
-              className="bg-cta-primary shadow-cta-primary rounded-control mt-3 w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80 disabled:opacity-40"
+              className="bg-cta-primary shadow-cta-primary rounded-control mt-3 w-full px-4 py-3.5 text-[15px] font-bold text-white active:opacity-80 disabled:opacity-40"
               disabled={next?.testCode == null && session?.anchorRecordId == null}
               onClick={() => {
                 if (next?.testCode != null) {
@@ -352,16 +352,16 @@ export function MatchPage() {
                 {m.match_go_blocked()}
               </div>
             )}
-            <div className="mt-[9px] flex gap-[9px]">
+            <div className="mt-2.25 flex gap-2.25">
               <button
-                className="bg-surface-input text-ink-secondary rounded-control flex-1 border-[1.5px] border-[#4b5563] py-[11px] text-center text-[12.5px] font-medium active:opacity-60"
+                className="bg-surface-input text-ink-secondary rounded-control border-ambient-slate flex-1 border-[1.5px] py-2.75 text-center text-[12.5px] font-medium active:opacity-60"
                 onClick={() => void navigate({ to: "/match/guide" })}
                 type="button"
               >
                 {m.match_btn_guide()}
               </button>
               <button
-                className="bg-surface-input text-ink-secondary rounded-control flex-1 border-[1.5px] border-[#4b5563] py-[11px] text-center text-[12.5px] font-medium active:opacity-60"
+                className="bg-surface-input text-ink-secondary rounded-control border-ambient-slate flex-1 border-[1.5px] py-2.75 text-center text-[12.5px] font-medium active:opacity-60"
                 onClick={() => void navigate({ to: "/match/switch" })}
                 type="button"
               >

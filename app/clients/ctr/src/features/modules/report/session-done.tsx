@@ -118,7 +118,7 @@ export function SessionDonePage() {
           onBack={() => void navigate({ to: "/" })}
           title={m.report_session_title()}
           trailing={
-            <span className="rounded-full bg-[rgba(34,197,94,0.15)] px-2.5 py-0.75 text-[11px] font-semibold text-[#6EE7B7]">
+            <span className="bg-status-ok-bg rounded-full px-2.5 py-0.75 text-[11px] font-semibold text-[#6EE7B7]">
               {m.report_session_done_tag({ done: played, total })}
             </span>
           }
@@ -130,8 +130,8 @@ export function SessionDonePage() {
             aria-hidden
             className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(6,182,212,0.3),transparent_65%)]"
           />
-          <div className="relative flex size-[88px] items-center justify-center rounded-full bg-[radial-gradient(circle,rgba(6,182,212,0.35),transparent_70%)]">
-            <Check aria-hidden className="text-[#22D3EE]" size={40} strokeWidth={2.5} />
+          <div className="relative flex size-22 items-center justify-center rounded-full bg-[radial-gradient(circle,rgba(6,182,212,0.35),transparent_70%)]">
+            <Check aria-hidden className="text-link" size={40} strokeWidth={2.5} />
           </div>
           <div className="text-ink relative mt-2.5 text-2xl font-extrabold">
             {m.report_session_hero()}
@@ -163,7 +163,7 @@ export function SessionDonePage() {
               <div className="relative mt-3 flex flex-wrap justify-center gap-2">
                 <TierChip grade={top.bestGrade} />
                 {top.percentile !== undefined ? (
-                  <span className="rounded-full bg-[rgba(34,197,94,0.15)] px-2.5 py-0.75 text-[11px] font-semibold text-[#6EE7B7]">
+                  <span className="bg-status-ok-bg rounded-full px-2.5 py-0.75 text-[11px] font-semibold text-[#6EE7B7]">
                     {m.report_session_top_beat({ pct: Math.round(top.percentile) })}
                   </span>
                 ) : null}
@@ -188,7 +188,7 @@ export function SessionDonePage() {
                   <div className="flex items-center gap-2">
                     <div
                       aria-hidden
-                      className={`${abilityWord(a.ability).gradient} shadow-inset-ring flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[10px] text-[13px] font-bold text-white`}
+                      className={`${abilityWord(a.ability).gradient} shadow-inset-ring flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-[10px] text-[13px] font-bold text-white`}
                     >
                       {abilityWord(a.ability).cn.slice(0, 2)}
                     </div>

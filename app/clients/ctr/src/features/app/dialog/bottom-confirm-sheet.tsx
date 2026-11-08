@@ -34,7 +34,7 @@ interface BottomConfirmSheetProps {
 const KIND_CLASS: Record<SheetActionKind, string> = {
   primary: "bg-cta-primary shadow-cta-primary font-bold text-white",
   hot: "bg-cta-practice shadow-cta-practice font-bold text-white",
-  ghost: "border-[1.5px] border-[#4B5563] bg-surface-input text-ink-secondary font-medium",
+  ghost: "border-[1.5px] border-ambient-slate bg-surface-input text-ink-secondary font-medium",
 };
 
 export function BottomConfirmSheet({

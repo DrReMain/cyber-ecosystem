@@ -9,11 +9,11 @@ import { ProgStrip } from "./prog-strip";
 /* The intro blob rides the ability's family color (prototype test-intro). */
 const abilityBlob: Record<string, string> = {
   reactionSpeed: "bg-[#7f1d1d]",
-  aimingAccuracy: "bg-[#ea580c]",
-  trackingStability: "bg-[#0e7490]",
-  skillReleaseAccuracy: "bg-[#7e22ce]",
-  resourceAllocation: "bg-[#15803d]",
-  decisionEfficiency: "bg-[#1d4ed8]",
+  aimingAccuracy: "bg-ambient-orange",
+  trackingStability: "bg-ambient-teal",
+  skillReleaseAccuracy: "bg-ability-skill",
+  resourceAllocation: "bg-ability-resource",
+  decisionEfficiency: "bg-ambient-indigo",
 };
 
 /* The seeded how-to copy carries the prototype's own <b> emphasis
@@ -61,8 +61,8 @@ function HowToCard({ introduction }: Readonly<{ introduction: string }>) {
   }
   return (
     <>
-      <div aria-hidden className="h-[14px]" />
-      <div className="border-line bg-surface-content text-ink-muted rounded-control border px-[13px] py-3 text-[12px] leading-[1.85]">
+      <div aria-hidden className="h-3.5" />
+      <div className="border-line bg-surface-content text-ink-muted rounded-control border px-3.25 py-3 text-[12px] leading-[1.85]">
         {howToNodes(introduction)}
       </div>
     </>
@@ -112,7 +112,7 @@ export function IntroFace({
   }, [countdown, onStart]);
 
   const word = step !== null ? abilityWord(step.ability) : null;
-  const blob = (step !== null ? abilityBlob[step.ability] : undefined) ?? "bg-[#2563eb]";
+  const blob = (step !== null ? abilityBlob[step.ability] : undefined) ?? "bg-ambient-blue";
   // The category was a pool word (universal/fps/moba) — internal
   // vocabulary the prototype's identity card never shows (Q1-⑦); the
   // unit label renders only when the test row authored one.
@@ -131,7 +131,7 @@ export function IntroFace({
     <div className="bg-canvas absolute inset-0 isolate z-40 overflow-x-hidden overflow-y-auto">
       <div
         aria-hidden
-        className={`pointer-events-none absolute top-[-60px] right-[-70px] size-[240px] rounded-full opacity-26 blur-[70px] ${blob}`}
+        className={`pointer-events-none absolute -top-15 -right-17.5 size-60 rounded-full opacity-26 blur-[70px] ${blob}`}
       />
       <div className="relative w-full">
         <div className="flex items-center gap-3 px-4 pt-5 pb-2.5">
@@ -147,17 +147,17 @@ export function IntroFace({
         </div>
 
         {step !== null ? (
-          <div className="mb-[14px] px-4">
+          <div className="mb-3.5 px-4">
             <ProgStrip currentIndex={step.index} doneCodes={step.doneCodes} lineup={step.lineup} />
           </div>
         ) : null}
 
         <div className="flex flex-col gap-3 px-4 pb-6">
-          <div className="border-line bg-surface-card shadow-card rounded-card border px-4 py-[18px] backdrop-blur-md">
+          <div className="border-line bg-surface-card shadow-card rounded-card border px-4 py-4.5 backdrop-blur-md">
             <div className="flex items-center gap-3">
               {step !== null ? (
                 <div
-                  className={`${word?.gradient} shadow-inset-ring flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-[12px] text-[22px] font-bold text-white`}
+                  className={`${word?.gradient} shadow-inset-ring flex h-13 w-13 shrink-0 items-center justify-center rounded-[12px] text-[22px] font-bold text-white`}
                 >
                   {step.index + 1}
                 </div>
@@ -166,9 +166,9 @@ export function IntroFace({
                 {word !== null ? (
                   <div className="text-ink-tertiary text-[11px]">{word.cn}</div>
                 ) : null}
-                <div className="text-ink mt-[3px] text-[17px] font-extrabold">{testName}</div>
+                <div className="text-ink mt-0.75 text-[17px] font-extrabold">{testName}</div>
                 {catUnit !== "" ? (
-                  <div className="text-ink-tertiary mt-[3px] text-[10.5px]">{catUnit}</div>
+                  <div className="text-ink-tertiary mt-0.75 text-[10.5px]">{catUnit}</div>
                 ) : null}
               </div>
             </div>
@@ -177,17 +177,17 @@ export function IntroFace({
 
           {step !== null ? (
             <div className="flex gap-2.5">
-              <div className="border-line bg-surface-content rounded-control flex-1 border px-3 py-[11px]">
+              <div className="border-line bg-surface-content rounded-control flex-1 border px-3 py-2.75">
                 <div className="text-ink-tertiary text-[10.5px]">
                   {m.test_intro_progress_label()}
                 </div>
-                <div className="text-ink mt-[3px] text-[15px] font-extrabold tabular-nums">
+                <div className="text-ink mt-0.75 text-[15px] font-extrabold tabular-nums">
                   {step.doneCodes.length} / {step.lineup.length}
                 </div>
               </div>
-              <div className="border-line bg-surface-content rounded-control flex-1 border px-3 py-[11px]">
+              <div className="border-line bg-surface-content rounded-control flex-1 border px-3 py-2.75">
                 <div className="text-ink-tertiary text-[10.5px]">{m.test_intro_retest_label()}</div>
-                <div className="text-ink mt-[3px] text-[15px] font-extrabold tabular-nums">
+                <div className="text-ink mt-0.75 text-[15px] font-extrabold tabular-nums">
                   {m.test_intro_retest_value({ n: step.retestLeft })}
                 </div>
               </div>
@@ -195,15 +195,15 @@ export function IntroFace({
           ) : null}
 
           {prevBest !== null ? (
-            <div className="border-line bg-surface-content text-ink-muted rounded-control border px-[13px] py-[11px] text-[11.5px] leading-[1.7]">
+            <div className="border-line bg-surface-content text-ink-muted rounded-control border px-3.25 py-2.75 text-[11.5px] leading-[1.7]">
               {m.test_intro_prev_prefix()}{" "}
-              <b className="font-bold text-[#FDE047] tabular-nums">{prevBest.sessionBest}</b>
+              <b className="text-grade-s font-bold tabular-nums">{prevBest.sessionBest}</b>
               {m.test_intro_prev_history({ n: prevBest.historyBest ?? "—" })}
             </div>
           ) : null}
 
           <Button
-            className={`bg-cta-primary shadow-cta-primary rounded-control w-full cursor-pointer px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80 ${
+            className={`bg-cta-primary shadow-cta-primary rounded-control w-full cursor-pointer px-4 py-3.5 text-[15px] font-bold text-white active:opacity-80 ${
               spent ? "pointer-events-none opacity-40" : ""
             }`}
             isDisabled={spent}

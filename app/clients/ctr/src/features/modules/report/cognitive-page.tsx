@@ -29,9 +29,9 @@ const CORE_ABILITIES = [
 // The detail row's bare-letter chip keeps the tier ladder's own colors
 // (the head's full chip shares the palette).
 const DIM_TIER_STYLE: Record<string, string> = {
-  s: "bg-[rgba(234,179,8,0.15)] text-[#FDE047]",
-  a: "bg-[rgba(34,197,94,0.15)] text-[#6EE7B7]",
-  b: "bg-[rgba(59,130,246,0.15)] text-[#93C5FD]",
+  s: "bg-[rgba(234,179,8,0.15)] text-grade-s",
+  a: "bg-status-ok-bg text-[#6EE7B7]",
+  b: "bg-[rgba(59,130,246,0.15)] text-accent-info",
   c: "bg-[rgba(249,115,22,0.15)] text-[#FDBA74]",
 };
 
@@ -147,7 +147,7 @@ export function CognitivePage() {
                 })}
               </div>
               {r.dimensions.length > 0 ? (
-                <div className="mt-2 divide-y divide-[#1F2937]">
+                <div className="divide-tier-trap mt-2 divide-y">
                   {r.dimensions.map((d) => (
                     <div className="flex items-center justify-between py-2" key={d.dimension}>
                       <span className="text-ink text-[12.5px]">{dimensionWord(d.dimension)}</span>

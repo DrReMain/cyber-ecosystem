@@ -106,7 +106,7 @@ export function ForgotPasswordPage() {
                 value={sms.code}
               />
               <button
-                className="border-line text-ink-secondary bg-surface-input rounded-control w-[112px] shrink-0 border-[1.5px] py-[13px] text-[13px] font-medium active:opacity-60 disabled:opacity-60"
+                className="border-line text-ink-secondary bg-surface-input rounded-control w-28 shrink-0 border-[1.5px] py-3.25 text-[13px] font-medium active:opacity-60 disabled:opacity-60"
                 disabled={sms.countdown > 0 || sms.sending}
                 onClick={() => void sms.send()}
                 type="button"

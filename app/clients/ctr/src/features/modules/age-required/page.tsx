@@ -13,7 +13,7 @@ import { useProfileUpdate } from "#/features/modules/profile/use-profile-update"
 import { m } from "#/paraglide/messages";
 
 const selectClass =
-  "w-full appearance-none rounded-control border border-line bg-surface-input px-2.5 py-[13px] text-[15px] text-ink outline-none focus:border-focus";
+  "w-full appearance-none rounded-control border border-line bg-surface-input px-2.5 py-3.25 text-[15px] text-ink outline-none focus:border-focus";
 
 /**
  * The pre-payment birth backfill (prototype age-required): the full form
@@ -73,11 +73,11 @@ export function AgeRequiredPage() {
   }
 
   return (
-    <AmbientLayout orbs={[{ className: "top-[-60px] right-[-60px] size-[220px]", tone: "orange" }]}>
+    <AmbientLayout orbs={[{ className: "-top-15 -right-15 size-55", tone: "orange" }]}>
       <div className="flex w-full flex-col gap-3 pb-6">
         <h1 className="text-ink text-center text-[19px] font-bold">{m.age_required_title()}</h1>
 
-        <div className="border-line bg-surface-card shadow-card rounded-card border px-4 py-[18px] backdrop-blur-md">
+        <div className="border-line bg-surface-card shadow-card rounded-card border px-4 py-4.5 backdrop-blur-md">
           <div className="mb-3 flex items-center gap-2.5">
             <div className="bg-cta-practice shadow-inset-ring rounded-control flex size-11 shrink-0 items-center justify-center">
               <Cake aria-hidden className="text-white" size={20} />
@@ -134,12 +134,12 @@ export function AgeRequiredPage() {
               ))}
             </select>
           </div>
-          <p className="text-danger-text min-h-[15px] text-[11.5px] leading-[1.4]" role="alert">
+          <p className="text-danger-text min-h-3.75 text-[11.5px] leading-[1.4]" role="alert">
             {error ?? ""}
           </p>
         </div>
 
-        <div className="border-line bg-surface-content text-ink-tertiary rounded-control border px-[13px] py-3 text-[11.5px] leading-[1.85]">
+        <div className="border-line bg-surface-content text-ink-tertiary rounded-control border px-3.25 py-3 text-[11.5px] leading-[1.85]">
           <span className="font-bold text-[#e5e7eb]">{m.age_required_warn_must()}</span>
           {m.age_required_warn_must_tail()}
           <br />
@@ -149,20 +149,20 @@ export function AgeRequiredPage() {
         </div>
 
         <Button
-          className="bg-cta-practice shadow-cta-practice rounded-control w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80 disabled:opacity-50"
+          className="bg-cta-practice shadow-cta-practice rounded-control w-full px-4 py-3.5 text-[15px] font-bold text-white active:opacity-80 disabled:opacity-50"
           isDisabled={updateMutation.isPending}
           onPress={() => void onSave()}
         >
           {updateMutation.isPending ? m.common_loading() : m.age_required_btn_save()}
         </Button>
         <Button
-          className="bg-cta-primary shadow-cta-primary rounded-control w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80"
+          className="bg-cta-primary shadow-cta-primary rounded-control w-full px-4 py-3.5 text-[15px] font-bold text-white active:opacity-80"
           onPress={() => void navigate({ to: "/" })}
         >
           {m.age_required_btn_free()}
         </Button>
         <Button
-          className="bg-surface-input rounded-control w-full border-[1.5px] border-[#4b5563] px-4 py-[14px] text-[15px] font-medium text-[#d1d5db] active:opacity-80"
+          className="bg-surface-input rounded-control border-ambient-slate text-ink-secondary w-full border-[1.5px] px-4 py-3.5 text-[15px] font-medium active:opacity-80"
           onPress={() => void navigate({ to: "/" })}
         >
           {m.age_required_btn_home()}

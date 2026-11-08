@@ -18,7 +18,7 @@ import { ORDER_SCOPE_TRIAL, ORDER_STATE_CLOSED, ORDER_STATE_PAID } from "./order
 // The prototype's single state blob: one 250px orb whose color states the
 // verdict before any copy is read (green paid, purple member, red failed,
 // slate cancelled).
-const RESULT_ORB_CLASS = "top-[-80px] left-[-60px] size-[250px]";
+const RESULT_ORB_CLASS = "-top-20 -left-15 size-62.5";
 
 // The order row as the transport delivers it: WKT wrappers flattened (the
 // strings plain, the fen a bigint, the stamps ISO strings) and enums as
@@ -83,10 +83,10 @@ const FACE_ART: Record<
     titleColor: string;
   }
 > = {
-  "trial-ok": { Icon: CircleCheck, orb: "green", titleColor: "text-[#22C55E]" },
+  "trial-ok": { Icon: CircleCheck, orb: "green", titleColor: "text-status-ok" },
   member: { Icon: Crown, orb: "purple", titleColor: "text-[#A855F7]" },
-  fail: { Icon: TriangleAlert, orb: "red", titleColor: "text-[#F87171]" },
-  cancel: { Icon: Ban, orb: "slate", titleColor: "text-[#9CA3AF]" },
+  fail: { Icon: TriangleAlert, orb: "red", titleColor: "text-danger-text" },
+  cancel: { Icon: Ban, orb: "slate", titleColor: "text-status-lock" },
 };
 
 function ReceiptRow({ label, value }: Readonly<{ label: string; value: string }>) {

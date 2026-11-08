@@ -195,7 +195,7 @@ export function SetupGamesPage() {
         <div className="flex gap-2">
           <input
             aria-label={m.profile_setup_games_custom_title()}
-            className="border-line bg-surface-input text-ink placeholder:text-ink-tertiary focus:border-focus rounded-control min-w-0 flex-1 border px-3.5 py-[13px] text-[15px] outline-none"
+            className="border-line bg-surface-input text-ink placeholder:text-ink-tertiary focus:border-focus rounded-control min-w-0 flex-1 border px-3.5 py-3.25 text-[15px] outline-none"
             maxLength={30}
             name="customGame"
             onChange={(event) => setDraft(event.target.value)}
@@ -210,7 +210,7 @@ export function SetupGamesPage() {
             value={draft}
           />
           <button
-            className="border-ambient-blue/60 text-accent-info rounded-control w-[74px] shrink-0 border-[1.5px] py-[13px] text-center text-[13px] font-medium disabled:pointer-events-none disabled:opacity-45"
+            className="border-ambient-blue/60 text-accent-info rounded-control w-18.5 shrink-0 border-[1.5px] py-3.25 text-center text-[13px] font-medium disabled:pointer-events-none disabled:opacity-45"
             disabled={customs.length >= CUSTOM_CAP}
             onClick={addCustom}
             type="button"
@@ -241,7 +241,7 @@ export function SetupGamesPage() {
               const on = picked.includes(name);
               return (
                 <div
-                  className={`rounded-tile flex items-start gap-1.5 border px-2.5 py-[7px] text-xs ${
+                  className={`rounded-tile flex items-start gap-1.5 border px-2.5 py-1.75 text-xs ${
                     on
                       ? "border-ambient-blue bg-ambient-blue/18 text-accent-info font-bold"
                       : "border-line bg-surface-content text-ink-muted"
@@ -303,7 +303,7 @@ export function SetupGamesPage() {
       )}
 
       <Button
-        className="bg-cta-primary shadow-cta-primary rounded-control px-4 py-[14px] text-[15px] font-bold text-white disabled:opacity-50"
+        className="bg-cta-primary shadow-cta-primary rounded-control px-4 py-3.5 text-[15px] font-bold text-white disabled:opacity-50"
         isDisabled={updateMutation.isPending}
         onPress={() => void onDone()}
       >

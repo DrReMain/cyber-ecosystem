@@ -5,10 +5,10 @@ import { m } from "#/paraglide/messages";
  * axis name and score stay public, the analysis behind them does not. */
 export function LockLine({ abilityCn }: Readonly<{ abilityCn: string }>) {
   return (
-    <div className="border-line relative mt-2 h-[30px] overflow-hidden rounded-md border">
+    <div className="border-line relative mt-2 h-7.5 overflow-hidden rounded-md border">
       <div
         aria-hidden
-        className="text-ink-tertiary px-2.5 text-[10.5px] leading-[30px] blur-[3px] select-none"
+        className="text-ink-tertiary px-2.5 text-[10.5px] leading-7.5 blur-[3px] select-none"
       >
         {m.report_lock_blur({ ability: abilityCn })}
       </div>

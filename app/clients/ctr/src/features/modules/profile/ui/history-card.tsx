@@ -18,11 +18,11 @@ function HistoryRow({ slot }: Readonly<{ slot: HistorySlot }>) {
         ? ({ to: "/report/$recordId", params: { recordId: line.anchorRecordId } } as const)
         : ({ to: "/report/session/$sessionId", params: { sessionId: line.sessionId } } as const);
   return (
-    <div className="flex items-center justify-between border-b border-[rgba(55,65,81,0.4)] py-[9px] last:border-b-0">
+    <div className="flex items-center justify-between border-b border-[rgba(55,65,81,0.4)] py-2.25 last:border-b-0">
       <div className="flex min-w-0 items-center gap-2.5">
         <span
           aria-hidden
-          className={`flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[9px] text-[9px] font-bold text-white ${
+          className={`flex h-7.5 w-7.5 shrink-0 items-center justify-center rounded-[9px] text-[9px] font-bold text-white ${
             slot.genre === "fps" ? "bg-[rgba(79,70,229,0.25)]" : "bg-[rgba(29,78,216,0.25)]"
           }`}
         >
@@ -30,7 +30,7 @@ function HistoryRow({ slot }: Readonly<{ slot: HistorySlot }>) {
         </span>
         <div className="min-w-0">
           <div
-            className={`text-[12.5px] font-extrabold ${line === undefined ? "text-[#9ca3af]" : "text-ink"}`}
+            className={`text-[12.5px] font-extrabold ${line === undefined ? "text-status-lock" : "text-ink"}`}
           >
             {slot.genre === "fps" ? m.profile_hist_fps() : m.profile_hist_moba()}
           </div>
@@ -39,7 +39,7 @@ function HistoryRow({ slot }: Readonly<{ slot: HistorySlot }>) {
       </div>
       {line === undefined ? (
         <button
-          className="text-ink-secondary tap-zone rounded-control shrink-0 border-[1.5px] border-[#4b5563] px-3 py-1.5 text-[11.5px] font-medium active:opacity-60"
+          className="text-ink-secondary tap-zone rounded-control border-ambient-slate shrink-0 border-[1.5px] px-3 py-1.5 text-[11.5px] font-medium active:opacity-60"
           onClick={() => void navigate({ to: "/match" })}
           type="button"
         >
@@ -55,7 +55,7 @@ function HistoryRow({ slot }: Readonly<{ slot: HistorySlot }>) {
         </button>
       ) : (
         <button
-          className="text-ink-secondary tap-zone rounded-control shrink-0 border-[1.5px] border-[#4b5563] px-3 py-1.5 text-[11.5px] font-medium active:opacity-60"
+          className="text-ink-secondary tap-zone rounded-control border-ambient-slate shrink-0 border-[1.5px] px-3 py-1.5 text-[11.5px] font-medium active:opacity-60"
           onClick={() => openRead !== undefined && void navigate(openRead)}
           type="button"
         >
@@ -71,10 +71,8 @@ function HistoryRow({ slot }: Readonly<{ slot: HistorySlot }>) {
  * a fabricated session. */
 export function HistoryCard({ slots }: Readonly<{ slots: readonly HistorySlot[] }>) {
   return (
-    <div className="border-line-accent-blue bg-identity rounded-card border px-4 py-[15px]">
-      <div className="text-ink mb-[11px] text-[14.5px] font-extrabold">
-        {m.profile_hist_title()}
-      </div>
+    <div className="border-line-accent-blue bg-identity rounded-card border px-4 py-3.75">
+      <div className="text-ink mb-2.75 text-[14.5px] font-extrabold">{m.profile_hist_title()}</div>
       {slots.map((slot) => (
         <HistoryRow key={slot.genre} slot={slot} />
       ))}

@@ -124,9 +124,9 @@ function elapsedPctOf(remainingMs: number, durationSeconds: number): number {
 function RunTimeBar({ pct }: Readonly<{ pct: number }>) {
   return (
     <div className="flex-none px-4 pt-1.5 pb-2">
-      <div className="h-[6px] w-full overflow-hidden rounded-full bg-[#111827]">
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#111827]">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-[#0e7490] to-[#22d3ee]"
+          className="from-ambient-teal to-link h-full rounded-full bg-gradient-to-r"
           style={{ minWidth: pct > 0 ? "6px" : undefined, width: `${pct}%` }}
         />
       </div>

@@ -25,7 +25,7 @@ export type AmbientTone =
   | "slate";
 
 export interface AmbientOrb {
-  /** Position + size utilities (e.g. "top-[-70px] left-[-60px] size-[260px]"). */
+  /** Position + size utilities (e.g. "-top-17.5 -left-15 size-65"). */
   className: string;
   tone: AmbientTone;
 }
@@ -53,9 +53,9 @@ const driftClass = [
 
 /** The login page's trio — also the default for pages not yet art-directed. */
 export const loginOrbs: readonly AmbientOrb[] = [
-  { className: "top-[-70px] left-[-60px] size-[260px]", tone: "purple" },
-  { className: "top-[320px] right-[-80px] size-[220px]", tone: "blue" },
-  { className: "bottom-[-40px] left-[40px] size-[200px]", tone: "cyan" },
+  { className: "-top-17.5 -left-15 size-65", tone: "purple" },
+  { className: "top-80 -right-20 size-55", tone: "blue" },
+  { className: "-bottom-10 left-10 size-50", tone: "cyan" },
 ];
 
 export interface AmbientBackdropProps {

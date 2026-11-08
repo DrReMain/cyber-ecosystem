@@ -13,8 +13,8 @@ import { abilityWord, defaultGenre, GENRE_ORDER, type Genre, genreLabel } from "
 
 /* The page's own orb pair (prototype match-genre-pick). */
 const pickOrbs: readonly AmbientOrb[] = [
-  { className: "top-[-60px] left-[-50px] size-[220px]", tone: "violet" },
-  { className: "bottom-[-50px] right-[-50px] size-[200px]", tone: "purple" },
+  { className: "-top-15 -left-12.5 size-55", tone: "violet" },
+  { className: "-bottom-12.5 -right-12.5 size-50", tone: "purple" },
 ];
 
 /**
@@ -49,7 +49,7 @@ export function GenrePickPage() {
             onBack={() => void navigate({ to: "/" })}
             title={m.match_pick_empty_title()}
           />
-          <div className="border-line bg-surface-card shadow-card rounded-card border px-4 py-[22px] text-center backdrop-blur-md">
+          <div className="border-line bg-surface-card shadow-card rounded-card border px-4 py-5.5 text-center backdrop-blur-md">
             <FolderOpen
               aria-hidden
               className="text-ink-tertiary mx-auto"
@@ -64,14 +64,14 @@ export function GenrePickPage() {
             </p>
           </div>
           <button
-            className="bg-cta-primary rounded-control w-full px-4 py-[14px] text-[15px] font-bold text-white active:opacity-80"
+            className="bg-cta-primary rounded-control w-full px-4 py-3.5 text-[15px] font-bold text-white active:opacity-80"
             onClick={() => void navigate({ to: "/match/pick" })}
             type="button"
           >
             {m.match_pick_empty_retry()}
           </button>
           <button
-            className="bg-surface-input text-ink-secondary rounded-control w-full border-[1.5px] border-[#4b5563] px-4 py-[14px] text-[15px] font-medium active:opacity-60"
+            className="bg-surface-input text-ink-secondary rounded-control border-ambient-slate w-full border-[1.5px] px-4 py-3.5 text-[15px] font-medium active:opacity-60"
             onClick={() => void navigate({ to: "/" })}
             type="button"
           >
@@ -87,13 +87,13 @@ export function GenrePickPage() {
       <div className="flex w-full flex-col gap-3 pb-6">
         <FlowHeader onBack={() => void navigate({ to: "/" })} title={m.match_pick_title()} />
         {search.why === "tie" ? (
-          <div className="bg-surface-content text-status-pending rounded-control border border-[rgba(245,158,11,0.45)] px-3.5 py-[13px] text-[12px] leading-[1.85]">
+          <div className="bg-surface-content text-status-pending rounded-control border border-[rgba(245,158,11,0.45)] px-3.5 py-3.25 text-[12px] leading-[1.85]">
             {m.match_pick_tie_lead()}
             <span className="font-bold">{m.match_pick_tie_tied()}</span>
             {m.match_pick_tie_tail()}
           </div>
         ) : (
-          <div className="border-line bg-surface-content text-ink-muted rounded-control border px-3.5 py-[13px] text-[12px] leading-[1.85]">
+          <div className="border-line bg-surface-content text-ink-muted rounded-control border px-3.5 py-3.25 text-[12px] leading-[1.85]">
             {m.match_pick_normal_lead()}
             <span className="font-bold">{m.match_pick_normal_session()}</span>
             {m.match_pick_normal_tail()}
@@ -101,7 +101,7 @@ export function GenrePickPage() {
         )}
         {(["fps", "moba"] as const).map((genre) => (
           <button
-            className="border-line bg-surface-card shadow-card rounded-card relative border px-4 py-[15px] text-left backdrop-blur-md active:opacity-60"
+            className="border-line bg-surface-card shadow-card rounded-card relative border px-4 py-3.75 text-left backdrop-blur-md active:opacity-60"
             key={genre}
             onClick={() => choose(genre)}
             type="button"
@@ -116,16 +116,16 @@ export function GenrePickPage() {
                 <div className="text-ink text-[15px] font-extrabold">
                   {genre === "fps" ? m.match_pick_fps() : m.match_pick_moba()}
                 </div>
-                <div className="text-ink-tertiary mt-[3px] text-[11px]">{m.match_pick_sub()}</div>
+                <div className="text-ink-tertiary mt-0.75 text-[11px]">{m.match_pick_sub()}</div>
               </div>
               <ChevronRight aria-hidden className="text-ink-tertiary" size={16} />
             </div>
             {GENRE_ORDER[genre].map((ability) => {
               const word = abilityWord(ability);
               return (
-                <div className="mt-[5px] flex items-center gap-[7px]" key={ability}>
+                <div className="mt-1.25 flex items-center gap-1.75" key={ability}>
                   <span
-                    className={`${word.gradient} flex h-[22px] w-[22px] items-center justify-center rounded-full text-[9px] font-bold text-white`}
+                    className={`${word.gradient} flex h-5.5 w-5.5 items-center justify-center rounded-full text-[9px] font-bold text-white`}
                   >
                     {word.axis}
                   </span>

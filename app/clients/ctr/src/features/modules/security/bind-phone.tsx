@@ -20,7 +20,7 @@ import { previewMergePhoneFn } from "./security.fn";
 import { useBindSms } from "./use-bind-sms";
 
 const sendBtnClass =
-  "border-focus text-link bg-transparent rounded-control w-[116px] shrink-0 border px-3 py-[13px] text-[13px] font-bold active:opacity-60 disabled:opacity-60";
+  "border-focus text-link bg-transparent rounded-control w-29 shrink-0 border px-3 py-3.25 text-[13px] font-bold active:opacity-60 disabled:opacity-60";
 
 type Preview = { offer: MergeOfferDTO } | null;
 

@@ -416,7 +416,7 @@ export function EndFace({
     <div className="bg-canvas absolute inset-0 isolate z-40 overflow-x-hidden overflow-y-auto">
       <div
         aria-hidden
-        className="pointer-events-none absolute -top-20 -left-17.5 size-65 rounded-full bg-[#2563eb] opacity-26 blur-[70px]"
+        className="bg-ambient-blue pointer-events-none absolute -top-20 -left-17.5 size-65 rounded-full opacity-26 blur-[70px]"
       />
       <div
         aria-hidden

@@ -192,7 +192,7 @@ export function MergeConfirmPage() {
           {proofCopyOf(scenario.kind)}
         </div>
 
-        <div className="rounded-card border border-[rgba(245,158,11,0.45)] bg-[rgba(120,53,15,0.18)] px-3.5 py-3 text-[12px] leading-[1.85] text-[#FCD34D]">
+        <div className="rounded-card text-status-pending border border-[rgba(245,158,11,0.45)] bg-[rgba(120,53,15,0.18)] px-3.5 py-3 text-[12px] leading-[1.85]">
           {m.security_merge_warning()}
         </div>
 
@@ -279,7 +279,7 @@ function AccountPair({ poor, rich }: { poor: Side; rich: Side }) {
 }
 
 const sendBtnClass =
-  "border-focus text-link bg-transparent rounded-control w-[112px] shrink-0 border px-3 py-[13px] text-[13px] font-bold active:opacity-60 disabled:opacity-60";
+  "border-focus text-link bg-transparent rounded-control w-28 shrink-0 border px-3 py-3.25 text-[13px] font-bold active:opacity-60 disabled:opacity-60";
 
 function SmsProofFields({ bind }: { bind: ReturnType<typeof useBindSms> }) {
   return (

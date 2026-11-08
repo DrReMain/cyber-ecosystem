@@ -25,14 +25,14 @@ export function ImprovementBoard({ lines }: Readonly<{ lines: ImprovementLine[] 
                 {m.report_improve_gap({ pct: Math.round(line.gap) })}
               </span>
             </div>
-            <div className="relative mt-1.5 h-[6px] w-full overflow-hidden rounded-full bg-[#111827]">
+            <div className="relative mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-[#111827]">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-[#22D3EE] to-[#3B82F6]"
+                className="from-link to-grade-b h-full rounded-full bg-gradient-to-r"
                 style={{ width: `${Math.min(100, Math.max(2, line.current))}%` }}
               />
               <div
                 aria-hidden
-                className="absolute top-0 bottom-0 w-[2px] bg-[#FDE047]"
+                className="bg-grade-s absolute top-0 bottom-0 w-0.5"
                 style={{ left: `${Math.min(100, Math.max(0, line.target))}%` }}
               />
             </div>

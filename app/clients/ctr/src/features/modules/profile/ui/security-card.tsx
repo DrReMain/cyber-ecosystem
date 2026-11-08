@@ -5,9 +5,8 @@ import { Link } from "@tanstack/react-router";
 import { ChevronRight, KeyRound, MessageCircle, Smartphone } from "lucide-react";
 import { m } from "#/paraglide/messages";
 
-const CARD_CLASS = "border-line-accent-blue bg-identity rounded-card border px-4 py-[15px]";
-const OK_CHIP =
-  "bg-[rgba(34,197,94,0.15)] text-[#6EE7B7] rounded-full px-2.5 py-1 text-[10px] font-semibold";
+const CARD_CLASS = "border-line-accent-blue bg-identity rounded-card border px-4 py-3.75";
+const OK_CHIP = "bg-status-ok-bg text-[#6EE7B7] rounded-full px-2.5 py-1 text-[10px] font-semibold";
 const LOCK_CHIP =
   "bg-[rgba(107,114,128,0.22)] text-ink-tertiary rounded-full px-2.5 py-1 text-[10px] font-semibold";
 
@@ -30,7 +29,7 @@ export function SecurityCard() {
 
   return (
     <div className={CARD_CLASS}>
-      <div className="mb-[11px] flex items-baseline justify-between">
+      <div className="mb-2.75 flex items-baseline justify-between">
         <span className="text-ink text-[14.5px] font-extrabold">{m.profile_card_account()}</span>
         <Link
           className="tap-zone text-ink-tertiary text-[10.5px] active:opacity-60"
@@ -40,9 +39,9 @@ export function SecurityCard() {
         </Link>
       </div>
 
-      <div className="flex items-center justify-between py-[9px]">
-        <span className="text-ink flex items-center gap-[9px] text-[13px] font-bold">
-          <span className="rounded-control flex h-[30px] w-[30px] shrink-0 items-center justify-center bg-[rgba(34,197,94,0.16)] text-[#4ADE80]">
+      <div className="flex items-center justify-between py-2.25">
+        <span className="text-ink flex items-center gap-2.25 text-[13px] font-bold">
+          <span className="rounded-control flex h-7.5 w-7.5 shrink-0 items-center justify-center bg-[rgba(34,197,94,0.16)] text-[#4ADE80]">
             <MessageCircle aria-hidden size={14} />
           </span>
           {m.profile_row_wechat()}
@@ -62,9 +61,9 @@ export function SecurityCard() {
         </span>
       </div>
 
-      <div className="flex items-center justify-between border-t border-[rgba(55,65,81,0.4)] py-[9px]">
-        <span className="text-ink flex items-center gap-[9px] text-[13px] font-bold">
-          <span className="rounded-control flex h-[30px] w-[30px] shrink-0 items-center justify-center bg-[rgba(37,99,235,0.16)] text-[#93C5FD]">
+      <div className="flex items-center justify-between border-t border-[rgba(55,65,81,0.4)] py-2.25">
+        <span className="text-ink flex items-center gap-2.25 text-[13px] font-bold">
+          <span className="rounded-control text-accent-info flex h-7.5 w-7.5 shrink-0 items-center justify-center bg-[rgba(37,99,235,0.16)]">
             <Smartphone aria-hidden size={14} />
           </span>
           {m.profile_row_phone()}
@@ -87,9 +86,9 @@ export function SecurityCard() {
         </span>
       </div>
 
-      <div className="flex items-center justify-between border-t border-[rgba(55,65,81,0.4)] py-[9px]">
-        <span className="text-ink flex items-center gap-[9px] text-[13px] font-bold">
-          <span className="text-ink-secondary rounded-control flex h-[30px] w-[30px] shrink-0 items-center justify-center bg-[rgba(107,114,128,0.18)]">
+      <div className="flex items-center justify-between border-t border-[rgba(55,65,81,0.4)] py-2.25">
+        <span className="text-ink flex items-center gap-2.25 text-[13px] font-bold">
+          <span className="text-ink-secondary rounded-control bg-status-lock-bg flex h-7.5 w-7.5 shrink-0 items-center justify-center">
             <KeyRound aria-hidden size={14} />
           </span>
           {m.profile_row_password()}

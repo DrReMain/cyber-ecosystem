@@ -29,7 +29,7 @@ export function MemberCard({
             {m.report_member_unlocked()}
           </span>
         </div>
-        <div className="mt-2 text-[11px] leading-[1.7] text-[#C4B5FD]">
+        <div className="text-status-soon mt-2 text-[11px] leading-[1.7]">
           {memberActive ? m.report_member_note() : m.report_member_unlocked_single()}
         </div>
       </div>
@@ -47,16 +47,16 @@ export function MemberCard({
             <Crown aria-hidden size={15} />
             {m.report_member_title()}
           </span>
-          <span className="rounded-full bg-[rgba(234,179,8,0.18)] px-2 py-0.5 text-[10px] font-extrabold text-[#FDE047]">
+          <span className="text-grade-s rounded-full bg-[rgba(234,179,8,0.18)] px-2 py-0.5 text-[10px] font-extrabold">
             {m.report_member_better()}
           </span>
         </div>
-        <div className="mt-2 text-[11px] leading-[1.7] text-[#C4B5FD]">
+        <div className="text-status-soon mt-2 text-[11px] leading-[1.7]">
           {m.report_member_pitch({ price: priceYuan })}
         </div>
         <div className="mt-2.5 flex flex-col items-center gap-1">
           <button
-            className="w-full cursor-pointer rounded-[10px] bg-[#7C3AED] px-4 py-2.5 text-[13px] font-bold text-white active:opacity-60"
+            className="bg-ambient-purple w-full cursor-pointer rounded-[10px] px-4 py-2.5 text-[13px] font-bold text-white active:opacity-60"
             onClick={onPay}
             type="button"
           >

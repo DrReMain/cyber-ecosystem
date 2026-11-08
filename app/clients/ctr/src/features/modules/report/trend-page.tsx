@@ -141,7 +141,7 @@ export function TrendPage() {
                     </span>
                   </div>
                   <button
-                    className="rounded-control mt-3.5 w-full bg-linear-to-r from-[#7C3AED] to-[#A855F7] px-4 py-3 text-[15px] font-bold text-white active:opacity-80"
+                    className="rounded-control from-ambient-purple mt-3.5 w-full bg-linear-to-r to-[#A855F7] px-4 py-3 text-[15px] font-bold text-white active:opacity-80"
                     onClick={() => void navigate({ to: "/pay", search: { from: "/report/trend" } })}
                     type="button"
                   >

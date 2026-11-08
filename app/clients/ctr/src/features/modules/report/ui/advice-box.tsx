@@ -14,11 +14,11 @@ export function AdviceBox({
     delta?.tone === "up"
       ? "text-status-ok"
       : delta?.tone === "down"
-        ? "text-[#F87171]"
+        ? "text-danger-text"
         : "text-ink-tertiary";
   return (
     <div className="mt-2 rounded-lg border border-[rgba(55,65,81,0.5)] bg-[rgba(255,255,255,0.03)] px-2.5 py-2">
-      <span className="text-[11px] font-bold text-[#FDE047]">{m.report_advice_title()}</span>
+      <span className="text-grade-s text-[11px] font-bold">{m.report_advice_title()}</span>
       <span className="text-ink-tertiary text-[11px]"> · {advice}</span>
       {delta !== null ? (
         <span className={`ml-1.5 text-[11px] font-bold ${tone}`}>{delta.text}</span>

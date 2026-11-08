@@ -14,11 +14,11 @@ export function BirthCard({
 }>) {
   return (
     <div className="flex flex-col gap-3">
-      <div className="border-line bg-surface-card shadow-card rounded-card text-ink-muted border px-4 py-[18px] text-[12px] leading-[1.85] backdrop-blur-md">
+      <div className="border-line bg-surface-card shadow-card rounded-card text-ink-muted border px-4 py-4.5 text-[12px] leading-[1.85] backdrop-blur-md">
         {copy}
       </div>
       <Button
-        className="bg-cta-primary shadow-cta-primary w-full rounded-[12px] py-[14px] text-[15px] font-bold text-white active:opacity-80"
+        className="bg-cta-primary shadow-cta-primary w-full rounded-[12px] py-3.5 text-[15px] font-bold text-white active:opacity-80"
         onPress={onBackfill}
       >
         {actionLabel}

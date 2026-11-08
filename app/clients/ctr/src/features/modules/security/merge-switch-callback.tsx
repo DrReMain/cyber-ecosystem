@@ -12,7 +12,7 @@ import { mergeFailureCopy } from "./merge-failure";
 import { mergeSmsFn, sendBindSmsCodeFn } from "./security.fn";
 
 const sendBtnClass =
-  "border-focus text-link bg-transparent rounded-control w-[112px] shrink-0 border px-3 py-[13px] text-[13px] font-bold active:opacity-60 disabled:opacity-60";
+  "border-focus text-link bg-transparent rounded-control w-28 shrink-0 border px-3 py-3.25 text-[13px] font-bold active:opacity-60 disabled:opacity-60";
 
 // The switch flow's tail: the wechat login switched the session to the rich
 // account; this page collects the poor side's phone code and fires the
@@ -123,7 +123,7 @@ export function MergeSwitchCallbackPage() {
   }
 
   return (
-    <main className="safe-px safe-pt min-h-app mx-auto flex w-full max-w-[420px] flex-col gap-3 px-5 pt-6">
+    <main className="safe-px safe-pt min-h-app mx-auto flex w-full max-w-105 flex-col gap-3 px-5 pt-6">
       <div className="border-line-accent-blue bg-identity rounded-card border px-4 py-4">
         <div className="text-ink text-[15px] font-extrabold">{m.security_merge_tail_title()}</div>
         <p className="text-ink-secondary mt-1.5 text-[12px] leading-[1.8]">

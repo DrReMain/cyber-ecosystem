@@ -8,17 +8,17 @@ import { m } from "#/paraglide/messages";
  * values the report seat carries). */
 export function PayFilingFooter() {
   return (
-    <div className="text-center text-[9px] leading-[1.8] text-[#6B7280]">
+    <div className="text-status-off text-center text-[9px] leading-[1.8]">
       {m.pay_filing_lead()}{" "}
-      <Link className="tap-zone text-[#9CA3AF] active:opacity-60" to="/agreement/user">
+      <Link className="tap-zone text-status-lock active:opacity-60" to="/agreement/user">
         {m.pay_filing_user()}
       </Link>{" "}
       {m.pay_filing_and()}{" "}
-      <Link className="tap-zone text-[#9CA3AF] active:opacity-60" to="/agreement/privacy">
+      <Link className="tap-zone text-status-lock active:opacity-60" to="/agreement/privacy">
         {m.pay_filing_privacy()}
       </Link>
       <br />
-      <span className="text-[#9CA3AF]">
+      <span className="text-status-lock">
         {m.pay_filing_company()} · {m.pay_filing_icp()} · {m.pay_filing_email()}
       </span>
     </div>
