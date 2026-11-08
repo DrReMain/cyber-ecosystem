@@ -18,6 +18,13 @@ data:
     max_open_conns: 100        # 个 (最大连接数)
     max_idle_conns: 50         # 个 (最大空闲连接数)
     conn_max_lifetime: 3600s   # 时长 (连接最大存活)
+  mq:
+    pg: # 与 nats 二选一；无 NATS 部署用；需预先 CREATE DATABASE mq
+      dsn: ${MQ_DSN:postgres://postgres:postgres@localhost:5432/mq?sslmode=disable}
+      poll_interval: 0.5s
+      visibility_timeout: 30s
+      max_retries: 5
+      retention: 604800s         # 7 天
 observability:
   endpoint: ${OTLP_ENDPOINT:localhost:4318}
   insecure: true

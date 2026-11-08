@@ -23,7 +23,6 @@ import (
 )
 
 const (
-	topic         = "audit_log"
 	consumerGroup = "audit" // group identity; survives restarts — only a brand-new group replays
 )
 
@@ -35,15 +34,15 @@ type auditRP struct {
 }
 
 func NewAuditRP(logger *slog.Logger, p *platform.Platform) (AuditRP, func()) {
-	log := logger.With("module", "module/audit")
+	log := logger.With("module", "module/audit_rp")
 	rp := &auditRP{RP: shared.NewRP(log, p)}
 	emitter, stop := kaudit.NewEmitter(rp.publish, log)
 	rp.emitter = emitter
 	// Subscribe failure degrades to no persistence with a loud log — the
 	// service stays up; audit availability yields to service availability.
-	sub, err := p.GetMQ().Consumer.Subscribe(context.Background(), topic, consumerGroup, rp.handle)
+	sub, err := p.GetMQ().Consumer.Subscribe(context.Background(), kaudit.TopicLog, consumerGroup, rp.handle)
 	if err != nil {
-		log.Error("audit consumer subscribe failed; events are not being persisted", "topic", topic, "error", err)
+		log.Error("audit consumer subscribe failed; events are not being persisted", "topic", kaudit.TopicLog, "error", err)
 		return rp, stop
 	}
 	return rp, func() { _ = sub.Close(); stop() }
@@ -181,12 +180,12 @@ func (rp *auditRP) publish(ctx context.Context, ev *kaudit.Event) error {
 		return err
 	}
 	msg := &mq.Message{
-		Topic:     topic,
+		Topic:     kaudit.TopicLog,
 		Payload:   payload,
 		Headers:   map[string]string{"event_id": xid.New().String()},
 		Timestamp: ev.OccurredAt,
 	}
-	if _, err = rp.Platform.GetMQ().Publisher.Publish(ctx, topic, msg); err != nil {
+	if _, err = rp.Platform.GetMQ().Publisher.Publish(ctx, kaudit.TopicLog, msg); err != nil {
 		return rp.Platform.HandleMQError(err)
 	}
 	return nil

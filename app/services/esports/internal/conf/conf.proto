@@ -47,7 +47,32 @@ message Data {
     int32 max_idle_conns = 8;
     google.protobuf.Duration conn_max_lifetime = 9;
   }
+  message MQ {
+    message NATS {
+      string endpoint = 1;
+      string creds = 2;
+      google.protobuf.Duration max_age = 3;
+      int64 max_bytes = 4;
+      int32 max_retries = 5;
+      google.protobuf.Duration ack_wait = 6;
+      int32 max_ack_pending = 7; // in-flight unacked cap per consumer (0 → backend default)
+      google.protobuf.Duration dlq_max_age = 8; // DLQ stream TTL (0 → backend default)
+      int64 dlq_max_bytes = 9; // DLQ stream size cap (0 → backend default)
+      google.protobuf.Duration nak_backoff_step = 10; // linear Nak redelivery delay step (0 → backend default)
+    }
+    message PG {
+      string dsn = 1; // postgres://... to the standalone `mq` database
+      google.protobuf.Duration poll_interval = 2; // consumer poll interval (0 → backend default)
+      google.protobuf.Duration visibility_timeout = 3; // = NATS ack_wait (0 → backend default)
+      int32 max_retries = 4; // delivery attempts before DLQ (0 → backend default)
+      google.protobuf.Duration retention = 5; // message retention, age-based eviction (0 → backend default)
+      int32 batch_size = 6; // max messages per poll batch (0 → backend default)
+    }
+    NATS nats = 1;
+    PG pg = 2;
+  }
   Database database = 1;
+  MQ mq = 2;
 }
 
 message Observability {

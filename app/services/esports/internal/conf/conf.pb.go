@@ -161,6 +161,7 @@ func (x *Server) GetConnect() *Server_Connect {
 type Data struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Database      *Data_Database         `protobuf:"bytes,1,opt,name=database,proto3" json:"database,omitempty"`
+	Mq            *Data_MQ               `protobuf:"bytes,2,opt,name=mq,proto3" json:"mq,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -198,6 +199,13 @@ func (*Data) Descriptor() ([]byte, []int) {
 func (x *Data) GetDatabase() *Data_Database {
 	if x != nil {
 		return x.Database
+	}
+	return nil
+}
+
+func (x *Data) GetMq() *Data_MQ {
+	if x != nil {
+		return x.Mq
 	}
 	return nil
 }
@@ -679,6 +687,258 @@ func (x *Data_Database) GetConnMaxLifetime() *durationpb.Duration {
 	return nil
 }
 
+type Data_MQ struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Nats          *Data_MQ_NATS          `protobuf:"bytes,1,opt,name=nats,proto3" json:"nats,omitempty"`
+	Pg            *Data_MQ_PG            `protobuf:"bytes,2,opt,name=pg,proto3" json:"pg,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Data_MQ) Reset() {
+	*x = Data_MQ{}
+	mi := &file_internal_conf_conf_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Data_MQ) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Data_MQ) ProtoMessage() {}
+
+func (x *Data_MQ) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_conf_conf_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Data_MQ.ProtoReflect.Descriptor instead.
+func (*Data_MQ) Descriptor() ([]byte, []int) {
+	return file_internal_conf_conf_proto_rawDescGZIP(), []int{2, 1}
+}
+
+func (x *Data_MQ) GetNats() *Data_MQ_NATS {
+	if x != nil {
+		return x.Nats
+	}
+	return nil
+}
+
+func (x *Data_MQ) GetPg() *Data_MQ_PG {
+	if x != nil {
+		return x.Pg
+	}
+	return nil
+}
+
+type Data_MQ_NATS struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Endpoint       string                 `protobuf:"bytes,1,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
+	Creds          string                 `protobuf:"bytes,2,opt,name=creds,proto3" json:"creds,omitempty"`
+	MaxAge         *durationpb.Duration   `protobuf:"bytes,3,opt,name=max_age,json=maxAge,proto3" json:"max_age,omitempty"`
+	MaxBytes       int64                  `protobuf:"varint,4,opt,name=max_bytes,json=maxBytes,proto3" json:"max_bytes,omitempty"`
+	MaxRetries     int32                  `protobuf:"varint,5,opt,name=max_retries,json=maxRetries,proto3" json:"max_retries,omitempty"`
+	AckWait        *durationpb.Duration   `protobuf:"bytes,6,opt,name=ack_wait,json=ackWait,proto3" json:"ack_wait,omitempty"`
+	MaxAckPending  int32                  `protobuf:"varint,7,opt,name=max_ack_pending,json=maxAckPending,proto3" json:"max_ack_pending,omitempty"`    // in-flight unacked cap per consumer (0 → backend default)
+	DlqMaxAge      *durationpb.Duration   `protobuf:"bytes,8,opt,name=dlq_max_age,json=dlqMaxAge,proto3" json:"dlq_max_age,omitempty"`                 // DLQ stream TTL (0 → backend default)
+	DlqMaxBytes    int64                  `protobuf:"varint,9,opt,name=dlq_max_bytes,json=dlqMaxBytes,proto3" json:"dlq_max_bytes,omitempty"`          // DLQ stream size cap (0 → backend default)
+	NakBackoffStep *durationpb.Duration   `protobuf:"bytes,10,opt,name=nak_backoff_step,json=nakBackoffStep,proto3" json:"nak_backoff_step,omitempty"` // linear Nak redelivery delay step (0 → backend default)
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *Data_MQ_NATS) Reset() {
+	*x = Data_MQ_NATS{}
+	mi := &file_internal_conf_conf_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Data_MQ_NATS) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Data_MQ_NATS) ProtoMessage() {}
+
+func (x *Data_MQ_NATS) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_conf_conf_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Data_MQ_NATS.ProtoReflect.Descriptor instead.
+func (*Data_MQ_NATS) Descriptor() ([]byte, []int) {
+	return file_internal_conf_conf_proto_rawDescGZIP(), []int{2, 1, 0}
+}
+
+func (x *Data_MQ_NATS) GetEndpoint() string {
+	if x != nil {
+		return x.Endpoint
+	}
+	return ""
+}
+
+func (x *Data_MQ_NATS) GetCreds() string {
+	if x != nil {
+		return x.Creds
+	}
+	return ""
+}
+
+func (x *Data_MQ_NATS) GetMaxAge() *durationpb.Duration {
+	if x != nil {
+		return x.MaxAge
+	}
+	return nil
+}
+
+func (x *Data_MQ_NATS) GetMaxBytes() int64 {
+	if x != nil {
+		return x.MaxBytes
+	}
+	return 0
+}
+
+func (x *Data_MQ_NATS) GetMaxRetries() int32 {
+	if x != nil {
+		return x.MaxRetries
+	}
+	return 0
+}
+
+func (x *Data_MQ_NATS) GetAckWait() *durationpb.Duration {
+	if x != nil {
+		return x.AckWait
+	}
+	return nil
+}
+
+func (x *Data_MQ_NATS) GetMaxAckPending() int32 {
+	if x != nil {
+		return x.MaxAckPending
+	}
+	return 0
+}
+
+func (x *Data_MQ_NATS) GetDlqMaxAge() *durationpb.Duration {
+	if x != nil {
+		return x.DlqMaxAge
+	}
+	return nil
+}
+
+func (x *Data_MQ_NATS) GetDlqMaxBytes() int64 {
+	if x != nil {
+		return x.DlqMaxBytes
+	}
+	return 0
+}
+
+func (x *Data_MQ_NATS) GetNakBackoffStep() *durationpb.Duration {
+	if x != nil {
+		return x.NakBackoffStep
+	}
+	return nil
+}
+
+type Data_MQ_PG struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Dsn               string                 `protobuf:"bytes,1,opt,name=dsn,proto3" json:"dsn,omitempty"`                                                      // postgres://... to the standalone `mq` database
+	PollInterval      *durationpb.Duration   `protobuf:"bytes,2,opt,name=poll_interval,json=pollInterval,proto3" json:"poll_interval,omitempty"`                // consumer poll interval (0 → backend default)
+	VisibilityTimeout *durationpb.Duration   `protobuf:"bytes,3,opt,name=visibility_timeout,json=visibilityTimeout,proto3" json:"visibility_timeout,omitempty"` // = NATS ack_wait (0 → backend default)
+	MaxRetries        int32                  `protobuf:"varint,4,opt,name=max_retries,json=maxRetries,proto3" json:"max_retries,omitempty"`                     // delivery attempts before DLQ (0 → backend default)
+	Retention         *durationpb.Duration   `protobuf:"bytes,5,opt,name=retention,proto3" json:"retention,omitempty"`                                          // message retention, age-based eviction (0 → backend default)
+	BatchSize         int32                  `protobuf:"varint,6,opt,name=batch_size,json=batchSize,proto3" json:"batch_size,omitempty"`                        // max messages per poll batch (0 → backend default)
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *Data_MQ_PG) Reset() {
+	*x = Data_MQ_PG{}
+	mi := &file_internal_conf_conf_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Data_MQ_PG) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Data_MQ_PG) ProtoMessage() {}
+
+func (x *Data_MQ_PG) ProtoReflect() protoreflect.Message {
+	mi := &file_internal_conf_conf_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Data_MQ_PG.ProtoReflect.Descriptor instead.
+func (*Data_MQ_PG) Descriptor() ([]byte, []int) {
+	return file_internal_conf_conf_proto_rawDescGZIP(), []int{2, 1, 1}
+}
+
+func (x *Data_MQ_PG) GetDsn() string {
+	if x != nil {
+		return x.Dsn
+	}
+	return ""
+}
+
+func (x *Data_MQ_PG) GetPollInterval() *durationpb.Duration {
+	if x != nil {
+		return x.PollInterval
+	}
+	return nil
+}
+
+func (x *Data_MQ_PG) GetVisibilityTimeout() *durationpb.Duration {
+	if x != nil {
+		return x.VisibilityTimeout
+	}
+	return nil
+}
+
+func (x *Data_MQ_PG) GetMaxRetries() int32 {
+	if x != nil {
+		return x.MaxRetries
+	}
+	return 0
+}
+
+func (x *Data_MQ_PG) GetRetention() *durationpb.Duration {
+	if x != nil {
+		return x.Retention
+	}
+	return nil
+}
+
+func (x *Data_MQ_PG) GetBatchSize() int32 {
+	if x != nil {
+		return x.BatchSize
+	}
+	return 0
+}
+
 type Observability_Trace struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Enabled       bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
@@ -689,7 +949,7 @@ type Observability_Trace struct {
 
 func (x *Observability_Trace) Reset() {
 	*x = Observability_Trace{}
-	mi := &file_internal_conf_conf_proto_msgTypes[10]
+	mi := &file_internal_conf_conf_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -701,7 +961,7 @@ func (x *Observability_Trace) String() string {
 func (*Observability_Trace) ProtoMessage() {}
 
 func (x *Observability_Trace) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[10]
+	mi := &file_internal_conf_conf_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -740,7 +1000,7 @@ type Observability_Metrics struct {
 
 func (x *Observability_Metrics) Reset() {
 	*x = Observability_Metrics{}
-	mi := &file_internal_conf_conf_proto_msgTypes[11]
+	mi := &file_internal_conf_conf_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -752,7 +1012,7 @@ func (x *Observability_Metrics) String() string {
 func (*Observability_Metrics) ProtoMessage() {}
 
 func (x *Observability_Metrics) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[11]
+	mi := &file_internal_conf_conf_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -787,7 +1047,7 @@ type Observability_Log struct {
 
 func (x *Observability_Log) Reset() {
 	*x = Observability_Log{}
-	mi := &file_internal_conf_conf_proto_msgTypes[12]
+	mi := &file_internal_conf_conf_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -799,7 +1059,7 @@ func (x *Observability_Log) String() string {
 func (*Observability_Log) ProtoMessage() {}
 
 func (x *Observability_Log) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[12]
+	mi := &file_internal_conf_conf_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -852,7 +1112,7 @@ type Observability_SlowQuery struct {
 
 func (x *Observability_SlowQuery) Reset() {
 	*x = Observability_SlowQuery{}
-	mi := &file_internal_conf_conf_proto_msgTypes[13]
+	mi := &file_internal_conf_conf_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -864,7 +1124,7 @@ func (x *Observability_SlowQuery) String() string {
 func (*Observability_SlowQuery) ProtoMessage() {}
 
 func (x *Observability_SlowQuery) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[13]
+	mi := &file_internal_conf_conf_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -900,7 +1160,7 @@ type Observability_Log_FileOutput struct {
 
 func (x *Observability_Log_FileOutput) Reset() {
 	*x = Observability_Log_FileOutput{}
-	mi := &file_internal_conf_conf_proto_msgTypes[14]
+	mi := &file_internal_conf_conf_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -912,7 +1172,7 @@ func (x *Observability_Log_FileOutput) String() string {
 func (*Observability_Log_FileOutput) ProtoMessage() {}
 
 func (x *Observability_Log_FileOutput) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[14]
+	mi := &file_internal_conf_conf_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -974,7 +1234,7 @@ type Payment_Provider struct {
 
 func (x *Payment_Provider) Reset() {
 	*x = Payment_Provider{}
-	mi := &file_internal_conf_conf_proto_msgTypes[15]
+	mi := &file_internal_conf_conf_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -986,7 +1246,7 @@ func (x *Payment_Provider) String() string {
 func (*Payment_Provider) ProtoMessage() {}
 
 func (x *Payment_Provider) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[15]
+	mi := &file_internal_conf_conf_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1039,7 +1299,7 @@ type Payment_Wechat struct {
 
 func (x *Payment_Wechat) Reset() {
 	*x = Payment_Wechat{}
-	mi := &file_internal_conf_conf_proto_msgTypes[16]
+	mi := &file_internal_conf_conf_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1051,7 +1311,7 @@ func (x *Payment_Wechat) String() string {
 func (*Payment_Wechat) ProtoMessage() {}
 
 func (x *Payment_Wechat) ProtoReflect() protoreflect.Message {
-	mi := &file_internal_conf_conf_proto_msgTypes[16]
+	mi := &file_internal_conf_conf_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1150,9 +1410,10 @@ const file_internal_conf_conf_proto_rawDesc = "" +
 	"\aConnect\x12\x18\n" +
 	"\anetwork\x18\x01 \x01(\tR\anetwork\x12\x12\n" +
 	"\x04addr\x18\x02 \x01(\tR\x04addr\x123\n" +
-	"\atimeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\atimeout\"\xe6\x02\n" +
+	"\atimeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\atimeout\"\xb3\t\n" +
 	"\x04Data\x125\n" +
-	"\bdatabase\x18\x01 \x01(\v2\x19.cyber.conf.Data.DatabaseR\bdatabase\x1a\xa6\x02\n" +
+	"\bdatabase\x18\x01 \x01(\v2\x19.cyber.conf.Data.DatabaseR\bdatabase\x12#\n" +
+	"\x02mq\x18\x02 \x01(\v2\x13.cyber.conf.Data.MQR\x02mq\x1a\xa6\x02\n" +
 	"\bDatabase\x12\x16\n" +
 	"\x06driver\x18\x01 \x01(\tR\x06driver\x12\x12\n" +
 	"\x04host\x18\x02 \x01(\tR\x04host\x12\x12\n" +
@@ -1162,7 +1423,32 @@ const file_internal_conf_conf_proto_rawDesc = "" +
 	"\adb_name\x18\x06 \x01(\tR\x06dbName\x12$\n" +
 	"\x0emax_open_conns\x18\a \x01(\x05R\fmaxOpenConns\x12$\n" +
 	"\x0emax_idle_conns\x18\b \x01(\x05R\fmaxIdleConns\x12E\n" +
-	"\x11conn_max_lifetime\x18\t \x01(\v2\x19.google.protobuf.DurationR\x0fconnMaxLifetime\"\x83\x06\n" +
+	"\x11conn_max_lifetime\x18\t \x01(\v2\x19.google.protobuf.DurationR\x0fconnMaxLifetime\x1a\xa5\x06\n" +
+	"\x02MQ\x12,\n" +
+	"\x04nats\x18\x01 \x01(\v2\x18.cyber.conf.Data.MQ.NATSR\x04nats\x12&\n" +
+	"\x02pg\x18\x02 \x01(\v2\x16.cyber.conf.Data.MQ.PGR\x02pg\x1a\xac\x03\n" +
+	"\x04NATS\x12\x1a\n" +
+	"\bendpoint\x18\x01 \x01(\tR\bendpoint\x12\x14\n" +
+	"\x05creds\x18\x02 \x01(\tR\x05creds\x122\n" +
+	"\amax_age\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\x06maxAge\x12\x1b\n" +
+	"\tmax_bytes\x18\x04 \x01(\x03R\bmaxBytes\x12\x1f\n" +
+	"\vmax_retries\x18\x05 \x01(\x05R\n" +
+	"maxRetries\x124\n" +
+	"\back_wait\x18\x06 \x01(\v2\x19.google.protobuf.DurationR\aackWait\x12&\n" +
+	"\x0fmax_ack_pending\x18\a \x01(\x05R\rmaxAckPending\x129\n" +
+	"\vdlq_max_age\x18\b \x01(\v2\x19.google.protobuf.DurationR\tdlqMaxAge\x12\"\n" +
+	"\rdlq_max_bytes\x18\t \x01(\x03R\vdlqMaxBytes\x12C\n" +
+	"\x10nak_backoff_step\x18\n" +
+	" \x01(\v2\x19.google.protobuf.DurationR\x0enakBackoffStep\x1a\x99\x02\n" +
+	"\x02PG\x12\x10\n" +
+	"\x03dsn\x18\x01 \x01(\tR\x03dsn\x12>\n" +
+	"\rpoll_interval\x18\x02 \x01(\v2\x19.google.protobuf.DurationR\fpollInterval\x12H\n" +
+	"\x12visibility_timeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\x11visibilityTimeout\x12\x1f\n" +
+	"\vmax_retries\x18\x04 \x01(\x05R\n" +
+	"maxRetries\x127\n" +
+	"\tretention\x18\x05 \x01(\v2\x19.google.protobuf.DurationR\tretention\x12\x1d\n" +
+	"\n" +
+	"batch_size\x18\x06 \x01(\x05R\tbatchSize\"\x83\x06\n" +
 	"\rObservability\x12\x1a\n" +
 	"\bendpoint\x18\x01 \x01(\tR\bendpoint\x12\x1a\n" +
 	"\binsecure\x18\x02 \x01(\bR\binsecure\x125\n" +
@@ -1225,7 +1511,7 @@ func file_internal_conf_conf_proto_rawDescGZIP() []byte {
 	return file_internal_conf_conf_proto_rawDescData
 }
 
-var file_internal_conf_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
+var file_internal_conf_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
 var file_internal_conf_conf_proto_goTypes = []any{
 	(*Bootstrap)(nil),                    // 0: cyber.conf.Bootstrap
 	(*Server)(nil),                       // 1: cyber.conf.Server
@@ -1237,14 +1523,17 @@ var file_internal_conf_conf_proto_goTypes = []any{
 	(*Server_GRPC)(nil),                  // 7: cyber.conf.Server.GRPC
 	(*Server_Connect)(nil),               // 8: cyber.conf.Server.Connect
 	(*Data_Database)(nil),                // 9: cyber.conf.Data.Database
-	(*Observability_Trace)(nil),          // 10: cyber.conf.Observability.Trace
-	(*Observability_Metrics)(nil),        // 11: cyber.conf.Observability.Metrics
-	(*Observability_Log)(nil),            // 12: cyber.conf.Observability.Log
-	(*Observability_SlowQuery)(nil),      // 13: cyber.conf.Observability.SlowQuery
-	(*Observability_Log_FileOutput)(nil), // 14: cyber.conf.Observability.Log.FileOutput
-	(*Payment_Provider)(nil),             // 15: cyber.conf.Payment.Provider
-	(*Payment_Wechat)(nil),               // 16: cyber.conf.Payment.Wechat
-	(*durationpb.Duration)(nil),          // 17: google.protobuf.Duration
+	(*Data_MQ)(nil),                      // 10: cyber.conf.Data.MQ
+	(*Data_MQ_NATS)(nil),                 // 11: cyber.conf.Data.MQ.NATS
+	(*Data_MQ_PG)(nil),                   // 12: cyber.conf.Data.MQ.PG
+	(*Observability_Trace)(nil),          // 13: cyber.conf.Observability.Trace
+	(*Observability_Metrics)(nil),        // 14: cyber.conf.Observability.Metrics
+	(*Observability_Log)(nil),            // 15: cyber.conf.Observability.Log
+	(*Observability_SlowQuery)(nil),      // 16: cyber.conf.Observability.SlowQuery
+	(*Observability_Log_FileOutput)(nil), // 17: cyber.conf.Observability.Log.FileOutput
+	(*Payment_Provider)(nil),             // 18: cyber.conf.Payment.Provider
+	(*Payment_Wechat)(nil),               // 19: cyber.conf.Payment.Wechat
+	(*durationpb.Duration)(nil),          // 20: google.protobuf.Duration
 }
 var file_internal_conf_conf_proto_depIdxs = []int32{
 	1,  // 0: cyber.conf.Bootstrap.server:type_name -> cyber.conf.Server
@@ -1256,23 +1545,33 @@ var file_internal_conf_conf_proto_depIdxs = []int32{
 	7,  // 6: cyber.conf.Server.grpc:type_name -> cyber.conf.Server.GRPC
 	8,  // 7: cyber.conf.Server.connect:type_name -> cyber.conf.Server.Connect
 	9,  // 8: cyber.conf.Data.database:type_name -> cyber.conf.Data.Database
-	10, // 9: cyber.conf.Observability.trace:type_name -> cyber.conf.Observability.Trace
-	11, // 10: cyber.conf.Observability.metrics:type_name -> cyber.conf.Observability.Metrics
-	12, // 11: cyber.conf.Observability.log:type_name -> cyber.conf.Observability.Log
-	13, // 12: cyber.conf.Observability.slow_query:type_name -> cyber.conf.Observability.SlowQuery
-	15, // 13: cyber.conf.Payment.providers:type_name -> cyber.conf.Payment.Provider
-	17, // 14: cyber.conf.Server.HTTP.timeout:type_name -> google.protobuf.Duration
-	17, // 15: cyber.conf.Server.GRPC.timeout:type_name -> google.protobuf.Duration
-	17, // 16: cyber.conf.Server.Connect.timeout:type_name -> google.protobuf.Duration
-	17, // 17: cyber.conf.Data.Database.conn_max_lifetime:type_name -> google.protobuf.Duration
-	14, // 18: cyber.conf.Observability.Log.file:type_name -> cyber.conf.Observability.Log.FileOutput
-	17, // 19: cyber.conf.Observability.SlowQuery.db:type_name -> google.protobuf.Duration
-	16, // 20: cyber.conf.Payment.Provider.wechat:type_name -> cyber.conf.Payment.Wechat
-	21, // [21:21] is the sub-list for method output_type
-	21, // [21:21] is the sub-list for method input_type
-	21, // [21:21] is the sub-list for extension type_name
-	21, // [21:21] is the sub-list for extension extendee
-	0,  // [0:21] is the sub-list for field type_name
+	10, // 9: cyber.conf.Data.mq:type_name -> cyber.conf.Data.MQ
+	13, // 10: cyber.conf.Observability.trace:type_name -> cyber.conf.Observability.Trace
+	14, // 11: cyber.conf.Observability.metrics:type_name -> cyber.conf.Observability.Metrics
+	15, // 12: cyber.conf.Observability.log:type_name -> cyber.conf.Observability.Log
+	16, // 13: cyber.conf.Observability.slow_query:type_name -> cyber.conf.Observability.SlowQuery
+	18, // 14: cyber.conf.Payment.providers:type_name -> cyber.conf.Payment.Provider
+	20, // 15: cyber.conf.Server.HTTP.timeout:type_name -> google.protobuf.Duration
+	20, // 16: cyber.conf.Server.GRPC.timeout:type_name -> google.protobuf.Duration
+	20, // 17: cyber.conf.Server.Connect.timeout:type_name -> google.protobuf.Duration
+	20, // 18: cyber.conf.Data.Database.conn_max_lifetime:type_name -> google.protobuf.Duration
+	11, // 19: cyber.conf.Data.MQ.nats:type_name -> cyber.conf.Data.MQ.NATS
+	12, // 20: cyber.conf.Data.MQ.pg:type_name -> cyber.conf.Data.MQ.PG
+	20, // 21: cyber.conf.Data.MQ.NATS.max_age:type_name -> google.protobuf.Duration
+	20, // 22: cyber.conf.Data.MQ.NATS.ack_wait:type_name -> google.protobuf.Duration
+	20, // 23: cyber.conf.Data.MQ.NATS.dlq_max_age:type_name -> google.protobuf.Duration
+	20, // 24: cyber.conf.Data.MQ.NATS.nak_backoff_step:type_name -> google.protobuf.Duration
+	20, // 25: cyber.conf.Data.MQ.PG.poll_interval:type_name -> google.protobuf.Duration
+	20, // 26: cyber.conf.Data.MQ.PG.visibility_timeout:type_name -> google.protobuf.Duration
+	20, // 27: cyber.conf.Data.MQ.PG.retention:type_name -> google.protobuf.Duration
+	17, // 28: cyber.conf.Observability.Log.file:type_name -> cyber.conf.Observability.Log.FileOutput
+	20, // 29: cyber.conf.Observability.SlowQuery.db:type_name -> google.protobuf.Duration
+	19, // 30: cyber.conf.Payment.Provider.wechat:type_name -> cyber.conf.Payment.Wechat
+	31, // [31:31] is the sub-list for method output_type
+	31, // [31:31] is the sub-list for method input_type
+	31, // [31:31] is the sub-list for extension type_name
+	31, // [31:31] is the sub-list for extension extendee
+	0,  // [0:31] is the sub-list for field type_name
 }
 
 func init() { file_internal_conf_conf_proto_init() }
@@ -1286,7 +1585,7 @@ func file_internal_conf_conf_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_internal_conf_conf_proto_rawDesc), len(file_internal_conf_conf_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   17,
+			NumMessages:   20,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

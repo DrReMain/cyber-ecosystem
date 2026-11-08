@@ -54,7 +54,7 @@ func TestAdminReadBackE2E(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ent client: %v", err)
 	}
-	pf, err := platform.NewPlatform(db, platform.NewEntErrorHandler(), nil, nil)
+	pf, err := platform.NewPlatform(db, platform.NewEntErrorHandler(), nil, nil, nil, nil)
 	if err != nil {
 		t.Fatalf("platform: %v", err)
 	}

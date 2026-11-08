@@ -92,7 +92,7 @@ func TestPayLiveE2E(t *testing.T) {
 	if err != nil {
 		t.Fatalf("pay handler: %v", err)
 	}
-	pf, err := platform.NewPlatform(db, entHandler, payments, payHandler)
+	pf, err := platform.NewPlatform(db, entHandler, payments, payHandler, nil, nil)
 	if err != nil {
 		t.Fatalf("platform: %v", err)
 	}

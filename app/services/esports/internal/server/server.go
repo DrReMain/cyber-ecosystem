@@ -7,6 +7,7 @@ import (
 	"github.com/go-kratos/kratos/v3/middleware/selector"
 	"github.com/google/wire"
 
+	kaudit "cyber-ecosystem/shared-go/kratos/audit"
 	"cyber-ecosystem/shared-go/kratos/middleware/sanitize"
 	"cyber-ecosystem/shared-go/kratos/middleware/validator"
 	"cyber-ecosystem/shared-go/kratos/security"
@@ -33,17 +34,19 @@ func init() {
 	kauthz.ErrPolicyDenied = errorspb.ErrorGeneralErrorPermissionDenied("").WithCause(kauthz.ErrPolicyDenied)
 }
 
-func accessLadder(authn krauth.Authenticator, authorizer kauthz.Authorizer) []middleware.Middleware {
+func accessLadder(authn krauth.Authenticator, auditSink kaudit.Sink, authorizer kauthz.Authorizer) []middleware.Middleware {
 	return []middleware.Middleware{
 		selector.Server(security.DefaultGuard()).Match(security.MatchAccess(extv1.Access_ACCESS_UNSPECIFIED)).Build(),
 
 		selector.Server(
 			krauth.SessionAuth(authn),
+			kaudit.Audit(auditSink),
 			security.MemberPlaneGuard(),
 		).Match(security.MatchAccess(extv1.Access_ACCESS_BUILTIN)).Build(),
 
 		selector.Server(
 			krauth.SessionAuth(authn),
+			kaudit.Audit(auditSink),
 			security.BackendPlaneGuard(),
 			kauthz.OperationAuthz(authorizer),
 		).Match(security.MatchAccess(extv1.Access_ACCESS_ADMIN)).Build(),

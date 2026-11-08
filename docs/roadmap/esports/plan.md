@@ -39,7 +39,7 @@
 | # | 缺陷 | 级 | 依据 | 归属 |
 |---|---|---|---|---|
 | B-1 | 支付到期竞速「已付」恢复死路——**修形已落**(11-08 用户裁 a):classifyAPIError 增 ORDERPAID→ChannelError 分支(400 不再折叠为 ErrInvalidArgument,retirePending 认得「已付拒关」→ConvergeOnce 收敛)+单测钉。**余=真通道活证**:live 码表与关单实测归 PAY2 联调刀(NO_STATEMENT_EXIST 前科=文档码表之外的拼写可能仍在),dev/mock 结构性照不见 | 最重→余活证 | G-420 F1;修形=wechat/error.go+client_test.go(400_orderpaid 例) | PAY2 联调窗活证 |
-| B-4 | esports(及 agent)全部 WRITE 面零审计行:kratos §5a 三兄弟缺一+proto/UI「入审计」承诺落空;修形=esports 生产者三件(MQ+Sink+ladder 双块,镜像 system server.go:38-58) | 高(cutover 审计合规) | G-417;消费侧已在(system/audit 订阅 audit_log 实锤) | lzx+用户裁定后落片;**并行会话已在途,落片时核对** |
+| B-4 | ~~esports 全部 WRITE 面零审计行~~ **11-08 修毕销行**(用户裁:agent 挂起不动,esports 单家落):生产者三件=platform 接 MQ 能力(pg 后端,镜像 system 双后端形)+module/audit(AuditUC 实现 kaudit.Sink wire.Bind,纯生产半边——读面/落库归 system 消费侧)+accessLadder BUILTIN/ADMIN 两块插 kaudit.Audit(位置契约=SessionAuth 后 guard/authz 外侧);topic 契约上移 shared-go(`kaudit.TopicLog`,第二生产者出现故私有字面量升包契约,system 同步改引);活证三腿=CreateSku 200(allow WRITE)/UpdateTestConfig 400(写失败同收)/UpdateProfile 403(plane deny 留痕)全落 system.audit_log,净清探针行归零 | 高→已修 | G-417 | **agent 侧同缺陷挂起**(用户裁暂不动,复燃时同法镜像) |
 
 走查覆盖缺口(非缺陷,未执行的用例腿)=verify/coverage-map.md 缺口清单,后续多轮走查轮次消费。
 

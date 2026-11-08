@@ -12,6 +12,7 @@ import (
 	"cyber-ecosystem/app/services/esports/internal/conf"
 	"cyber-ecosystem/app/services/esports/internal/module/agreement"
 	"cyber-ecosystem/app/services/esports/internal/module/agreementadmin"
+	"cyber-ecosystem/app/services/esports/internal/module/audit"
 	"cyber-ecosystem/app/services/esports/internal/module/authz"
 	"cyber-ecosystem/app/services/esports/internal/module/compliance"
 	"cyber-ecosystem/app/services/esports/internal/module/complianceadmin"
@@ -59,8 +60,22 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 		cleanup()
 		return nil, nil, err
 	}
-	platformPlatform, err := platform.NewPlatform(entClient, entErrorHandler, payments, paymentErrorHandler)
+	mq, cleanup3, err := platform.NewMQ(data)
 	if err != nil {
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	mqErrorHandler, err := platform.NewMQErrorHandler()
+	if err != nil {
+		cleanup3()
+		cleanup2()
+		cleanup()
+		return nil, nil, err
+	}
+	platformPlatform, err := platform.NewPlatform(entClient, entErrorHandler, payments, paymentErrorHandler, mq, mqErrorHandler)
+	if err != nil {
+		cleanup3()
 		cleanup2()
 		cleanup()
 		return nil, nil, err
@@ -73,8 +88,9 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 	eventSubscriptions := bootstrap.NewEventSubscriptions(logger)
 	entitleUC := entitle.NewEntitleUC(logger, platformPlatform, activationCodeRP, entitlementRP, reportPolicyRP, eventSubscriptions)
 	profileUC := profile.NewProfileUC(logger, platformPlatform, profileRP, gameRP, entitleUC)
-	systemClient, cleanup3, err := client.NewSystemClient(remote, logger)
+	systemClient, cleanup4, err := client.NewSystemClient(remote, logger)
 	if err != nil {
+		cleanup3()
 		cleanup2()
 		cleanup()
 		return nil, nil, err
@@ -134,11 +150,15 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 	mockCashierService := mockcashier.NewMockCashierService(logger, payment, platformPlatform, orderUC)
 	v := server.NewRegistrarList(profileService, gameService, memberService, testService, matchService, skuService, orderService, entitlementService, entitleAdminService, reportService, testAdminService, skuAdminService, orderAdminService, agreementService, agreementAdminService, complianceAdminService, messageService, messageAdminService, feedbackService, feedbackAdminService, mockCashierService)
 	authzUC := authz.NewAuthzUC(logger, platformPlatform, systemClient)
-	grpcServer := server.NewGRPCServer(confServer, logger, v, systemClient, authzUC)
-	httpServer := server.NewHTTPServer(confServer, logger, v, systemClient, authzUC)
-	connectServer := server.NewConnectServer(confServer, logger, v, systemClient, authzUC)
+	auditRP, cleanup5 := audit.NewAuditRP(logger, platformPlatform)
+	auditUC := audit.NewAuditUC(logger, platformPlatform, auditRP)
+	grpcServer := server.NewGRPCServer(confServer, logger, v, systemClient, authzUC, auditUC)
+	httpServer := server.NewHTTPServer(confServer, logger, v, systemClient, authzUC, auditUC)
+	connectServer := server.NewConnectServer(confServer, logger, v, systemClient, authzUC, auditUC)
 	seed, err := bootstrap.NewSeed(platformPlatform, logger)
 	if err != nil {
+		cleanup5()
+		cleanup4()
 		cleanup3()
 		cleanup2()
 		cleanup()
@@ -146,6 +166,8 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, paym
 	}
 	app := newApp(logger, grpcServer, httpServer, connectServer, seed, lifecycle)
 	return app, func() {
+		cleanup5()
+		cleanup4()
 		cleanup3()
 		cleanup2()
 		cleanup()

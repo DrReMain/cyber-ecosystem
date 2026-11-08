@@ -80,7 +80,7 @@ func TestMembershipLiveE2E(t *testing.T) {
 		cleanMembershipE2E(t, db)
 		closeDB()
 	})
-	pf, err := platform.NewPlatform(db, platform.NewEntErrorHandler(), nil, nil)
+	pf, err := platform.NewPlatform(db, platform.NewEntErrorHandler(), nil, nil, nil, nil)
 	if err != nil {
 		t.Fatalf("platform: %v", err)
 	}

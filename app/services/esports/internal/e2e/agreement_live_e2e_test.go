@@ -85,7 +85,7 @@ func TestAgreementLiveE2E(t *testing.T) {
 		cleanAgreementE2E(t, db)
 		closeDB()
 	})
-	pf, err := platform.NewPlatform(db, platform.NewEntErrorHandler(), nil, nil)
+	pf, err := platform.NewPlatform(db, platform.NewEntErrorHandler(), nil, nil, nil, nil)
 	if err != nil {
 		t.Fatalf("platform: %v", err)
 	}

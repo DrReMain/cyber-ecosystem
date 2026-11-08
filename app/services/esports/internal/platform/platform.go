@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/wire"
 
+	"cyber-ecosystem/shared-go/capability/mq"
 	"cyber-ecosystem/shared-go/capability/payment"
 	"cyber-ecosystem/shared-go/orm/ent/entutil"
 
@@ -13,12 +14,15 @@ import (
 
 type EntErrorHandler func(error) error
 type PaymentErrorHandler func(error) error
+type MQErrorHandler func(error) error
 
 type Platform struct {
 	db             *ent.Client
 	handleEntError EntErrorHandler
 	payments       *Payments
 	handlePayError PaymentErrorHandler
+	mq             *mq.MQ
+	handleMQError  MQErrorHandler
 }
 
 func NewPlatform(
@@ -26,12 +30,16 @@ func NewPlatform(
 	handleEntError EntErrorHandler,
 	payments *Payments,
 	handlePayError PaymentErrorHandler,
+	mq *mq.MQ,
+	handleMQError MQErrorHandler,
 ) (*Platform, error) {
 	return &Platform{
 		db:             db,
 		handleEntError: handleEntError,
 		payments:       payments,
 		handlePayError: handlePayError,
+		mq:             mq,
+		handleMQError:  handleMQError,
 	}, nil
 }
 
@@ -53,10 +61,16 @@ func (p *Platform) Payments() *Payments { return p.payments }
 
 func (p *Platform) HandlePaymentError(err error) error { return p.handlePayError(err) }
 
+func (p *Platform) GetMQ() *mq.MQ { return p.mq }
+
+func (p *Platform) HandleMQError(err error) error { return p.handleMQError(err) }
+
 var ProviderSet = wire.NewSet(
 	NewPlatform,
 	NewEntClient,
 	NewEntErrorHandler,
 	NewPayments,
 	NewPaymentErrorHandler,
+	NewMQ,
+	NewMQErrorHandler,
 )

@@ -24,6 +24,13 @@ data:
     max_open_conns: 100        # connections (max)
     max_idle_conns: 50         # connections (max idle)
     conn_max_lifetime: 3600s   # duration (max connection lifetime)
+  mq:
+    pg:
+      dsn: ${MQ_DSN:postgres://postgres:postgres@postgresql.db:5432/mq?sslmode=disable}
+      poll_interval: 0.5s
+      visibility_timeout: 30s
+      max_retries: 5              # attempts (delivery ceiling)
+      retention: 604800s          # duration (7 days)
 observability:
   endpoint: ${OTLP_ENDPOINT:signoz-otel-collector.observability:4318} # SigNoz OTLP HTTP
   insecure: true

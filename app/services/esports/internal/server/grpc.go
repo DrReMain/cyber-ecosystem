@@ -11,6 +11,7 @@ import (
 	"github.com/go-kratos/kratos/v3/middleware/recovery"
 	"github.com/go-kratos/kratos/v3/transport/grpc"
 
+	kaudit "cyber-ecosystem/shared-go/kratos/audit"
 	"cyber-ecosystem/shared-go/kratos/middleware/sanitize"
 	"cyber-ecosystem/shared-go/kratos/middleware/validator"
 	"cyber-ecosystem/shared-go/kratos/observability"
@@ -26,6 +27,7 @@ func NewGRPCServer(
 	registrar []Registrar,
 	authn krauth.Authenticator,
 	authorizer kauthz.Authorizer,
+	auditSink kaudit.Sink,
 ) *grpc.Server {
 	var middlewares []middleware.Middleware
 	middlewares = append(middlewares, sanitize.Server())
@@ -36,7 +38,7 @@ func NewGRPCServer(
 	middlewares = append(middlewares, recovery.Recovery(recovery.WithLogger(observability.PrettyProto(logger))))
 	middlewares = append(middlewares, ratelimit.Server())
 	middlewares = append(middlewares, metadata.Server())
-	middlewares = append(middlewares, accessLadder(authn, authorizer)...)
+	middlewares = append(middlewares, accessLadder(authn, auditSink, authorizer)...)
 	middlewares = append(middlewares, validator.Server())
 
 	var opts = []grpc.ServerOption{
