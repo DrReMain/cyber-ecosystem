@@ -1,13 +1,18 @@
 import { useQuery } from "@connectrpc/connect-query";
+import type { Game } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/game_pb";
+import { listGames } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/game-GameService_connectquery";
 import type { GetProfileResponse } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile_pb";
+import { ProfileSex } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile_pb";
 import { getProfile } from "@cyber-ecosystem/gen-connect-ts/cyber/esports/v1/profile-ProfileService_connectquery";
 import type { GetSecurityStatusResponse } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/auth_pb";
 import { getSecurityStatus } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/auth-AuthService_connectquery";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ChevronRight, KeyRound, MessageCircle, Smartphone } from "lucide-react";
+import { useMemo } from "react";
 import { AmbientLayout } from "#/features/app/ambient/ambient-layout";
 import { PROFILE_STALE_MS } from "#/features/auth/profile-cache";
 import { FlowHeader } from "#/features/modules/match/ui/flow-header";
+import { sexFromWire } from "#/features/modules/profile/wire";
 import { m } from "#/paraglide/messages";
 
 const CARD_CLASS = "border-line-accent-blue bg-identity rounded-card border px-4 py-[15px]";
@@ -39,6 +44,19 @@ function birthValueOf(profile: GetProfileResponse | undefined): string {
     : m.security_info_unfilled();
 }
 
+// The games row prints catalog names, not stored codes — the wizard's own
+// resolution. A custom title outranks the catalog; a code the catalog does
+// not carry falls back to itself (honest, never blank).
+function gameNamesOf(games: Game[] | undefined): Map<string, string> {
+  const names = new Map<string, string>();
+  for (const game of games ?? []) {
+    if (game.id != null && game.id !== "" && game.name != null && game.name !== "") {
+      names.set(game.id, game.name);
+    }
+  }
+  return names;
+}
+
 export function SecurityPage() {
   const navigate = useNavigate();
   const securityQuery = useQuery(getSecurityStatus, {}, { throwOnError: false });
@@ -47,11 +65,16 @@ export function SecurityPage() {
     {},
     { staleTime: PROFILE_STALE_MS, throwOnError: false },
   );
+  // The games row resolves catalog names, so a failed listing degrades to
+  // the stored codes (honest) instead of failing the whole page.
+  const gamesQuery = useQuery(listGames, {}, { throwOnError: false });
   const status = securityQuery.data;
   const credentials = boundCredentials(status);
   const phone = credentials.find((c) => c.kind === "sms");
   const wechat = credentials.find((c) => c.kind === "wechat_mp");
   const profile = profileQuery.data?.profile;
+  const sex = sexFromWire(profile?.sex);
+  const gameNames = useMemo(() => gameNamesOf(gamesQuery.data?.games), [gamesQuery.data?.games]);
 
   return (
     <AmbientLayout>
@@ -156,9 +179,9 @@ export function SecurityPage() {
           <InfoRow
             label={m.security_info_sex()}
             value={
-              profile?.sex === 1
+              sex === ProfileSex.MALE
                 ? m.security_sex_male()
-                : profile?.sex === 2
+                : sex === ProfileSex.FEMALE
                   ? m.security_sex_female()
                   : m.security_info_unfilled()
             }
@@ -169,7 +192,7 @@ export function SecurityPage() {
             value={
               profile?.games && profile.games.length > 0
                 ? profile.games
-                    .map((g) => g.customName || g.gameId || "")
+                    .map((g) => g.customName || gameNames.get(g.gameId ?? "") || g.gameId || "")
                     .filter(Boolean)
                     .join("、")
                 : m.security_info_none()

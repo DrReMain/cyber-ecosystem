@@ -152,10 +152,10 @@ export function seedProfile(
 ): void {
   const games =
     shape === "profile-missing"
-      ? "('王者荣耀','CS2')"
+      ? "ARRAY['王者荣耀','CS2']"
       : shape === "underage"
-        ? "('和平精英')"
-        : "('王者荣耀','英雄联盟','CS2')";
+        ? "ARRAY['和平精英']"
+        : "ARRAY['王者荣耀','英雄联盟','CS2']";
   // Birth year 2004, not the prototype's 2008: the cohort key is birth
   // year + sex, and the shared dev pool carries a legacy 2008 male
   // calibration batch (another lane's residue, left in place) that a 2008
@@ -178,8 +178,12 @@ export function seedProfile(
              -- namespace ListGames exposes and UpdateProfile's
              -- ExistingCodes gate writes (the ent row PK is a different
              -- namespace the wizard's pre-pick never matches). Resolved by
-             -- name against the seeded catalog, never hardcoded.
-             (SELECT jsonb_agg(jsonb_build_object('game_id', code)) FROM game WHERE name IN ${games}));`,
+             -- name against the seeded catalog, never hardcoded. The
+             -- aggregate's order is pinned to the list's own order: the
+             -- hub face joins the names into one line, and a line that
+             -- differs by order is a diff.
+             (SELECT jsonb_agg(jsonb_build_object('game_id', code) ORDER BY array_position(${games}::text[], name))
+              FROM game WHERE name = ANY(${games}::text[])));`,
   );
 }
 

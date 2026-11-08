@@ -93,14 +93,6 @@ import {
 // · the hub's tabbar — the prototype renders the shell's five tab rows
 //   on the hub (its own tab: 'me'); the app's security tree is a
 //   headered subpage with no tabbar. A structural account, five rows.
-// · the hub's sex row — a real app bug the face caught: the wire's sex
-//   is the proto-JSON enum name (the age step normalizes it, its own
-//   comment says so), but the hub compares === 1, so the row reads
-//   未填 for every member. The oracle prints 男.
-// · the hub's games row — the wizard resolves catalog codes to names
-//   (listGames); the hub renders the stored codes raw (cs2、honor、lol
-//   against 王者荣耀、英雄联盟、CS2). A display-shape account, bug-flagged
-//   beside the sex row for a fix slice of their own.
 
 test.skip(!process.env.CTR_E2E, "security fidelity needs the live stack (CTR_E2E=1)");
 test.use({ locale: "zh-CN" });

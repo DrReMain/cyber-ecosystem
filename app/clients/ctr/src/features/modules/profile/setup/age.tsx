@@ -9,15 +9,8 @@ import { PROFILE_STALE_MS } from "#/features/auth/profile-cache";
 import { m } from "#/paraglide/messages";
 import { bandLabel, bandOfAge } from "../bands";
 import { useProfileUpdate } from "../use-profile-update";
+import { sexFromWire } from "../wire";
 import { StepFrame } from "./step-frame";
-
-// The read-side wire names (proto-JSON) for the sex enum — the write side
-// takes the enum itself, so the mapping lives only where reads land.
-const SEX_FROM_WIRE: Record<string, ProfileSex> = {
-  PROFILE_SEX_MALE: ProfileSex.MALE,
-  PROFILE_SEX_FEMALE: ProfileSex.FEMALE,
-  PROFILE_SEX_UNDETERMINED: ProfileSex.UNDETERMINED,
-};
 
 export function SetupAgePage() {
   const navigate = useNavigate();
@@ -43,14 +36,13 @@ export function SetupAgePage() {
   // auto-fill the prototype promised was ruled out (2026-10-30), so the
   // read stays the only prefill source.
   // The JSON transport delivers the enum as its wire-name string while
-  // the generated type claims the enum: the union narrows by typeof,
-  // and an absent/null sex collapses to "" which no table row matches.
+  // the generated type claims the enum — wire.ts owns the narrowing, and
+  // an absent sex maps to undefined which no table row matches.
   useEffect(() => {
     if (sex !== null) {
       return;
     }
-    const raw: ProfileSex | string = profileQuery.data?.profile?.sex ?? "";
-    const mapped = typeof raw === "string" ? SEX_FROM_WIRE[raw] : undefined;
+    const mapped = sexFromWire(profileQuery.data?.profile?.sex);
     if (mapped !== undefined) {
       setSex(mapped);
     }
