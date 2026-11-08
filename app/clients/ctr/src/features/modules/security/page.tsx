@@ -15,7 +15,7 @@ import { FlowHeader } from "#/features/modules/match/ui/flow-header";
 import { sexFromWire } from "#/features/modules/profile/wire";
 import { m } from "#/paraglide/messages";
 
-const CARD_CLASS = "border-line-accent-blue bg-identity rounded-card border px-4 py-[15px]";
+const CARD_CLASS = "border-line-accent-blue bg-identity rounded-card border px-4 py-3.75";
 
 // The bound chip, the prototype's st-ok.
 const OK_CHIP =
@@ -85,13 +85,13 @@ export function SecurityPage() {
         </div>
 
         <div className={CARD_CLASS}>
-          <div className="flex items-center gap-[11px]">
-            <span className="rounded-control flex h-[34px] w-[34px] items-center justify-center bg-[rgba(34,197,94,0.16)] text-[#4ADE80]">
+          <div className="flex items-center gap-2.75">
+            <span className="rounded-control flex h-8.5 w-8.5 items-center justify-center bg-[rgba(34,197,94,0.16)] text-[#4ADE80]">
               <MessageCircle aria-hidden size={17} />
             </span>
             <div className="min-w-0 flex-1">
               <div className="text-ink text-[13px] font-bold">{m.security_row_wechat()}</div>
-              <div className="text-ink-tertiary mt-[3px] text-[10.5px] leading-[1.6]">
+              <div className="text-ink-tertiary mt-0.75 text-[10.5px] leading-[1.6]">
                 {wechat !== undefined
                   ? m.security_wechat_bound_desc({ mask: wechat.maskedIdentifier ?? "" })
                   : m.security_wechat_unbound_desc()}
@@ -113,13 +113,13 @@ export function SecurityPage() {
         </div>
 
         <div className={CARD_CLASS}>
-          <div className="flex items-center gap-[11px]">
-            <span className="rounded-control flex h-[34px] w-[34px] items-center justify-center bg-[rgba(37,99,235,0.16)] text-[#93C5FD]">
+          <div className="flex items-center gap-2.75">
+            <span className="rounded-control text-accent-info flex h-8.5 w-8.5 items-center justify-center bg-[rgba(37,99,235,0.16)]">
               <Smartphone aria-hidden size={17} />
             </span>
             <div className="min-w-0 flex-1">
               <div className="text-ink text-[13px] font-bold">{m.security_row_phone()}</div>
-              <div className="text-ink-tertiary mt-[3px] text-[10.5px] leading-[1.6]">
+              <div className="text-ink-tertiary mt-0.75 text-[10.5px] leading-[1.6]">
                 {phone
                   ? m.security_phone_bound_desc({ mask: phone.maskedIdentifier })
                   : m.security_phone_unbound_desc()}
@@ -141,13 +141,13 @@ export function SecurityPage() {
         </div>
 
         <div className={CARD_CLASS}>
-          <div className="flex items-center gap-[11px]">
-            <span className="text-ink-secondary rounded-control flex h-[34px] w-[34px] items-center justify-center bg-[rgba(107,114,128,0.18)]">
+          <div className="flex items-center gap-2.75">
+            <span className="text-ink-secondary rounded-control bg-status-lock-bg flex h-8.5 w-8.5 items-center justify-center">
               <KeyRound aria-hidden size={17} />
             </span>
             <div className="min-w-0 flex-1">
               <div className="text-ink text-[13px] font-bold">{m.security_row_password()}</div>
-              <div className="text-ink-tertiary mt-[3px] text-[10.5px] leading-[1.6]">
+              <div className="text-ink-tertiary mt-0.75 text-[10.5px] leading-[1.6]">
                 {status?.hasPassword
                   ? m.security_password_set_desc()
                   : m.security_password_unset_desc()}
@@ -214,9 +214,9 @@ export function SecurityPage() {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between py-[7px] text-xs">
+    <div className="flex items-center justify-between py-1.75 text-xs">
       <span className="text-ink-secondary">{label}</span>
-      <span className="text-ink max-w-[200px] text-right">{value}</span>
+      <span className="text-ink max-w-50 text-right">{value}</span>
     </div>
   );
 }
