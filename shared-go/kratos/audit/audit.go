@@ -37,6 +37,11 @@ const (
 	DenyAbacConstraint = kauthz.DenyAbacConstraint
 )
 
+// TopicLog is the carrier topic audit events travel on — the shared name
+// between every producing service's Sink implementation and the persisting
+// consumer in the system service.
+const TopicLog = "audit_log"
+
 // Sink is the port the Audit middleware hands collected events to; the
 // application's audit usecase is the intended implementor. Implementations
 // must not block the request path.

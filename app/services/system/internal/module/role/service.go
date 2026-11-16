@@ -86,7 +86,7 @@ func (s *RoleService) DeleteRole(ctx context.Context, in *systempb.DeleteRoleReq
 }
 
 func (s *RoleService) ListRoles(ctx context.Context, in *systempb.ListRolesRequest) (*systempb.ListRolesResponse, error) {
-	out, err := s.roleUC.List(ctx, &RoleListIn{
+	out, err := s.roleUC.List(ctx, &ListIn{
 		PageRequest: helper.EnsurePageRequest(in.Page),
 		OrderBy:     in.OrderBy,
 		Code:        in.Code,

@@ -1,3 +1,9 @@
+# Dev config (bare metal). container/config.yaml mirrors this file's key
+# set and order for the baked image; keep the two aligned when either
+# changes. Overrides come ONLY from APP_-prefixed env vars (APP_DB_HOST=x);
+# the boot banner ("sms channel resolved" / "auth provider resolved")
+# prints the values actually in effect — read it back after exporting.
+# Optional blocks (nats mq, log file sink) stay commented until needed.
 server:
   http: {addr: 0.0.0.0:11001, timeout: 1s}
   grpc: {addr: 0.0.0.0:12001, timeout: 1s}
@@ -10,104 +16,103 @@ data:
     user: ${DB_USER:postgres}
     password: ${DB_PASS:postgres}
     db_name: ${DB_NAME:system}
-    max_open_conns: 100        # 个 (最大连接数)
-    max_idle_conns: 50         # 个 (最大空闲连接数)
-    conn_max_lifetime: 3600s   # 时长 (连接最大存活)
+    max_open_conns: 100
+    max_idle_conns: 50
+    conn_max_lifetime: 3600s
   redis:
     network: tcp
     addr: ${REDIS_ADDR:localhost:6379}
     password: ${REDIS_PASS:}
-    db: 0                      # 序号 (Redis 数据库 0–15)
-    pool_size: 50              # 个 (连接池大小)
-    min_idle_conns: 5          # 个 (最小空闲连接数)
-    conn_max_lifetime: 1800s   # 时长 (连接最大存活)
-    read_timeout: 0.2s         # 时长 (读超时)
-    write_timeout: 0.2s        # 时长 (写超时)
-    dial_timeout: 5s           # 时长 (拨号超时)
-    pool_timeout: 1.2s         # 时长 (池等待超时)
+    db: 0
+    pool_size: 50
+    min_idle_conns: 5
+    conn_max_lifetime: 1800s
+    read_timeout: 0.2s
+    write_timeout: 0.2s
+    dial_timeout: 5s
+    pool_timeout: 1.2s
   storage:
     s3:
       endpoint: ${S3_ENDPOINT:http://localhost:8333}
-      public_endpoint: ${S3_PUBLIC_ENDPOINT:} # presign 铸造基址（浏览器可达；LAN 场景导出 APP_S3_PUBLIC_ENDPOINT）；空=endpoint
       access_key: ${S3_ACCESS_KEY:admin@cyber-ecosystem.com}
       secret_key: ${S3_SECRET_KEY:Cyber-Ecosystem123}
       bucket: ${S3_BUCKET:core}
       region: ${S3_REGION:us-east-1}
       use_path_style: true
-      multipart_threshold: 8388608  # 8 MiB；直传单发/会话裁决 + 服务端 transfermanager 大文件自动分片
-      part_size: 5242880            # 5 MiB；直传分片规划 + 服务端 multipart 分片规划
-      presign_ttl: 900s             # 预签名有效期；仅直传上传与下载铸造
-      max_file_size: 2147483648     # 2 GiB；直传预检 + 服务端流式上限（代理通道 4MiB 上限是 proto 契约常量，不在此处）
+      multipart_threshold: 8388608 # 8 MiB — uploads above split into parts
+      part_size: 5242880           # 5 MiB
+      presign_ttl: 900s
+      max_file_size: 2147483648    # 2 GiB; proxy channel caps at 4 MiB by contract
+      public_endpoint: ${S3_PUBLIC_ENDPOINT:} # browser-facing presign base; empty = endpoint; set for LAN deploys
   mq:
-    pg: # 与 nats 二选一；无 NATS 部署用；需预先 CREATE DATABASE mq
+    pg: # postgres-backed queue; needs CREATE DATABASE mq once; alternative to nats below
       dsn: ${MQ_DSN:postgres://postgres:postgres@localhost:5432/mq?sslmode=disable}
       poll_interval: 0.5s
       visibility_timeout: 30s
       max_retries: 5
-      retention: 604800s         # 7 天
+      retention: 604800s # 7 days
       batch_size: 16
 #    nats:
 #      endpoint: nats://localhost:4222
-#      # creds: ""                 # dev 无鉴权
-#      max_age: 604800s            # 7 天 (protobuf Duration: 秒)
-#      max_bytes: 1073741824       # 1 GiB
-#      max_retries: 5              # 次 (投递上限，超过则 DLQ)
-#      ack_wait: 30s               # 时长 (重投等待，须大于 handler p99)
-#      max_ack_pending: 256        # 个 (每消费者在途未 ack 上限，限内存+重投)
-#      dlq_max_age: 2592000s       # 30 天 (DLQ 流保留，长于业务流)
-#      dlq_max_bytes: 1073741824   # 1 GiB (DLQ 流容量)
-#      nak_backoff_step: 0.5s      # 线性退避步长 (Nak 重投延迟)
+#      # creds: ""               # dev runs without auth
+#      max_age: 604800s          # 7 days
+#      max_bytes: 1073741824     # 1 GiB
+#      max_retries: 5            # then dlq
+#      ack_wait: 30s             # keep above handler p99
+#      max_ack_pending: 256      # in-flight cap per consumer
+#      dlq_max_age: 2592000s     # 30 days — longer than the business stream
+#      dlq_max_bytes: 1073741824
+#      nak_backoff_step: 0.5s
 observability:
-  endpoint: ${OTLP_ENDPOINT:localhost:4318} # SigNoz OTLP HTTP
+  endpoint: ${OTLP_ENDPOINT:localhost:4318} # otlp http collector
   insecure: true
   trace:
     enabled: ${TRACE_ENABLED:false}
   metrics:
     enabled: ${METRICS_ENABLED:false}
-  slow_query:
-    db: 0.2s
-    cache: 0.05s
   log:
     level: debug
     console: true
     otlp: false
 #    file:
 #      path: app.log
-#      max_size_mb: 100 # MiB (单文件最大)
-#      max_backups: 10 # 个 (保留备份数)
-#      max_age_days: 30 # 天 (最大保留天数)
+#      max_size_mb: 100
+#      max_backups: 10
+#      max_age_days: 30
 #      compress: true
+  slow_query:
+    db: 0.2s
+    cache: 0.05s
 catalog:
-  dir: ${CATALOG_DIR:../../../../../gen/catalog} # 生成物清单
-
+  dir: ${CATALOG_DIR:../../../../../gen/catalog}
 auth:
   providers:
-    - key: wechat                   # 实例注册键 (登录请求的 provider 参数)
-      kind: wechat_mp               # 代码注册的 kind (公众号网页授权)
+    - key: wechat            # instance key — the login request's provider param
+      kind: wechat_mp
       enabled: ${WECHAT_ENABLED:true}
-      auto_register: ${WECHAT_AUTO_REGISTER:true} # 无绑定交换=注册新会员
-      endpoint: ${WECHAT_ENDPOINT:} # 交换端点；空 = 官方默认 (e2e 覆写指向 mock)
-      population: member           # 落座人群
+      auto_register: ${WECHAT_AUTO_REGISTER:true}
+      endpoint: ${WECHAT_ENDPOINT:}
+      population: ${WECHAT_POPULATION:member} # landing population for this provider's logins
       wechat:
-        appid: ${WECHAT_APPID:wxfda597a14a57bf08} # 测试号
+        appid: ${WECHAT_APPID:wxfda597a14a57bf08}   # test account
         secret: ${WECHAT_SECRET:da1ce920bfcee3db140f431d2c1f3a5b}
-    - key: sms                      # 实例注册键 (发码/登录请求的 provider 参数)
-      kind: sms                     # 代码注册的 kind (短信验证码直登)
+    - key: sms
+      kind: sms
       enabled: ${SMS_ENABLED:true}
-      auto_register: ${SMS_AUTO_REGISTER:true} # 无绑定手机号=注册新会员
-      population: member           # 落座人群
+      auto_register: ${SMS_AUTO_REGISTER:true}
+      population: ${SMS_POPULATION:member}
       sms:
-        backend: ${SMS_BACKEND:}               # 空 = 按凭据自动；dysmsapi | mock
-        access_key_id: ${SMS_ACCESS_KEY_ID:}   # 自动模式下 id/secret 成对才起 dysmsapi，全空 = mock
+        backend: ${SMS_BACKEND:mock} # dysmsapi (credential pair required) | mock (record, never dial)
+        access_key_id: ${SMS_ACCESS_KEY_ID:}
         access_key_secret: ${SMS_ACCESS_KEY_SECRET:}
         sign_name: ${SMS_SIGN_NAME:曦光未来}
-        template_code: ${SMS_TEMPLATE_CODE:}  # 模板自有占位词表，须含 ${code} 变量
-        endpoint: ${SMS_ENDPOINT:}             # 空 = 官方默认
+        template_code: ${SMS_TEMPLATE_CODE:SMS_460000000}
+        endpoint: ${SMS_ENDPOINT:}
 seed:
   super_admins:
-    - admin                       # 账号 (种子超管)
-  initial_password: ${SEED_INITIAL_PASSWORD:admin123456} # 种子超管口令
+    - admin
+  initial_password: ${SEED_INITIAL_PASSWORD:admin123456}
   populations:
-    - code: member                # C 端会员人群 (member 面: 引擎拒后台, 组合面枚举)
+    - code: member
       name: Member
       plane: member

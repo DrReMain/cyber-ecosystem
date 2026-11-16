@@ -9,6 +9,9 @@ import (
 // AgentConfig is the predicate function for agentconfig builders.
 type AgentConfig func(*sql.Selector)
 
+// AuditLog is the predicate function for auditlog builders.
+type AuditLog func(*sql.Selector)
+
 // ChatMessage is the predicate function for chatmessage builders.
 type ChatMessage func(*sql.Selector)
 

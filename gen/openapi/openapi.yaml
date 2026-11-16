@@ -448,6 +448,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.ListAuditExportsResponse'
+    /api/v1/system/auth/begin-bind-credential:
+        post:
+            tags:
+                - AuthService
+            operationId: AuthService_BeginBindCredential
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.BeginBindCredentialRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.BeginBindCredentialResponse'
     /api/v1/system/auth/begin-identity-login:
         post:
             tags:
@@ -484,6 +502,31 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.BindCredentialResponse'
+    /api/v1/system/auth/import-accounts:
+        post:
+            tags:
+                - AuthService
+            description: |-
+                Bulk registration on the operator's behalf: one file's rows become
+                 accounts with an sms credential each — the exact dance the sms login's
+                 auto-registration runs, minus the proof (the operator collected the
+                 numbers off-line). A phone that already names an account skips — the
+                 credential table's own uniqueness, read ahead of the write — and
+                 nothing rolls back the rows that already landed.
+            operationId: AuthService_ImportAccounts
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.ImportAccountsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ImportAccountsResponse'
     /api/v1/system/auth/login:
         post:
             tags:
@@ -520,6 +563,18 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.LoginByIdentityResponse'
+    /api/v1/system/auth/login-config:
+        get:
+            tags:
+                - AuthService
+            operationId: AuthService_GetLoginConfig
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.GetLoginConfigResponse'
     /api/v1/system/auth/logout:
         post:
             tags:
@@ -538,6 +593,42 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.LogoutResponse'
+    /api/v1/system/auth/reset-password:
+        post:
+            tags:
+                - AuthService
+            operationId: AuthService_ResetPassword
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.ResetPasswordRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.ResetPasswordResponse'
+    /api/v1/system/auth/send-bind-sms-code:
+        post:
+            tags:
+                - AuthService
+            operationId: AuthService_SendBindSmsCode
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.SendBindSmsCodeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.SendBindSmsCodeResponse'
     /api/v1/system/auth/send-sms-code:
         post:
             tags:
@@ -1064,6 +1155,18 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.ChangePasswordResponse'
+    /api/v1/system/me/security:
+        get:
+            tags:
+                - AuthService
+            operationId: AuthService_GetSecurityStatus
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.GetSecurityStatusResponse'
     /api/v1/system/policies:
         get:
             tags:
@@ -1640,6 +1743,23 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.ListTenantsResponse'
+        post:
+            tags:
+                - TenantService
+            operationId: TenantService_CreateTenant
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.CreateTenantRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.CreateTenantResponse'
     /api/v1/system/tenants/{id}:
         get:
             tags:
@@ -1682,6 +1802,31 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.UpdateTenantStatusResponse'
+    /api/v1/system/tenants/{tenantCode}/admins:
+        post:
+            tags:
+                - TenantService
+            operationId: TenantService_AddTenantAdmin
+            parameters:
+                - name: tenantCode
+                  in: path
+                  description: The tenant the administrator joins — the code CreateTenant took.
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.AddTenantAdminRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.AddTenantAdminResponse'
     /api/v1/system/transfer/echo:
         get:
             tags:
@@ -2310,6 +2455,74 @@ components:
         cyber.system.v1.AbortUploadResponse:
             type: object
             properties: {}
+        cyber.system.v1.AccountImportResult:
+            type: object
+            properties:
+                rowIndex:
+                    type: integer
+                    format: int32
+                phone:
+                    type: string
+                    description: |-
+                        The row's phone as submitted — the operator's own list echoes back, so
+                         the masked form would only blur the line-by-line check.
+                userId:
+                    type: string
+                    description: |-
+                        Present on created and skipped-duplicate — the account's id, the
+                         hydration join key (a skipped row's caller still has a pre-fill to
+                         land against it).
+                status:
+                    enum:
+                        - ACCOUNT_IMPORT_STATUS_UNSPECIFIED
+                        - ACCOUNT_IMPORT_STATUS_CREATED
+                        - ACCOUNT_IMPORT_STATUS_SKIPPED_DUPLICATE
+                        - ACCOUNT_IMPORT_STATUS_INVALID
+                    type: string
+                    format: enum
+                reason:
+                    enum:
+                        - ACCOUNT_IMPORT_REASON_UNSPECIFIED
+                        - ACCOUNT_IMPORT_REASON_NOT_MAINLAND_MOBILE
+                        - ACCOUNT_IMPORT_REASON_DUPLICATE_IN_FILE
+                        - ACCOUNT_IMPORT_REASON_PHONE_TAKEN
+                    type: string
+                    description: |-
+                        Why the row landed where it did — operator-facing, only read on
+                         SKIPPED_DUPLICATE and INVALID; the caller maps every value to its own
+                         locale copy, so a new value is a caller-copy change, never a copy
+                         change on the wire.
+                    format: enum
+            description: |-
+                One row's verdict; the index is the request's own row, 1-based — the
+                 caller maps it back to its file line.
+        cyber.system.v1.AddTenantAdminRequest:
+            type: object
+            properties:
+                tenantCode:
+                    type: string
+                    description: The tenant the administrator joins — the code CreateTenant took.
+                account:
+                    type: string
+                    description: |-
+                        An existing account is seated and bound as-is (identity is global,
+                         passwords belong to admin flows); an account that does not exist yet
+                         is created with this password. This is the runtime tenant's break-glass
+                         face — a tenant whose administrators all lost their passwords is never
+                         locked out, the platform admin adds a fresh one from here.
+                password:
+                    type: string
+                    description: |-
+                        Plain on the wire (TLS), strength-enforced server-side by the same
+                         password policy every credential flows through; ignored when the
+                         account already exists.
+            description: add-admin
+        cyber.system.v1.AddTenantAdminResponse:
+            type: object
+            properties:
+                userId:
+                    type: string
+                    description: The administrator's user id — created or reused.
         cyber.system.v1.AuditExport:
             type: object
             properties:
@@ -2378,6 +2591,21 @@ components:
                     description: |-
                         key = requested id; an absent key = no row or outside the viewer's data
                          scope — skip semantics, no per-item error channel.
+        cyber.system.v1.BeginBindCredentialRequest:
+            type: object
+            properties:
+                provider:
+                    type: string
+                redirectUri:
+                    type: string
+        cyber.system.v1.BeginBindCredentialResponse:
+            type: object
+            properties:
+                authorizeUrl:
+                    type: string
+                    description: |-
+                        Plain, not a wrapper: a successful begin always mints the redirect —
+                         success implies presence.
         cyber.system.v1.BeginIdentityLoginRequest:
             type: object
             properties:
@@ -2385,11 +2613,25 @@ components:
                     type: string
                 redirectUri:
                     type: string
+                next:
+                    type: string
+                    description: |-
+                        Same-origin post-login target relayed through the authorize hop: the
+                         redirect_uri itself may carry no query (wechat rejects it), so Begin
+                         folds this into the one-shot state it mints. The pattern is the
+                         open-redirect law — a leading slash, never a protocol-relative "//".
+                         The state caps at 128 chars (wechat's own limit), leaving ~45 bytes
+                         for the path once the token takes its share; a next that does not fit
+                         is dropped at mint, never refused — the login then lands on its
+                         completeness branch instead.
         cyber.system.v1.BeginIdentityLoginResponse:
             type: object
             properties:
                 authorizeUrl:
                     type: string
+                    description: |-
+                        Plain, not a wrapper: a successful begin always mints the redirect —
+                         success implies presence.
         cyber.system.v1.BindCredentialRequest:
             type: object
             properties:
@@ -2397,17 +2639,26 @@ components:
                     type: string
                 wechat:
                     $ref: '#/components/schemas/cyber.system.v1.WeChatIdentityPayload'
+                sms:
+                    $ref: '#/components/schemas/cyber.system.v1.SmsIdentityPayload'
                 state:
                     type: string
                     description: |-
-                        The state is one-shot (consumed on exchange) but binds only the
-                         provider key, not the initiating browser: this RPC trusts whoever
-                         presents the code. Dormant while no client offers a bind entry; the
-                         first GET-triggered bind flow must tie the state to the initiating
-                         session before shipping — do not copy this shape without that.
+                        The state must be one minted on an authenticated rung (SendBindSmsCode
+                         or BeginBindCredential) and carries the minting session: the exchange
+                         refuses a state born in another session or anonymous, so a phished code
+                         cannot be injected into a foreign bind flow. Login faces accept any
+                         live state of their provider — the code itself is the login proof.
         cyber.system.v1.BindCredentialResponse:
             type: object
-            properties: {}
+            properties:
+                wechatProfile:
+                    allOf:
+                        - $ref: '#/components/schemas/cyber.system.v1.WeChatProfile'
+                    description: |-
+                        Same shape as the login response's: binding a wechat identity is the
+                         wizard pill's moment — the openid binds and the nickname/avatar arrive
+                         in the same exchange, so the caller fills the form without a second hop.
         cyber.system.v1.CalendarOverride:
             type: object
             properties:
@@ -2527,6 +2778,27 @@ components:
             properties:
                 id:
                     type: string
+        cyber.system.v1.CreateTenantRequest:
+            type: object
+            properties:
+                code:
+                    type: string
+                    description: |-
+                        The tenant's reference key — memberships and sessions name tenants by
+                         this code, and a code is never reused (a hard-deleted tenant's code
+                         stays burned). "default" is unreachable here in practice: the protected
+                         default row always exists and its code answers 409 like any taken code.
+                name:
+                    type: string
+            description: create
+        cyber.system.v1.CreateTenantResponse:
+            type: object
+            properties:
+                id:
+                    type: string
+                    description: |-
+                        The provisioned tenant's id, so the caller can jump to it without a
+                         second read.
         cyber.system.v1.CreateUploadRequest:
             type: object
             properties:
@@ -2565,12 +2837,6 @@ components:
                         type: string
                 avatar:
                     type: string
-                population:
-                    type: string
-                    description: |-
-                        Seat population for the identity's birth seat; empty = the default user
-                         population. Validated against the registry — a seat is never born on a
-                         code that does not exist.
             description: create
         cyber.system.v1.CreateUserResponse:
             type: object
@@ -2801,6 +3067,17 @@ components:
                     type: object
                     additionalProperties:
                         $ref: '#/components/schemas/cyber.system.v1.FileUrl'
+        cyber.system.v1.GetLoginConfigResponse:
+            type: object
+            properties:
+                providers:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.LoginProvider'
+                    description: |-
+                        The identity providers the login page may offer, exactly as configured:
+                         an empty list is a wired-but-closed deployment, and the page renders the
+                         account form only — never a dead button.
         cyber.system.v1.GetPolicyResponse:
             type: object
             properties:
@@ -2815,6 +3092,19 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/cyber.system.v1.RoleGrant'
+        cyber.system.v1.GetSecurityStatusResponse:
+            type: object
+            properties:
+                hasPassword:
+                    type: boolean
+                credentials:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.SecurityCredential'
+            description: |-
+                The caller's own binding surface: password set or not, and each
+                 credential with a display-masked identifier. The mask is server policy
+                 with one home; clients render what they receive and never re-derive it.
         cyber.system.v1.GetTenantResponse:
             type: object
             properties:
@@ -2825,6 +3115,41 @@ components:
             properties:
                 user:
                     $ref: '#/components/schemas/cyber.system.v1.User'
+        cyber.system.v1.ImportAccountRow:
+            type: object
+            properties:
+                phone:
+                    type: string
+        cyber.system.v1.ImportAccountsRequest:
+            type: object
+            properties:
+                rows:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.ImportAccountRow'
+            description: |-
+                One file of phones. The contract checks shape only (the sms payload's own
+                 law); which market a number belongs to is the channel's knowledge and
+                 answers per-row invalid below, never a whole-file refusal.
+        cyber.system.v1.ImportAccountsResponse:
+            type: object
+            properties:
+                created:
+                    type: integer
+                    description: |-
+                        created plus skipped plus invalid is the request's row count — the
+                         ledger closes on every row.
+                    format: int32
+                skipped:
+                    type: integer
+                    format: int32
+                invalid:
+                    type: integer
+                    format: int32
+                results:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/cyber.system.v1.AccountImportResult'
         cyber.system.v1.ListAuditExportsResponse:
             type: object
             properties:
@@ -3011,12 +3336,33 @@ components:
             properties:
                 sessionToken:
                     type: string
+                    description: |-
+                        Plain, not a wrapper: the call succeeding is the token's presence —
+                         no "succeeded but empty session" shape exists.
                 issuedAt:
                     type: string
                     format: date-time
                 expiresAt:
                     type: string
                     format: date-time
+                wechatProfile:
+                    allOf:
+                        - $ref: '#/components/schemas/cyber.system.v1.WeChatProfile'
+                    description: |-
+                        The wechat profile when the logged-in identity is wechat and userinfo
+                         came back; the wizard prefills nickname/avatar from it. Absent for every
+                         other identity and for a degraded userinfo fetch alike.
+        cyber.system.v1.LoginProvider:
+            type: object
+            properties:
+                key:
+                    type: string
+                    description: The configured provider row's key — the value LoginByIdentity expects.
+                kind:
+                    type: string
+                    description: |-
+                        The channel kind (wechat_mp, sms): the login page picks its UI shape
+                         per kind.
         cyber.system.v1.LoginRequest:
             type: object
             properties:
@@ -3204,6 +3550,27 @@ components:
         cyber.system.v1.RenameFileResponse:
             type: object
             properties: {}
+        cyber.system.v1.ResetPasswordRequest:
+            type: object
+            properties:
+                provider:
+                    type: string
+                sms:
+                    $ref: '#/components/schemas/cyber.system.v1.SmsIdentityPayload'
+                state:
+                    type: string
+                newPassword:
+                    type: string
+            description: |-
+                The proof-carrying password setter for accounts whose only reach is their
+                 phone: the forgot-password leg on the login page and the first-password
+                 leg in account security both land here. The sms code to the account's own
+                 phone is the anti-takeover gate; the state is the one SendSmsCode minted.
+                 The account owning the sms credential is the one rehashed; sessions stay
+                 standing (a rotation is not a revocation).
+        cyber.system.v1.ResetPasswordResponse:
+            type: object
+            properties: {}
         cyber.system.v1.Role:
             type: object
             properties:
@@ -3266,6 +3633,32 @@ components:
                 createdAt:
                     type: string
                     format: date-time
+        cyber.system.v1.SecurityCredential:
+            type: object
+            properties:
+                kind:
+                    type: string
+                maskedIdentifier:
+                    type: string
+            description: |-
+                One binding row of the security surface; kind is the credential family
+                 (sms, wechat_mp).
+        cyber.system.v1.SendBindSmsCodeRequest:
+            type: object
+            properties:
+                provider:
+                    type: string
+                phone:
+                    type: string
+        cyber.system.v1.SendBindSmsCodeResponse:
+            type: object
+            properties:
+                state:
+                    type: string
+                    description: |-
+                        The one-shot state bound to the calling session; present it at
+                         BindCredential together with the code the phone received. Plain, not a
+                         wrapper: a successful send always mints it — success implies presence.
         cyber.system.v1.SendSmsCodeRequest:
             type: object
             properties:
@@ -3280,7 +3673,8 @@ components:
                     type: string
                     description: |-
                         The one-shot state the caller presents at LoginByIdentity — the same
-                         shape Begin mints for redirect flows.
+                         shape Begin mints for redirect flows. Plain, not a wrapper: a
+                         successful send always mints it — success implies presence.
         cyber.system.v1.Service:
             type: object
             properties:
@@ -3580,6 +3974,15 @@ components:
                     type: boolean
                 avatar:
                     type: string
+                phoneMasked:
+                    type: string
+                    description: |-
+                        The seat's phone credential, middle-masked (153****0101) — the number
+                         operators recognize members by; the raw digit string never crosses
+                         this face. Null when no phone credential is bound.
+                wechatBound:
+                    type: boolean
+                    description: Whether a wechat credential is bound — the identity header's badge.
         cyber.system.v1.UserBrief:
             type: object
             properties:
@@ -3610,6 +4013,20 @@ components:
                 code:
                     type: string
                     description: OAuth authorization code from the wechat redirect.
+        cyber.system.v1.WeChatProfile:
+            type: object
+            properties:
+                nickname:
+                    type: string
+                avatarUrl:
+                    type: string
+            description: |-
+                What the wechat oauth leg learned about the person behind the openid:
+                 the raw nickname and avatar URL as wechat reports them, present only when
+                 the authorize scope was snsapi_userinfo and the userinfo fetch survived
+                 (a failed fetch degrades to absent, never to a failed login). Values are
+                 wechat's own — sanitising to the nickname rules is the consumer's side of
+                 the wire.
 tags:
     - name: AgentConfigAdminService
     - name: AgentConfigService

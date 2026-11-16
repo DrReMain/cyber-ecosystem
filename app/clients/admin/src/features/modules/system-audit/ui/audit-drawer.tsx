@@ -7,6 +7,7 @@ import { userRefView } from "#/features/app/user/user-ref";
 import { m } from "#/paraglide/messages";
 import { getTextDirection } from "#/paraglide/runtime";
 import { denyHint, denyLabel, StatusTag } from "./event-tags";
+import { dash } from "./format";
 import { Latency } from "./latency";
 
 interface AuditDrawerProps {
@@ -45,8 +46,6 @@ function eventJson(event: AuditLog): string {
     2,
   );
 }
-
-const dash = (v: string | undefined) => (v === undefined || v === "" ? "-" : v);
 
 function ActorCell({
   actor,

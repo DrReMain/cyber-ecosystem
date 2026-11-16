@@ -15,7 +15,7 @@ export function NotFoundPage({ appName, homePath, headerTrailing }: Readonly<Not
   return (
     <>
       <div aria-hidden className="fixed inset-0 bg-[#05070d]" />
-      <div className="relative mx-auto flex min-h-svh w-full max-w-[1920px] flex-col overflow-x-clip border-x border-white/10 text-[#e8ecf4]">
+      <div className="relative mx-auto flex min-h-svh w-full max-w-480 flex-col overflow-x-clip border-x border-white/10 text-[#e8ecf4]">
         <style>{`
 @keyframes nc-scan {
   from { transform: translateX(0); }

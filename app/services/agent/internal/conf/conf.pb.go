@@ -22,6 +22,8 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Bootstrap is the whole boot config tree; every field overrides a typed
+// default, none is required at the yaml layer.
 type Bootstrap struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Server        *Server                `protobuf:"bytes,1,opt,name=server,proto3" json:"server,omitempty"`
@@ -98,6 +100,7 @@ func (x *Bootstrap) GetCrypto() *Crypto {
 	return nil
 }
 
+// Server: the three listen faces; addr host:port.
 type Server struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Http          *Server_HTTP           `protobuf:"bytes,1,opt,name=http,proto3" json:"http,omitempty"`
@@ -158,6 +161,7 @@ func (x *Server) GetConnect() *Server_Connect {
 	return nil
 }
 
+// Data: the persistence plane — database only (no redis/storage/mq here).
 type Data struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Database      *Data_Database         `protobuf:"bytes,1,opt,name=database,proto3" json:"database,omitempty"`
@@ -202,10 +206,11 @@ func (x *Data) GetDatabase() *Data_Database {
 	return nil
 }
 
+// Observability: telemetry sinks share one collector endpoint.
 type Observability struct {
 	state         protoimpl.MessageState   `protogen:"open.v1"`
-	Endpoint      string                   `protobuf:"bytes,1,opt,name=endpoint,proto3" json:"endpoint,omitempty"`
-	Insecure      bool                     `protobuf:"varint,2,opt,name=insecure,proto3" json:"insecure,omitempty"`
+	Endpoint      string                   `protobuf:"bytes,1,opt,name=endpoint,proto3" json:"endpoint,omitempty"`  // otlp http collector
+	Insecure      bool                     `protobuf:"varint,2,opt,name=insecure,proto3" json:"insecure,omitempty"` // skip tls to the collector
 	Trace         *Observability_Trace     `protobuf:"bytes,3,opt,name=trace,proto3" json:"trace,omitempty"`
 	Metrics       *Observability_Metrics   `protobuf:"bytes,4,opt,name=metrics,proto3" json:"metrics,omitempty"`
 	Log           *Observability_Log       `protobuf:"bytes,5,opt,name=log,proto3" json:"log,omitempty"`
@@ -286,10 +291,10 @@ func (x *Observability) GetSlowQuery() *Observability_SlowQuery {
 	return nil
 }
 
-// Remote holds endpoints of other services this service calls (ACL targets).
+// Remote: endpoints of other services this service calls (ACL targets).
 type Remote struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	SystemConnect string                 `protobuf:"bytes,1,opt,name=system_connect,json=systemConnect,proto3" json:"system_connect,omitempty"` // system service connect face (session introspection)
+	SystemConnect string                 `protobuf:"bytes,1,opt,name=system_connect,json=systemConnect,proto3" json:"system_connect,omitempty"` // system connect face (session introspection)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -331,10 +336,10 @@ func (x *Remote) GetSystemConnect() string {
 	return ""
 }
 
-// Crypto holds keys for at-rest encryption of service-held secrets.
+// Crypto: at-rest encryption keys for service-held secrets.
 type Crypto struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	MasterKey     string                 `protobuf:"bytes,1,opt,name=master_key,json=masterKey,proto3" json:"master_key,omitempty"` // api_key column encryption; high-entropy secret injected via env (HKDF-derived to AES-256-GCM); never a human passphrase, never committed
+	MasterKey     string                 `protobuf:"bytes,1,opt,name=master_key,json=masterKey,proto3" json:"master_key,omitempty"` // api_key column encryption; high-entropy secret via env (HKDF-derived to AES-256-GCM); never a human passphrase, never committed
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -378,9 +383,9 @@ func (x *Crypto) GetMasterKey() string {
 
 type Server_HTTP struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Network       string                 `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"`
+	Network       string                 `protobuf:"bytes,1,opt,name=network,proto3" json:"network,omitempty"` // tcp | unix
 	Addr          string                 `protobuf:"bytes,2,opt,name=addr,proto3" json:"addr,omitempty"`
-	Timeout       *durationpb.Duration   `protobuf:"bytes,3,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	Timeout       *durationpb.Duration   `protobuf:"bytes,3,opt,name=timeout,proto3" json:"timeout,omitempty"` // whole-handler ceiling
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -558,7 +563,7 @@ func (x *Server_Connect) GetTimeout() *durationpb.Duration {
 
 type Data_Database struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
-	Driver          string                 `protobuf:"bytes,1,opt,name=driver,proto3" json:"driver,omitempty"`
+	Driver          string                 `protobuf:"bytes,1,opt,name=driver,proto3" json:"driver,omitempty"` // postgres
 	Host            string                 `protobuf:"bytes,2,opt,name=host,proto3" json:"host,omitempty"`
 	Port            int32                  `protobuf:"varint,3,opt,name=port,proto3" json:"port,omitempty"`
 	User            string                 `protobuf:"bytes,4,opt,name=user,proto3" json:"user,omitempty"`
@@ -667,7 +672,7 @@ func (x *Data_Database) GetConnMaxLifetime() *durationpb.Duration {
 type Observability_Trace struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Enabled       bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	SamplingRatio float64                `protobuf:"fixed64,2,opt,name=sampling_ratio,json=samplingRatio,proto3" json:"sampling_ratio,omitempty"`
+	SamplingRatio float64                `protobuf:"fixed64,2,opt,name=sampling_ratio,json=samplingRatio,proto3" json:"sampling_ratio,omitempty"` // 0–1
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -762,10 +767,10 @@ func (x *Observability_Metrics) GetEnabled() bool {
 
 type Observability_Log struct {
 	state         protoimpl.MessageState        `protogen:"open.v1"`
-	Level         string                        `protobuf:"bytes,1,opt,name=level,proto3" json:"level,omitempty"`
+	Level         string                        `protobuf:"bytes,1,opt,name=level,proto3" json:"level,omitempty"` // debug | info | warn | error
 	Console       bool                          `protobuf:"varint,2,opt,name=console,proto3" json:"console,omitempty"`
 	Otlp          bool                          `protobuf:"varint,3,opt,name=otlp,proto3" json:"otlp,omitempty"`
-	File          *Observability_Log_FileOutput `protobuf:"bytes,4,opt,name=file,proto3" json:"file,omitempty"`
+	File          *Observability_Log_FileOutput `protobuf:"bytes,4,opt,name=file,proto3" json:"file,omitempty"` // absent = no file sink
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -830,7 +835,7 @@ func (x *Observability_Log) GetFile() *Observability_Log_FileOutput {
 
 type Observability_SlowQuery struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Db            *durationpb.Duration   `protobuf:"bytes,1,opt,name=db,proto3" json:"db,omitempty"` // slow SQL threshold; 0/omit = disabled
+	Db            *durationpb.Duration   `protobuf:"bytes,1,opt,name=db,proto3" json:"db,omitempty"` // slow sql threshold; 0/omit = off
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

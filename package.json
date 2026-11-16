@@ -6,10 +6,14 @@
     "node": ">=24.15.0"
   },
   "devDependencies": {
-    "@ariga/atlas": "1.3.3",
-    "@biomejs/biome": "2.6.2",
-    "@bufbuild/protoc-gen-es": "2.16.0",
+    "@ariga/atlas": "1.3.10",
+    "@biomejs/biome": "2.6.8",
+    "@bufbuild/protoc-gen-es": "2.17.0",
     "@connectrpc/protoc-gen-connect-query": "2.3.1",
+    "lefthook": "2.2.2",
     "typescript": "7.0.2"
+  },
+  "scripts": {
+    "prepare": "lefthook install || true"
   }
 }

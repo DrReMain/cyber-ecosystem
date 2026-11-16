@@ -13,14 +13,21 @@
   "peerDependencies": {
     "@types/react": "^19",
     "immer": "^11",
-    "jotai": "^2",
-    "jotai-devtools": "^0.14",
+    "jotai": "^3",
+    "jotai-devtools": "^0.15",
     "jotai-immer": "^0.4",
     "react": "^19",
     "zod": "^4"
   },
   "devDependencies": {
+    "@types/react": "19.3.0",
+    "immer": "11.1.18",
+    "jotai": "3.0.2",
+    "jotai-devtools": "0.15.1",
+    "jotai-immer": "0.4.3",
+    "react": "19.3.1",
     "typescript": "7.0.2",
-    "vitest": "5.0.3"
+    "vitest": "5.1.0",
+    "zod": "4.6.7"
   }
 }

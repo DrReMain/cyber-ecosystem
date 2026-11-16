@@ -78,7 +78,7 @@ func (s *DeptService) DeleteDept(ctx context.Context, in *systempb.DeleteDeptReq
 }
 
 func (s *DeptService) ListDepts(ctx context.Context, in *systempb.ListDeptsRequest) (*systempb.ListDeptsResponse, error) {
-	out, err := s.deptUC.List(ctx, &DeptListIn{
+	out, err := s.deptUC.List(ctx, &ListIn{
 		PageRequest: helper.EnsurePageRequest(in.Page),
 		OrderBy:     in.OrderBy,
 		Name:        in.Name,

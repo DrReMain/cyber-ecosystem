@@ -21,14 +21,14 @@ type Population struct {
 	Plane     string
 }
 
-type PopulationListIn struct {
+type ListIn struct {
 	*commonpb.PageRequest
 	OrderBy []string
 	Code    *string
 	Name    *string
 }
 
-type PopulationListOut struct {
+type ListOut struct {
 	*commonpb.PageResponse
 	List []*Population
 }
@@ -36,7 +36,7 @@ type PopulationListOut struct {
 // Port ----------------------------------------------------------------------------------------------------------------
 
 type PopulationRP interface {
-	List(ctx context.Context, in *PopulationListIn) (*PopulationListOut, error)
+	List(ctx context.Context, in *ListIn) (*ListOut, error)
 	FindByCode(ctx context.Context, code string) (*Population, error)
 }
 
@@ -56,6 +56,6 @@ func NewPopulationUC(logger *slog.Logger, tm shared.Transaction, populationRP Po
 
 // Method --------------------------------------------------------------------------------------------------------------
 
-func (uc *PopulationUC) List(ctx context.Context, in *PopulationListIn) (*PopulationListOut, error) {
+func (uc *PopulationUC) List(ctx context.Context, in *ListIn) (*ListOut, error) {
 	return uc.populationRP.List(ctx, in)
 }

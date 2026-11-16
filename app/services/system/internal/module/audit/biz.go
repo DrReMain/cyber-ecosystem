@@ -45,7 +45,7 @@ type AuditLog struct {
 	DenyReason    string
 }
 
-type AuditListIn struct {
+type ListIn struct {
 	*commonpb.PageRequest
 	OrderBy    []string
 	Tenant     string
@@ -56,7 +56,7 @@ type AuditListIn struct {
 	Denied     *bool
 }
 
-type AuditListOut struct {
+type ListOut struct {
 	*commonpb.PageResponse
 	List []*AuditLog
 }
@@ -86,7 +86,7 @@ type ExportListOut struct {
 // Port ----------------------------------------------------------------------------------------------------------------
 
 type AuditRP interface {
-	ListAuditLogs(ctx context.Context, in *AuditListIn) (*AuditListOut, error)
+	ListAuditLogs(ctx context.Context, in *ListIn) (*ListOut, error)
 	Publish(ctx context.Context, ev *kaudit.Event)
 	CreateExport(ctx context.Context, fileID, ownerID string) error
 	ListExports(ctx context.Context, in *ExportListIn) (*ExportListOut, error)
@@ -112,7 +112,7 @@ func NewAuditUC(logger *slog.Logger, tm shared.Transaction, auditRP AuditRP, fil
 
 // Method --------------------------------------------------------------------------------------------------------------
 
-func (uc *AuditUC) List(ctx context.Context, in *AuditListIn) (*AuditListOut, error) {
+func (uc *AuditUC) List(ctx context.Context, in *ListIn) (*ListOut, error) {
 	subject, ok := security.SubjectFromCtx(ctx)
 	if !ok {
 		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("audit list requires a subject"))

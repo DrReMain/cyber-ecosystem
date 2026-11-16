@@ -45,7 +45,7 @@ func (s *PopulationService) RegisterConnect(srv *connecttransport.Server) {
 // Handler -------------------------------------------------------------------------------------------------------------
 
 func (s *PopulationService) ListPopulations(ctx context.Context, in *systempb.ListPopulationsRequest) (*systempb.ListPopulationsResponse, error) {
-	out, err := s.populationUC.List(ctx, &PopulationListIn{
+	out, err := s.populationUC.List(ctx, &ListIn{
 		PageRequest: helper.EnsurePageRequest(in.Page),
 		OrderBy:     in.OrderBy,
 		Code:        in.Code,

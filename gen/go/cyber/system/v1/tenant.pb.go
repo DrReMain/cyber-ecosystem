@@ -410,6 +410,224 @@ func (*UpdateTenantStatusResponse) Descriptor() ([]byte, []int) {
 	return file_cyber_system_v1_tenant_proto_rawDescGZIP(), []int{6}
 }
 
+// create
+type CreateTenantRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The tenant's reference key — memberships and sessions name tenants by
+	// this code, and a code is never reused (a hard-deleted tenant's code
+	// stays burned). "default" is unreachable here in practice: the protected
+	// default row always exists and its code answers 409 like any taken code.
+	Code          *string `protobuf:"bytes,1,opt,name=code,proto3,oneof" json:"code,omitempty"`
+	Name          *string `protobuf:"bytes,2,opt,name=name,proto3,oneof" json:"name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateTenantRequest) Reset() {
+	*x = CreateTenantRequest{}
+	mi := &file_cyber_system_v1_tenant_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateTenantRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateTenantRequest) ProtoMessage() {}
+
+func (x *CreateTenantRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_tenant_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateTenantRequest.ProtoReflect.Descriptor instead.
+func (*CreateTenantRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_tenant_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *CreateTenantRequest) GetCode() string {
+	if x != nil && x.Code != nil {
+		return *x.Code
+	}
+	return ""
+}
+
+func (x *CreateTenantRequest) GetName() string {
+	if x != nil && x.Name != nil {
+		return *x.Name
+	}
+	return ""
+}
+
+type CreateTenantResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The provisioned tenant's id, so the caller can jump to it without a
+	// second read.
+	Id            string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateTenantResponse) Reset() {
+	*x = CreateTenantResponse{}
+	mi := &file_cyber_system_v1_tenant_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateTenantResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateTenantResponse) ProtoMessage() {}
+
+func (x *CreateTenantResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_tenant_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateTenantResponse.ProtoReflect.Descriptor instead.
+func (*CreateTenantResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_tenant_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *CreateTenantResponse) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+// add-admin
+type AddTenantAdminRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The tenant the administrator joins — the code CreateTenant took.
+	TenantCode *string `protobuf:"bytes,1,opt,name=tenant_code,json=tenantCode,proto3,oneof" json:"tenant_code,omitempty"`
+	// An existing account is seated and bound as-is (identity is global,
+	// passwords belong to admin flows); an account that does not exist yet
+	// is created with this password. This is the runtime tenant's break-glass
+	// face — a tenant whose administrators all lost their passwords is never
+	// locked out, the platform admin adds a fresh one from here.
+	Account *string `protobuf:"bytes,2,opt,name=account,proto3,oneof" json:"account,omitempty"`
+	// Plain on the wire (TLS), strength-enforced server-side by the same
+	// password policy every credential flows through; ignored when the
+	// account already exists.
+	Password      *string `protobuf:"bytes,3,opt,name=password,proto3,oneof" json:"password,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AddTenantAdminRequest) Reset() {
+	*x = AddTenantAdminRequest{}
+	mi := &file_cyber_system_v1_tenant_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AddTenantAdminRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddTenantAdminRequest) ProtoMessage() {}
+
+func (x *AddTenantAdminRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_tenant_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddTenantAdminRequest.ProtoReflect.Descriptor instead.
+func (*AddTenantAdminRequest) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_tenant_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *AddTenantAdminRequest) GetTenantCode() string {
+	if x != nil && x.TenantCode != nil {
+		return *x.TenantCode
+	}
+	return ""
+}
+
+func (x *AddTenantAdminRequest) GetAccount() string {
+	if x != nil && x.Account != nil {
+		return *x.Account
+	}
+	return ""
+}
+
+func (x *AddTenantAdminRequest) GetPassword() string {
+	if x != nil && x.Password != nil {
+		return *x.Password
+	}
+	return ""
+}
+
+type AddTenantAdminResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The administrator's user id — created or reused.
+	UserId        string `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AddTenantAdminResponse) Reset() {
+	*x = AddTenantAdminResponse{}
+	mi := &file_cyber_system_v1_tenant_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AddTenantAdminResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddTenantAdminResponse) ProtoMessage() {}
+
+func (x *AddTenantAdminResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_cyber_system_v1_tenant_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddTenantAdminResponse.ProtoReflect.Descriptor instead.
+func (*AddTenantAdminResponse) Descriptor() ([]byte, []int) {
+	return file_cyber_system_v1_tenant_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *AddTenantAdminResponse) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
 var File_cyber_system_v1_tenant_proto protoreflect.FileDescriptor
 
 const file_cyber_system_v1_tenant_proto_rawDesc = "" +
@@ -444,8 +662,31 @@ const file_cyber_system_v1_tenant_proto_rawDesc = "" +
 	"\aenabled\x18\x02 \x01(\bB\x06\xbaH\x03\xc8\x01\x01H\x00R\aenabled\x88\x01\x01B\n" +
 	"\n" +
 	"\b_enabled\"\x1c\n" +
-	"\x1aUpdateTenantStatusResponse2\xfd\x03\n" +
-	"\rTenantService\x12\xb4\x01\n" +
+	"\x1aUpdateTenantStatusResponse\"\x8c\x01\n" +
+	"\x13CreateTenantRequest\x12;\n" +
+	"\x04code\x18\x01 \x01(\tB\"\xbaH\x1f\xc8\x01\x01r\x1a\x10\x02\x18@2\x14^[a-z0-9][a-z0-9-]*$H\x00R\x04code\x88\x01\x01\x12&\n" +
+	"\x04name\x18\x02 \x01(\tB\r\xbaH\n" +
+	"\xc8\x01\x01r\x05\x10\x01\x18\x80\x01H\x01R\x04name\x88\x01\x01B\a\n" +
+	"\x05_codeB\a\n" +
+	"\x05_name\"&\n" +
+	"\x14CreateTenantResponse\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"\xe6\x01\n" +
+	"\x15AddTenantAdminRequest\x12H\n" +
+	"\vtenant_code\x18\x01 \x01(\tB\"\xbaH\x1f\xc8\x01\x01r\x1a\x10\x02\x18@2\x14^[a-z0-9][a-z0-9-]*$H\x00R\n" +
+	"tenantCode\x88\x01\x01\x12+\n" +
+	"\aaccount\x18\x02 \x01(\tB\f\xbaH\t\xc8\x01\x01r\x04\x10\x03\x18@H\x01R\aaccount\x88\x01\x01\x12-\n" +
+	"\bpassword\x18\x03 \x01(\tB\f\xbaH\t\xc8\x01\x01r\x04\x10\b\x18@H\x02R\bpassword\x88\x01\x01B\x0e\n" +
+	"\f_tenant_codeB\n" +
+	"\n" +
+	"\b_accountB\v\n" +
+	"\t_password\"1\n" +
+	"\x16AddTenantAdminResponse\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId2\xcc\a\n" +
+	"\rTenantService\x12\xcf\x01\n" +
+	"\fCreateTenant\x12$.cyber.system.v1.CreateTenantRequest\x1a%.cyber.system.v1.CreateTenantResponse\"r\x88\xf1\x04\x03\x8a\xd3\x0eI\n" +
+	"E运行时开通租户：建租户与其超管角色（不带账号）\x10\x02\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/v1/system/tenants\x12\xfa\x01\n" +
+	"\x0eAddTenantAdmin\x12&.cyber.system.v1.AddTenantAdminRequest\x1a'.cyber.system.v1.AddTenantAdminResponse\"\x96\x01\x88\xf1\x04\x03\x8a\xd3\x0eX\n" +
+	"T给租户新增超级管理员：账号已有则加座授权，无则随密码创建\x10\x02\x82\xd3\xe4\x93\x020:\x01*\"+/api/v1/system/tenants/{tenant_code}/admins\x12\xb4\x01\n" +
 	"\x12UpdateTenantStatus\x12*.cyber.system.v1.UpdateTenantStatusRequest\x1a+.cyber.system.v1.UpdateTenantStatusResponse\"E\x88\xf1\x04\x03\x8a\xd3\x0e\x10\n" +
 	"\f启停租户\x10\x02\x82\xd3\xe4\x93\x02':\x01*\x1a\"/api/v1/system/tenants/{id}/status\x12\x90\x01\n" +
 	"\vListTenants\x12#.cyber.system.v1.ListTenantsRequest\x1a$.cyber.system.v1.ListTenantsResponse\"6\x88\xf1\x04\x03\x8a\xd3\x0e\x10\n" +
@@ -465,7 +706,7 @@ func file_cyber_system_v1_tenant_proto_rawDescGZIP() []byte {
 	return file_cyber_system_v1_tenant_proto_rawDescData
 }
 
-var file_cyber_system_v1_tenant_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_cyber_system_v1_tenant_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_cyber_system_v1_tenant_proto_goTypes = []any{
 	(*Tenant)(nil),                     // 0: cyber.system.v1.Tenant
 	(*ListTenantsRequest)(nil),         // 1: cyber.system.v1.ListTenantsRequest
@@ -474,31 +715,39 @@ var file_cyber_system_v1_tenant_proto_goTypes = []any{
 	(*GetTenantResponse)(nil),          // 4: cyber.system.v1.GetTenantResponse
 	(*UpdateTenantStatusRequest)(nil),  // 5: cyber.system.v1.UpdateTenantStatusRequest
 	(*UpdateTenantStatusResponse)(nil), // 6: cyber.system.v1.UpdateTenantStatusResponse
-	(*wrapperspb.StringValue)(nil),     // 7: google.protobuf.StringValue
-	(*timestamppb.Timestamp)(nil),      // 8: google.protobuf.Timestamp
-	(*wrapperspb.BoolValue)(nil),       // 9: google.protobuf.BoolValue
-	(*v1.PageRequest)(nil),             // 10: cyber.shared.common.v1.PageRequest
-	(*v1.PageResponse)(nil),            // 11: cyber.shared.common.v1.PageResponse
+	(*CreateTenantRequest)(nil),        // 7: cyber.system.v1.CreateTenantRequest
+	(*CreateTenantResponse)(nil),       // 8: cyber.system.v1.CreateTenantResponse
+	(*AddTenantAdminRequest)(nil),      // 9: cyber.system.v1.AddTenantAdminRequest
+	(*AddTenantAdminResponse)(nil),     // 10: cyber.system.v1.AddTenantAdminResponse
+	(*wrapperspb.StringValue)(nil),     // 11: google.protobuf.StringValue
+	(*timestamppb.Timestamp)(nil),      // 12: google.protobuf.Timestamp
+	(*wrapperspb.BoolValue)(nil),       // 13: google.protobuf.BoolValue
+	(*v1.PageRequest)(nil),             // 14: cyber.shared.common.v1.PageRequest
+	(*v1.PageResponse)(nil),            // 15: cyber.shared.common.v1.PageResponse
 }
 var file_cyber_system_v1_tenant_proto_depIdxs = []int32{
-	7,  // 0: cyber.system.v1.Tenant.id:type_name -> google.protobuf.StringValue
-	8,  // 1: cyber.system.v1.Tenant.created_at:type_name -> google.protobuf.Timestamp
-	8,  // 2: cyber.system.v1.Tenant.updated_at:type_name -> google.protobuf.Timestamp
-	7,  // 3: cyber.system.v1.Tenant.code:type_name -> google.protobuf.StringValue
-	7,  // 4: cyber.system.v1.Tenant.name:type_name -> google.protobuf.StringValue
-	9,  // 5: cyber.system.v1.Tenant.enabled:type_name -> google.protobuf.BoolValue
-	10, // 6: cyber.system.v1.ListTenantsRequest.page:type_name -> cyber.shared.common.v1.PageRequest
-	11, // 7: cyber.system.v1.ListTenantsResponse.page:type_name -> cyber.shared.common.v1.PageResponse
+	11, // 0: cyber.system.v1.Tenant.id:type_name -> google.protobuf.StringValue
+	12, // 1: cyber.system.v1.Tenant.created_at:type_name -> google.protobuf.Timestamp
+	12, // 2: cyber.system.v1.Tenant.updated_at:type_name -> google.protobuf.Timestamp
+	11, // 3: cyber.system.v1.Tenant.code:type_name -> google.protobuf.StringValue
+	11, // 4: cyber.system.v1.Tenant.name:type_name -> google.protobuf.StringValue
+	13, // 5: cyber.system.v1.Tenant.enabled:type_name -> google.protobuf.BoolValue
+	14, // 6: cyber.system.v1.ListTenantsRequest.page:type_name -> cyber.shared.common.v1.PageRequest
+	15, // 7: cyber.system.v1.ListTenantsResponse.page:type_name -> cyber.shared.common.v1.PageResponse
 	0,  // 8: cyber.system.v1.ListTenantsResponse.list:type_name -> cyber.system.v1.Tenant
 	0,  // 9: cyber.system.v1.GetTenantResponse.tenant:type_name -> cyber.system.v1.Tenant
-	5,  // 10: cyber.system.v1.TenantService.UpdateTenantStatus:input_type -> cyber.system.v1.UpdateTenantStatusRequest
-	1,  // 11: cyber.system.v1.TenantService.ListTenants:input_type -> cyber.system.v1.ListTenantsRequest
-	3,  // 12: cyber.system.v1.TenantService.GetTenant:input_type -> cyber.system.v1.GetTenantRequest
-	6,  // 13: cyber.system.v1.TenantService.UpdateTenantStatus:output_type -> cyber.system.v1.UpdateTenantStatusResponse
-	2,  // 14: cyber.system.v1.TenantService.ListTenants:output_type -> cyber.system.v1.ListTenantsResponse
-	4,  // 15: cyber.system.v1.TenantService.GetTenant:output_type -> cyber.system.v1.GetTenantResponse
-	13, // [13:16] is the sub-list for method output_type
-	10, // [10:13] is the sub-list for method input_type
+	7,  // 10: cyber.system.v1.TenantService.CreateTenant:input_type -> cyber.system.v1.CreateTenantRequest
+	9,  // 11: cyber.system.v1.TenantService.AddTenantAdmin:input_type -> cyber.system.v1.AddTenantAdminRequest
+	5,  // 12: cyber.system.v1.TenantService.UpdateTenantStatus:input_type -> cyber.system.v1.UpdateTenantStatusRequest
+	1,  // 13: cyber.system.v1.TenantService.ListTenants:input_type -> cyber.system.v1.ListTenantsRequest
+	3,  // 14: cyber.system.v1.TenantService.GetTenant:input_type -> cyber.system.v1.GetTenantRequest
+	8,  // 15: cyber.system.v1.TenantService.CreateTenant:output_type -> cyber.system.v1.CreateTenantResponse
+	10, // 16: cyber.system.v1.TenantService.AddTenantAdmin:output_type -> cyber.system.v1.AddTenantAdminResponse
+	6,  // 17: cyber.system.v1.TenantService.UpdateTenantStatus:output_type -> cyber.system.v1.UpdateTenantStatusResponse
+	2,  // 18: cyber.system.v1.TenantService.ListTenants:output_type -> cyber.system.v1.ListTenantsResponse
+	4,  // 19: cyber.system.v1.TenantService.GetTenant:output_type -> cyber.system.v1.GetTenantResponse
+	15, // [15:20] is the sub-list for method output_type
+	10, // [10:15] is the sub-list for method input_type
 	10, // [10:10] is the sub-list for extension type_name
 	10, // [10:10] is the sub-list for extension extendee
 	0,  // [0:10] is the sub-list for field type_name
@@ -511,13 +760,15 @@ func file_cyber_system_v1_tenant_proto_init() {
 	}
 	file_cyber_system_v1_tenant_proto_msgTypes[1].OneofWrappers = []any{}
 	file_cyber_system_v1_tenant_proto_msgTypes[5].OneofWrappers = []any{}
+	file_cyber_system_v1_tenant_proto_msgTypes[7].OneofWrappers = []any{}
+	file_cyber_system_v1_tenant_proto_msgTypes[9].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_cyber_system_v1_tenant_proto_rawDesc), len(file_cyber_system_v1_tenant_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

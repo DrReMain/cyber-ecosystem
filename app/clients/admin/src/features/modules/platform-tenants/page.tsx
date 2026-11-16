@@ -8,10 +8,12 @@ import { Filter } from "@cyber-ecosystem/shared-antd/filter";
 import { useFilter } from "@cyber-ecosystem/shared-antd/use-search";
 import { useSearch } from "@tanstack/react-router";
 import { Card } from "antd";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useAreaSearchStore } from "#/libs";
 import { m } from "#/paraglide/messages";
 import { parseTenantsSearch, tenantsSearchSchema } from "./search";
+import { AddAdminDrawer } from "./ui/add-admin-drawer";
+import { CreateTenantDrawer } from "./ui/create-tenant-drawer";
 import { TenantsTable } from "./ui/tenants-table";
 
 const TENANTS_INPUT = { orderBy: ["code:asc"], page: { all: true } };
@@ -42,6 +44,8 @@ export function TenantsPage() {
   const search = useSearch({ from: AREA });
   const store = useAreaSearchStore(AREA, search, parseTenantsSearch);
   const { values, onFilter, onReset } = useFilter(store, tenantsSearchSchema);
+  const [creating, setCreating] = useState(false);
+  const [adminTenant, setAdminTenant] = useState<Tenant | null>(null);
 
   const tenantsQuery = useQuery(listTenants, TENANTS_INPUT);
   const toggleMut = useMutation(updateTenantStatus, {
@@ -89,10 +93,23 @@ export function TenantsPage() {
       </Card>
       <TenantsTable
         loading={tenantsQuery.isFetching}
+        onAddAdmin={(tenant) => setAdminTenant(tenant)}
+        onCreate={() => setCreating(true)}
         onRefresh={() => void tenantsQuery.refetch()}
         onToggle={(tenant, next) => toggleMut.mutate({ id: tenant.id ?? "", enabled: next })}
         pendingId={pendingId}
         tenants={tenants}
+      />
+      <CreateTenantDrawer
+        onClose={() => setCreating(false)}
+        onCreated={() => void tenantsQuery.refetch()}
+        open={creating}
+      />
+      <AddAdminDrawer
+        onAdded={() => void tenantsQuery.refetch()}
+        onClose={() => setAdminTenant(null)}
+        open={adminTenant !== null}
+        tenant={adminTenant}
       />
     </div>
   );

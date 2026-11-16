@@ -48,7 +48,7 @@ func (rp *fileRP) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func (rp *fileRP) List(ctx context.Context, in *FileListIn) (*FileListOut, error) {
+func (rp *fileRP) List(ctx context.Context, in *ListIn) (*ListOut, error) {
 	query := rp.Platform.GetClient(ctx).File.Query()
 	helper.Where(query, in.Name != nil, func() predicate.File { return entfile.NameContainsFold(*in.Name) })
 	helper.Where(query, in.ContentType != nil, func() predicate.File { return entfile.ContentTypeEQ(*in.ContentType) })
@@ -68,7 +68,7 @@ func (rp *fileRP) List(ctx context.Context, in *FileListIn) (*FileListOut, error
 	if err != nil {
 		return nil, rp.Platform.HandleEntError(err)
 	}
-	return &FileListOut{
+	return &ListOut{
 		PageResponse: helper.BuildPageResponse(total, offset, limit),
 		List:         utils.SliceMap(fs, MapFile),
 	}, nil

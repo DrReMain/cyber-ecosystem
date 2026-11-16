@@ -31,7 +31,7 @@ type Policy struct {
 	BoundCount int64
 }
 
-type PolicyListIn struct {
+type ListIn struct {
 	*commonpb.PageRequest
 	OrderBy []string
 	Kind    *string
@@ -39,7 +39,7 @@ type PolicyListIn struct {
 	Enabled *bool
 }
 
-type PolicyListOut struct {
+type ListOut struct {
 	*commonpb.PageResponse
 	List []*Policy
 }
@@ -50,7 +50,7 @@ type PolicyRP interface {
 	Create(ctx context.Context, p *Policy) (*Policy, error)
 	Update(ctx context.Context, fieldsMask []string, p *Policy) (*Policy, error)
 	Delete(ctx context.Context, id string) (string, error)
-	List(ctx context.Context, in *PolicyListIn) (*PolicyListOut, error)
+	List(ctx context.Context, in *ListIn) (*ListOut, error)
 	FindByID(ctx context.Context, id string) (*Policy, error)
 	FindByIDs(ctx context.Context, ids []string) ([]*Policy, error)
 	NotifyChanged(ctx context.Context)
@@ -140,7 +140,7 @@ func (uc *PolicyUC) Delete(ctx context.Context, id string) (string, error) {
 	return out, nil
 }
 
-func (uc *PolicyUC) List(ctx context.Context, in *PolicyListIn) (*PolicyListOut, error) {
+func (uc *PolicyUC) List(ctx context.Context, in *ListIn) (*ListOut, error) {
 	return uc.policyRP.List(ctx, in)
 }
 

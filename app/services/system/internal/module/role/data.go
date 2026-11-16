@@ -97,7 +97,7 @@ func (rp *roleRP) Delete(ctx context.Context, id string) (string, error) {
 	return id, nil
 }
 
-func (rp *roleRP) List(ctx context.Context, in *RoleListIn) (*RoleListOut, error) {
+func (rp *roleRP) List(ctx context.Context, in *ListIn) (*ListOut, error) {
 	query := rp.Platform.GetClient(ctx).Role.Query()
 	helper.Where(query, in.Code != nil, func() predicate.Role { return role.CodeContainsFold(*in.Code) })
 	helper.Where(query, in.Name != nil, func() predicate.Role { return role.NameContainsFold(*in.Name) })
@@ -115,7 +115,7 @@ func (rp *roleRP) List(ctx context.Context, in *RoleListIn) (*RoleListOut, error
 	if err != nil {
 		return nil, rp.Platform.HandleEntError(err)
 	}
-	out := &RoleListOut{
+	out := &ListOut{
 		PageResponse: helper.BuildPageResponse(total, offset, limit),
 		List:         utils.SliceMap(rs, mapRole),
 	}
@@ -175,6 +175,11 @@ func (rp *roleRP) ListByPrincipal(ctx context.Context, principalType, principalI
 }
 
 func (rp *roleRP) ReplaceGrants(ctx context.Context, roleID string, grants []*Permission) error {
+	// Diff-replace convergence: concurrent replaces converge to the union
+	// of the two intents — accepted semantics: both writers are
+	// grant-holding admins, so no unauthorized state is reachable, and an
+	// op survives removal only as another admin's explicit concurrent
+	// grant.
 	client := rp.Platform.GetClient(ctx)
 	stored, err := client.Permission.Query().Where(permission.RoleID(roleID)).All(ctx)
 	if err != nil {
@@ -204,12 +209,13 @@ func (rp *roleRP) ReplaceGrants(ctx context.Context, roleID string, grants []*Pe
 				OnConflictColumns(permission.FieldRoleID, permission.FieldOperation).
 				DoNothing().
 				Exec(ctx)
-			if cerr != nil {
-				if errors.Is(cerr, sql.ErrNoRows) {
-					continue
-				}
+			if cerr != nil && !errors.Is(cerr, sql.ErrNoRows) {
 				return rp.Platform.HandleEntError(cerr)
 			}
+			// ErrNoRows is the DoNothing conflict shape: a concurrent
+			// writer seated this op first. The row exists either way —
+			// fall through to the same re-query and link replacement, or
+			// the loser's op ships without its policy links.
 			row, qerr := client.Permission.Query().
 				Where(permission.RoleID(roleID), permission.Operation(op)).
 				Only(ctx)

@@ -11,6 +11,7 @@ import (
 
 	"cyber-ecosystem/shared-go/capability/cache"
 	"cyber-ecosystem/shared-go/capability/sms"
+	"cyber-ecosystem/shared-go/utils"
 
 	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
 	systempb "cyber-ecosystem/gen/go/cyber/system/v1"
@@ -33,6 +34,14 @@ const (
 	smsDayWindow   = 24 * time.Hour
 	smsSendPrefix  = "auth:sms:send-window:"
 	smsDailyPrefix = "auth:sms:send-daily:"
+	// The per-source pair is orthogonal to the per-phone pair: phone keys
+	// protect one number's holder; source keys protect the send budget from
+	// number-walking. A NAT-shared exit folds a whole office into one
+	// source — the failure direction is over-restriction, never exposure.
+	smsSrcWindow    = time.Second
+	smsSrcPerDay    = 100
+	smsSrcWinPrefix = "auth:sms:src-window:"
+	smsSrcDayPrefix = "auth:sms:src-daily:"
 )
 
 var mainlandMobile = regexp.MustCompile(`^1[3-9][0-9]{9}$`)
@@ -64,37 +73,64 @@ func NewSmsProvider(
 	}
 }
 
-func (p *smsProvider) IssueCode(ctx context.Context, row *conf.Auth_Provider, phone string) (string, error) {
+func (p *smsProvider) sendBudget(ctx context.Context, winKey string, window time.Duration, dayKey string, perDay int, who string) error {
+	// One dimension of the issuance budget (per-phone, or per-source
+	// against number-walking): one send per window plus a daily cap. The
+	// daily counter's TTL is re-asserted whenever it reads as unset, so a
+	// lost or failed Expire at the counter's birth cannot make the budget
+	// immortal — the heal lands on a later send at the latest.
+	res, err := p.cache.RateLimiter.Allow(ctx, winKey, 1, window)
+	if err != nil {
+		return p.handleCache(err)
+	}
+	if res != nil && !res.Allowed {
+		return systempb.ErrorSystemSmsRateLimited("").WithCause(
+			fmt.Errorf("send window: %s", who))
+	}
+	n, err := p.cache.Counter.Incr(ctx, dayKey, 1)
+	if err != nil {
+		return p.handleCache(err)
+	}
+	ttl, terr := p.cache.KV.GetTTL(ctx, dayKey)
+	if terr != nil {
+		return p.handleCache(terr)
+	}
+	if ttl == 0 {
+		if err := p.cache.Counter.Expire(ctx, dayKey, smsDayWindow); err != nil {
+			return p.handleCache(err)
+		}
+	}
+	if n > int64(perDay) {
+		return systempb.ErrorSystemSmsRateLimited("").WithCause(
+			fmt.Errorf("daily cap: %s", who))
+	}
+	return nil
+}
+
+func (p *smsProvider) IssueCode(ctx context.Context, row *conf.Auth_Provider, phone, source string) (string, error) {
 	canon := normalizePhone(phone)
 	if canon == "" {
 		return "", errorspb.ErrorGeneralErrorValidationFailed("").WithCause(
 			fmt.Errorf("sms: not a mainland mobile: %s", maskPhone(phone)))
 	}
-	res, err := p.cache.RateLimiter.Allow(ctx, smsSendPrefix+canon, 1, smsSendWindow)
-	if err != nil {
-		return "", p.handleCache(err)
-	}
-	if res != nil && !res.Allowed {
-		return "", systempb.ErrorSystemSmsRateLimited("").WithCause(
-			fmt.Errorf("send window: %s", maskPhone(canon)))
-	}
-	n, err := p.cache.Counter.Incr(ctx, smsDailyPrefix+canon, 1)
-	if err != nil {
-		return "", p.handleCache(err)
-	}
-	if n == 1 {
-		if err := p.cache.Counter.Expire(ctx, smsDailyPrefix+canon, smsDayWindow); err != nil {
-			return "", p.handleCache(err)
+	// Source first, then phone: the source pair spends nothing on any one
+	// number, so a walker exhausts its own source caps before denting any
+	// phone budget. An empty source (in-process callers, tests) skips the
+	// source dimension only — the phone budgets still hold.
+	if source != "" {
+		if err := p.sendBudget(ctx, smsSrcWinPrefix+source, smsSrcWindow, smsSrcDayPrefix+source, smsSrcPerDay, source); err != nil {
+			return "", err
 		}
 	}
-	if n > smsSendPerDay {
-		return "", systempb.ErrorSystemSmsRateLimited("").WithCause(
-			fmt.Errorf("daily cap: %s", maskPhone(canon)))
+	if err := p.sendBudget(ctx, smsSendPrefix+canon, smsSendWindow, smsDailyPrefix+canon, smsSendPerDay, maskPhone(canon)); err != nil {
+		return "", err
 	}
 	code, err := randomDigits(smsCodeDigits)
 	if err != nil {
 		return "", errorspb.ErrorGeneralErrorInternal("").WithCause(err)
 	}
+	// The rotation precedes the dial: the store holds one live code per
+	// phone, so merely attempting a resend kills the prior pair.
 	if err := p.tokenRP.Set(ctx, smsCodePrefix+canon, []byte(code), smsCodeTTL); err != nil {
 		return "", err
 	}
@@ -105,11 +141,17 @@ func (p *smsProvider) IssueCode(ctx context.Context, row *conf.Auth_Provider, ph
 		TemplateCode: sc.GetTemplateCode(),
 		Params:       map[string]string{"code": code},
 	}); err != nil {
+		// A refused channel also burns the fresh code — otherwise every
+		// failed send (config typo, carrier throttle) left a redeemable
+		// ghost behind while the send window kept burning: the caller
+		// was told "failed", yet the server held a live credential no
+		// phone ever saw.
+		_ = p.tokenRP.Del(ctx, smsCodePrefix+canon)
 		return "", p.handleSms(err)
 	}
 	// The state is minted only after a delivered send: a caller never
 	// holds a state whose code never traveled.
-	state, err := mintIdentityState(ctx, p.tokenRP, row.GetKey())
+	state, err := mintIdentityState(ctx, p.tokenRP, row.GetKey(), "")
 	if err != nil {
 		return "", err
 	}
@@ -117,10 +159,10 @@ func (p *smsProvider) IssueCode(ctx context.Context, row *conf.Auth_Provider, ph
 	return state, nil
 }
 
-func (p *smsProvider) Exchange(ctx context.Context, row *conf.Auth_Provider, payload identityPayload) (*exchangedIdentity, error) {
-	// A request narrows into the sms view by assertion — its oneof grows
-	// into the GetSms method as it admits the sms member
-	// (LoginByIdentity carries it; BindCredential does not yet).
+func (p *smsProvider) Exchange(ctx context.Context, row *conf.Auth_Provider, payload any) (*exchangedIdentity, error) {
+	// A request narrows into the sms view by assertion — the identity
+	// requests carrying the sms member (LoginByIdentity, BindCredential,
+	// MergeAccounts) all satisfy it.
 	sp, ok := payload.(smsPayload)
 	if !ok {
 		return nil, errorspb.ErrorGeneralErrorValidationFailed("").WithCause(fmt.Errorf("sms payload required"))
@@ -159,10 +201,9 @@ func normalizePhone(phone string) string {
 }
 
 func maskPhone(phone string) string {
-	if len(phone) < 7 {
-		return strings.Repeat("*", len(phone))
-	}
-	return phone[:3] + "****" + phone[len(phone)-4:]
+	// Thin alias: the masking law lives in utils, this name keeps the
+	// package's own call sites reading naturally.
+	return utils.MaskPhone(phone)
 }
 
 func randomDigits(n int) (string, error) {

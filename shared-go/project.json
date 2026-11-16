@@ -7,7 +7,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
-        "command": "go test ./..."
+        "command": "go test -count=1 ./..."
       }
     }
   }

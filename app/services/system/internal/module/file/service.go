@@ -59,7 +59,7 @@ func (s *FileService) DeleteFile(ctx context.Context, in *systempb.DeleteFileReq
 }
 
 func (s *FileService) ListFiles(ctx context.Context, in *systempb.ListFilesRequest) (*systempb.ListFilesResponse, error) {
-	listIn := &FileListIn{
+	listIn := &ListIn{
 		PageRequest: helper.EnsurePageRequest(in.Page),
 		OrderBy:     in.OrderBy,
 		Name:        in.Name,

@@ -32,7 +32,7 @@ func TestValidateDeclaredPopulations(t *testing.T) {
 	} {
 		err := bootstrap.ValidateDeclaredPopulations(tc.rows)
 		if (err == nil) != tc.want {
-			t.Fatalf("%s: err = %v, want ok=%v", tc.name, err, tc.want)
+			t.Errorf("%s: err = %v, want ok=%v", tc.name, err, tc.want)
 		}
 	}
 }

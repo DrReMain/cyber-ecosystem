@@ -1,3 +1,8 @@
+# Dev config (bare metal). container/config.yaml mirrors this file's key
+# set and order for the baked image; keep the two aligned when either
+# changes. Overrides come ONLY from APP_-prefixed env vars (APP_DB_HOST=x);
+# the boot banner prints the values actually in effect — read it back
+# after exporting.
 server:
   http: {addr: 0.0.0.0:11002, timeout: 1s}
   grpc: {addr: 0.0.0.0:12002, timeout: 1s}
@@ -10,25 +15,26 @@ data:
     user: ${DB_USER:postgres}
     password: ${DB_PASS:postgres}
     db_name: ${DB_NAME:agent}
-    max_open_conns: 100        # 个 (最大连接数)
-    max_idle_conns: 50         # 个 (最大空闲连接数)
-    conn_max_lifetime: 3600s   # 时长 (连接最大存活)
+    max_open_conns: 100
+    max_idle_conns: 50
+    conn_max_lifetime: 3600s
 observability:
-  endpoint: ${OTLP_ENDPOINT:localhost:4318}
+  endpoint: ${OTLP_ENDPOINT:localhost:4318} # otlp http collector
   insecure: true
   trace:
     enabled: ${TRACE_ENABLED:false}
   metrics:
     enabled: ${METRICS_ENABLED:false}
-  slow_query:
-    db: 0.2s
   log:
     level: debug
     console: true
     otlp: false
-
+  slow_query:
+    db: 0.2s
 remote:
-  system_connect: ${SYSTEM_CONNECT:localhost:13001} # system connect
-
+  system_connect: ${SYSTEM_CONNECT:localhost:13001} # system connect face
 crypto:
-  master_key: ${AGENT_MASTER_KEY:} # empty default mirrors container/config.yaml; required — the deploy plane owns the one dev value, and a missing key fails service start at UC construction (min 16 bytes)
+  # Empty default mirrors container/config.yaml; required — the deploy plane
+  # owns the one dev value (compose injects it via APP_AGENT_MASTER_KEY), and
+  # a missing key fails service start at UC construction (min 16 bytes).
+  master_key: ${AGENT_MASTER_KEY:}

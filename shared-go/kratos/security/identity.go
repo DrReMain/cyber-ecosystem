@@ -2,6 +2,11 @@ package security
 
 import "context"
 
+// ExtraAccount is the well-known key the session plane stores the login
+// account under in Subject.Extra — one vocabulary shared by every writer
+// (auth mints it, introspect forwards it, remote clients rehydrate it).
+const ExtraAccount = "account"
+
 // Subject is the authenticated identity carried through the request
 // context: written once by the auth middleware, read by tenant resolution,
 // authorization, and the data mixins.

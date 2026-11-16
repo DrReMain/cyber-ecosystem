@@ -60,7 +60,6 @@ http:
       entryPoints: ["web"]
       service: agent-connect
       middlewares: [strip-connect]
-
   middlewares:
     strip-connect:
       stripPrefix:

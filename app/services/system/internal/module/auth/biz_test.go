@@ -1,10 +1,13 @@
 package auth
 
 import (
+	"bytes"
 	"context"
+	"encoding/base64"
 	"fmt"
 	"io"
 	"log/slog"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -31,8 +34,11 @@ import (
 // CacheMiss error the real adapter would — fakes simulate the classification
 // layer, never raw errors.
 type fakeTokenRP struct {
-	vals      map[string][]byte
-	ttls      map[string]time.Duration
+	vals map[string][]byte
+	ttls map[string]time.Duration
+	// delOnGet simulates a logout landing between the session read and the
+	// write-back: Get answers the payload once and deletes the key.
+	delOnGet  bool
 	expire    []time.Duration
 	expireErr error
 	getErr    error
@@ -47,9 +53,24 @@ func (f *fakeTokenRP) Get(_ context.Context, key string) ([]byte, error) {
 		return nil, f.getErr
 	}
 	if v, ok := f.vals[key]; ok {
+		if f.delOnGet {
+			delete(f.vals, key)
+		}
 		return v, nil
 	}
 	return nil, errorspb.ErrorInfraErrorCacheMiss("")
+}
+
+// CompareAndSet mirrors the redis script's semantics: swap only on a
+// byte-identical current value; a deleted or changed key reports false
+// and stores nothing.
+func (f *fakeTokenRP) CompareAndSet(_ context.Context, key string, expected, val []byte, ttl time.Duration) (bool, error) {
+	if cur, ok := f.vals[key]; ok && bytes.Equal(cur, expected) {
+		f.vals[key] = val
+		f.ttls[key] = ttl
+		return true, nil
+	}
+	return false, nil
 }
 
 func (f *fakeTokenRP) GetDel(ctx context.Context, key string) ([]byte, error) {
@@ -102,10 +123,21 @@ type fakeUserRP struct {
 
 	credentials    map[string]*user.Credential
 	createCredErr  error
+	createCredErrs []error
+	findCredErr    error
 	createdCreds   []*user.Credential
 	deletedCredFor []string
 	findIDErr      error
 	findByIDCalls  int
+
+	// merge slice: the poor side's writes, the one-shot ledger, and the
+	// follow-ups the disable path owes.
+	credCounts map[string]int
+	moved      []string
+	moveErr    error
+	disabled   []string
+	revoked    []string
+	notified   int
 
 	createdUsers []*user.User
 }
@@ -117,7 +149,19 @@ func (f *fakeUserRP) ListSeatsByUser(_ context.Context, _ string) ([]*user.Seat,
 	return f.seats, nil
 }
 
+func (f *fakeUserRP) FindCredentialByIdentifier(_ context.Context, identifier string) (*user.Credential, error) {
+	for k, c := range f.credentials {
+		if _, id, ok := strings.Cut(k, "|"); ok && id == identifier {
+			return c, nil
+		}
+	}
+	return nil, errorspb.ErrorInfraErrorDbNotFound("")
+}
+
 func (f *fakeUserRP) FindCredential(_ context.Context, kind, identifier string) (*user.Credential, error) {
+	if f.findCredErr != nil {
+		return nil, f.findCredErr
+	}
 	if c, ok := f.credentials[kind+"|"+identifier]; ok {
 		return c, nil
 	}
@@ -125,6 +169,15 @@ func (f *fakeUserRP) FindCredential(_ context.Context, kind, identifier string) 
 }
 
 func (f *fakeUserRP) CreateCredential(_ context.Context, c *user.Credential) error {
+	// createCredErrs is a per-call queue: each call pops the next verdict,
+	// so one row can land and the next fail inside one batch.
+	if len(f.createCredErrs) > 0 {
+		err := f.createCredErrs[0]
+		f.createCredErrs = f.createCredErrs[1:]
+		if err != nil {
+			return err
+		}
+	}
 	if f.createCredErr != nil {
 		return f.createCredErr
 	}
@@ -135,6 +188,64 @@ func (f *fakeUserRP) CreateCredential(_ context.Context, c *user.Credential) err
 func (f *fakeUserRP) DeleteCredentialsByUser(_ context.Context, userID string) error {
 	f.deletedCredFor = append(f.deletedCredFor, userID)
 	return nil
+}
+
+func (f *fakeUserRP) CountCredentialsByUser(_ context.Context, userID string) (int, error) {
+	if f.credCounts != nil {
+		return f.credCounts[userID], nil
+	}
+	n := 0
+	for _, c := range f.credentials {
+		if c.UserID == userID {
+			n++
+		}
+	}
+	return n, nil
+}
+
+func (f *fakeUserRP) ListCredentialsByUser(_ context.Context, userID string) ([]*user.Credential, error) {
+	var out []*user.Credential
+	for _, c := range f.credentials {
+		if c.UserID == userID {
+			out = append(out, c)
+		}
+	}
+	return out, nil
+}
+
+func (f *fakeUserRP) MoveCredential(_ context.Context, kind, identifier, toUserID string) error {
+	if f.moveErr != nil {
+		return f.moveErr
+	}
+	c, ok := f.credentials[kind+"|"+identifier]
+	if !ok {
+		return errorspb.ErrorInfraErrorDbNotFound("")
+	}
+	c.UserID = toUserID
+	f.moved = append(f.moved, kind+"|"+identifier+"->"+toUserID)
+	return nil
+}
+
+func (f *fakeUserRP) UpdateStatus(_ context.Context, id string, enabled bool) (*user.User, error) {
+	if !enabled {
+		f.disabled = append(f.disabled, id)
+	}
+	if f.row != nil && f.row.ID == id {
+		row := *f.row
+		row.Enabled = enabled
+		f.row = &row
+		return &row, nil
+	}
+	return &user.User{ID: id, Enabled: enabled}, nil
+}
+
+func (f *fakeUserRP) RevokeUserSessions(_ context.Context, userID string) error {
+	f.revoked = append(f.revoked, userID)
+	return nil
+}
+
+func (f *fakeUserRP) NotifyChanged(context.Context) {
+	f.notified++
 }
 
 func (f *fakeUserRP) FindByAccount(_ context.Context, account string) (*user.User, error) {
@@ -271,7 +382,7 @@ type fakeIdentityProvider struct {
 
 var fakeExchanges int
 
-func (f fakeIdentityProvider) Exchange(_ context.Context, row *conf.Auth_Provider, _ identityPayload) (*exchangedIdentity, error) {
+func (f fakeIdentityProvider) Exchange(_ context.Context, row *conf.Auth_Provider, _ any) (*exchangedIdentity, error) {
 	fakeExchanges++
 	if row.GetKey() == "failing" {
 		return nil, systempb.ErrorSystemIdentityExchangeFailed("").WithCause(fmt.Errorf("provider rejected"))
@@ -287,7 +398,11 @@ const fakeKind = "fakekind"
 
 func testProviders() map[string]IdentityProvider {
 	return map[string]IdentityProvider{
-		fakeKind: fakeIdentityProvider{id: &exchangedIdentity{Kind: fakeKind, Identifier: "oid-x"}},
+		fakeKind: fakeIdentityProvider{id: &exchangedIdentity{Kind: fakeKind, Identifier: "oid-x",
+			Profile: &wechatProfile{Nickname: "昵称", AvatarURL: "https://qlogo.cn/a.png"}}},
+		// The resolve phone branch never exchanges; the row only has to
+		// carry the channel kind the branch guards on.
+		smsKind: fakeIdentityProvider{id: &exchangedIdentity{Kind: smsKind, Identifier: "13900001111"}},
 	}
 }
 
@@ -296,6 +411,7 @@ func fakeProviderConf() *conf.Auth {
 		{Key: "fake", Kind: fakeKind, Enabled: true},
 		{Key: "failing", Kind: fakeKind, Enabled: true},
 		{Key: "off", Kind: fakeKind},
+		{Key: "sms", Kind: smsKind, Enabled: true},
 	}}
 }
 
@@ -369,11 +485,22 @@ func identityReq(provider, state string) *systempb.LoginByIdentityRequest {
 }
 
 // issueState mints a begin-issued state directly into the fake store — the
-// law under test is the cash, not the mint (Begin covers that half).
+// law under test is the cash, not the mint (Begin covers that half). The
+// anonymous shape is what the public login rungs mint; boundState is the
+// bind-rung shape carrying the minting session.
 func issueState(t *testing.T, trp *fakeTokenRP, provider string) string {
 	t.Helper()
+	return issueBoundState(t, trp, provider, "")
+}
+
+func issueBoundState(t *testing.T, trp *fakeTokenRP, provider, bindUser string) string {
+	t.Helper()
 	state := "st-" + provider
-	if err := trp.Set(context.Background(), identityStatePrefix+state, []byte(provider), identityStateTTL); err != nil {
+	if bindUser != "" {
+		state += "-" + bindUser
+	}
+	val := utils.MustMarshal(identityStateValue{Provider: provider, BindUser: bindUser})
+	if err := trp.Set(context.Background(), identityStatePrefix+state, val, identityStateTTL); err != nil {
 		t.Fatalf("state: %v", err)
 	}
 	return state
@@ -429,6 +556,36 @@ func TestLoginUnknownAccountSameShapeAsWrongPassword(t *testing.T) {
 	_, _, _, errWrong := uc.Login(context.Background(), "a@x.co", "wrong", "")
 	if !systempb.IsSystemLoginFailed(errWrong) {
 		t.Fatalf("wrong password: want LOGIN_FAILED, got %v", errWrong)
+	}
+}
+
+// The credential fallback: an SMS-born member's login handle is their
+// phone — a bound credential, not an account handle. The handle misses,
+// the identifier resolves, the password answers. Kind-agnostic on
+// purpose: whatever kind the identifier bound through names the same
+// account, so a future email binding rides this path with zero new
+// branches.
+func TestLoginCredentialIdentifierFallback(t *testing.T) {
+	handle := "dbn18mlthm88rvujd2t0"
+	phone := "13800001111"
+	digest, err := utils.Hash("right")
+	if err != nil {
+		t.Fatalf("hash seed: %v", err)
+	}
+	row := &user.User{ID: "u-sms-born", Account: &handle, PasswordHash: &digest, Enabled: true}
+	rp := &fakeUserRP{row: row, credentials: map[string]*user.Credential{
+		"sms|" + phone: {Kind: "sms", Identifier: phone, UserID: "u-sms-born"},
+	}}
+	uc := newAuthUC(rp, &fakeAuthzRP{}, newTokenStore())
+
+	if _, _, _, err := uc.Login(context.Background(), phone, "right", ""); err != nil {
+		t.Fatalf("phone + password on sms-born member: %v", err)
+	}
+	if _, _, _, err := uc.Login(context.Background(), phone, "wrong", ""); !systempb.IsSystemLoginFailed(err) {
+		t.Fatalf("wrong password via credential: want LOGIN_FAILED, got %v", err)
+	}
+	if _, _, _, err := uc.Login(context.Background(), "13900002222", "right", ""); !systempb.IsSystemLoginFailed(err) {
+		t.Fatalf("identifier no credential knows: want LOGIN_FAILED, got %v", err)
 	}
 }
 
@@ -561,7 +718,7 @@ func TestLoginMultiSeatRequiresChoice(t *testing.T) {
 	uc := newAuthUCTenant(uf, &fakeAuthzRP{}, newTokenStore(),
 		&fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
 
-	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "right", ""); !systempb.IsSystemLoginSeatRequired(err) {
+	if _, _, _, err := uc.Login(context.Background(), "a@x.co", "right", ""); !systempb.IsSystemLoginSeatChoiceRequired(err) {
 		t.Fatalf("multi-seat: want SEAT_REQUIRED, got %v", err)
 	}
 }
@@ -707,6 +864,32 @@ func TestAuthenticateSessionUserGate(t *testing.T) {
 	az.stamp++ // an unrelated bump forces the deep read the error rides in on
 	if _, err := uc.AuthenticateSession(context.Background(), token); !errorspb.IsInfraErrorNetworkConnection(err) {
 		t.Fatalf("generic identity error: want passthrough, got %v", err)
+	}
+}
+
+// A logout deleting the session between the read and the stamp write-back
+// must not be undone by the write-back resurrecting the key: the
+// in-flight request completes (its gate already passed), the stored key
+// stays dead, and only the next request dies.
+func TestAuthenticateSessionWriteBackLostRaceToLogout(t *testing.T) {
+	rp := newTokenStore()
+	token := mintSession(t, rp, &Session{
+		UserID: "u1", TenantID: "t1", Account: "a@x.co",
+		ExpiresAt: time.Now().Add(time.Hour), IssuedAt: time.Now(),
+	})
+	rp.delOnGet = true // the session read lands, then a concurrent logout deletes the key
+	uc := newAuthUCTenant(
+		&fakeUserRP{row: seedRow(t, "a@x.co", "right")},
+		&fakeAuthzRP{},
+		rp,
+		&fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}},
+	)
+
+	if _, err := uc.AuthenticateSession(context.Background(), token); err != nil {
+		t.Fatalf("in-flight request must complete: %v", err)
+	}
+	if _, ok := rp.vals[sessionPrefix+token]; ok {
+		t.Fatal("write-back lost the race: the key must stay deleted — no resurrection")
 	}
 }
 
@@ -961,7 +1144,7 @@ func TestLogoutDeletesSessionKey(t *testing.T) {
 // session whose grants cannot resolve must never read as "no permissions".
 func TestGetCurrentUserEngineFailureIsInternal(t *testing.T) {
 	uc := newAuthUC(&fakeUserRP{}, &fakeAuthzRP{err: errorspb.ErrorInfraErrorNetworkConnection("")}, newTokenStore())
-	subject := &security.Subject{UserID: "u1", SessionID: "tok-1", Extra: map[string]any{shared.ExtraAccount: "a@x.co"}}
+	subject := &security.Subject{UserID: "u1", SessionID: "tok-1", Extra: map[string]any{security.ExtraAccount: "a@x.co"}}
 
 	if _, err := uc.GetCurrentUser(authCtx(subject)); !errorspb.IsGeneralErrorInternal(err) {
 		t.Fatalf("engine failure: want INTERNAL, got %v", err)
@@ -975,7 +1158,7 @@ func TestGetCurrentUserHydrates(t *testing.T) {
 	avatar := "f1"
 	row.Avatar = &avatar
 	uc := newAuthUC(&fakeUserRP{row: row}, &fakeAuthzRP{grants: []authz.GrantView{{Pattern: "/svc/*"}}}, newTokenStore())
-	subject := &security.Subject{UserID: "u1", SessionID: "tok-1", Extra: map[string]any{shared.ExtraAccount: "a@x.co"}}
+	subject := &security.Subject{UserID: "u1", SessionID: "tok-1", Extra: map[string]any{security.ExtraAccount: "a@x.co"}}
 
 	out, err := uc.GetCurrentUser(authCtx(subject))
 	if err != nil {
@@ -1034,7 +1217,7 @@ func TestLoginByIdentityMintsFromSeat(t *testing.T) {
 		&fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
 	state := issueState(t, trp, "fake")
 
-	token, _, _, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state))
+	token, _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state))
 	if err != nil {
 		t.Fatalf("login-by-identity: %v", err)
 	}
@@ -1044,6 +1227,24 @@ func TestLoginByIdentityMintsFromSeat(t *testing.T) {
 	}
 	if sess.UserID != "u9" || sess.TenantID != "t1" || sess.Population != security.DefaultPopulation {
 		t.Fatalf("mint: session = %+v, want the seat's t1/%s for u9", sess, security.DefaultPopulation)
+	}
+}
+
+// The person behind the identity rides the login's return verbatim — the
+// wizard's nickname prefill source — without touching the session mint.
+func TestLoginByIdentityCarriesProfile(t *testing.T) {
+	trp := newTokenStore()
+	uf := boundUser(t, []*user.Seat{{UserID: "u9", TenantID: "t1", Population: security.DefaultPopulation}})
+	uc := newAuthUCConf(fakeProviderConf(), uf, &fakeAuthzRP{}, trp,
+		&fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
+	state := issueState(t, trp, "fake")
+
+	_, _, _, profile, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state))
+	if err != nil {
+		t.Fatalf("login-by-identity: %v", err)
+	}
+	if profile == nil || profile.Nickname != "昵称" || profile.AvatarURL != "https://qlogo.cn/a.png" {
+		t.Fatalf("profile = %+v, want the exchange's person verbatim", profile)
 	}
 }
 
@@ -1057,7 +1258,7 @@ func TestLoginByIdentityStateLaws(t *testing.T) {
 	uc, trp := identityUC(t, uf)
 
 	before := fakeExchanges
-	if _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", "st-missing", identityReq("fake", "st-missing")); !systempb.IsSystemIdentityExchangeFailed(err) {
+	if _, _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", "st-missing", identityReq("fake", "st-missing")); !systempb.IsSystemIdentityExchangeFailed(err) {
 		t.Fatalf("missing state: want EXCHANGE_FAILED, got %v", err)
 	}
 	if fakeExchanges != before {
@@ -1066,7 +1267,7 @@ func TestLoginByIdentityStateLaws(t *testing.T) {
 
 	other := issueState(t, trp, "failing")
 	before = fakeExchanges
-	if _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", other, identityReq("fake", other)); !systempb.IsSystemIdentityExchangeFailed(err) {
+	if _, _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", other, identityReq("fake", other)); !systempb.IsSystemIdentityExchangeFailed(err) {
 		t.Fatalf("foreign state: want EXCHANGE_FAILED, got %v", err)
 	}
 	if fakeExchanges != before {
@@ -1074,10 +1275,10 @@ func TestLoginByIdentityStateLaws(t *testing.T) {
 	}
 
 	state := issueState(t, trp, "fake")
-	if _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state)); err != nil {
+	if _, _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state)); err != nil {
 		t.Fatalf("first cash: %v", err)
 	}
-	if _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state)); !systempb.IsSystemIdentityExchangeFailed(err) {
+	if _, _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state)); !systempb.IsSystemIdentityExchangeFailed(err) {
 		t.Fatalf("second cash: want EXCHANGE_FAILED (single use), got %v", err)
 	}
 }
@@ -1087,7 +1288,7 @@ func TestLoginByIdentityStateLaws(t *testing.T) {
 func TestBeginIdentityLoginIssuesState(t *testing.T) {
 	uc, trp := identityUC(t, &fakeUserRP{})
 
-	url, err := uc.BeginIdentityLogin(context.Background(), "fake", "https://app.example/cb")
+	url, err := uc.BeginIdentityLogin(context.Background(), "fake", "https://app.example/cb", "")
 	if err != nil {
 		t.Fatalf("begin: %v", err)
 	}
@@ -1098,8 +1299,15 @@ func TestBeginIdentityLoginIssuesState(t *testing.T) {
 	if state == "" {
 		t.Fatal("begin: empty state")
 	}
-	if got, err := trp.Get(context.Background(), identityStatePrefix+state); err != nil || string(got) != "fake" {
-		t.Fatalf("begin: stored state = %q err=%v, want provider key", got, err)
+	if strings.Contains(state, ".") {
+		t.Fatalf("begin: relayless state = %q, want a bare token", state)
+	}
+	got, err := trp.Get(context.Background(), identityStatePrefix+state)
+	if err != nil {
+		t.Fatalf("begin: stored state err=%v", err)
+	}
+	if val, uerr := utils.Unmarshal[identityStateValue](got); uerr != nil || val.Provider != "fake" || val.BindUser != "" {
+		t.Fatalf("begin: stored state = %q (%v), want an anonymous fake-provider mint", got, uerr)
 	}
 	if ttl := trp.ttls[identityStatePrefix+state]; ttl != 10*time.Minute {
 		t.Fatalf("begin: state ttl = %v, want 10m", ttl)
@@ -1107,11 +1315,98 @@ func TestBeginIdentityLoginIssuesState(t *testing.T) {
 
 	// An unknown provider refuses before any state is minted — a refused
 	// begin must leave zero one-time keys behind.
-	if _, err := uc.BeginIdentityLogin(context.Background(), "ghost", "https://app.example/cb"); !systempb.IsSystemIdentityProviderUnknown(err) {
+	if _, err := uc.BeginIdentityLogin(context.Background(), "ghost", "https://app.example/cb", ""); !systempb.IsSystemIdentityProviderUnknown(err) {
 		t.Fatalf("begin unknown provider: want PROVIDER_UNKNOWN, got %v", err)
 	}
 	if len(trp.vals) != 1 {
 		t.Fatalf("begin unknown provider: %d keys stored, want only the first mint", len(trp.vals))
+	}
+}
+
+// The state relay (the B-form fold): Begin folds the post-login target
+// into the state itself — "<token>.<base64url(next)>" — because the
+// redirect_uri may carry no query. The whole composite is the KV key, so
+// the burn consumes it verbatim and a tampered copy keys a miss: the
+// relay never weakens the one-shot proof.
+func TestBeginIdentityLoginRelayFoldsAndBurns(t *testing.T) {
+	uc, trp := identityUC(t, &fakeUserRP{})
+	const next = "/report/cltest123"
+
+	url, err := uc.BeginIdentityLogin(context.Background(), "fake", "https://app.example/cb", next)
+	if err != nil {
+		t.Fatalf("begin: %v", err)
+	}
+	state := strings.TrimPrefix(url, "https://idp.example/auth/fake?state=")
+	token, folded, ok := strings.Cut(state, ".")
+	if !ok || token == "" || folded == "" {
+		t.Fatalf("begin: relay state = %q, want <token>.<b64>", state)
+	}
+	decoded, derr := base64.RawURLEncoding.DecodeString(folded)
+	if derr != nil || string(decoded) != next {
+		t.Fatalf("begin: folded relay = %q (%v), want %q", folded, derr, next)
+	}
+
+	// The burn takes the whole composite verbatim: the exchange proceeds
+	// past the cash (its refusal below is the unbound identity, not the
+	// state) and the composite key is consumed.
+	if _, _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state)); !systempb.IsSystemIdentityExchangeFailed(err) {
+		t.Fatalf("relay burn: want EXCHANGE_FAILED (unbound), got %v", err)
+	}
+	if _, gerr := trp.Get(context.Background(), identityStatePrefix+state); gerr == nil {
+		t.Fatal("relay burn: composite key still stored, want consumed")
+	}
+}
+
+// A tampered relay self-destructs at the cash — the composite is the key,
+// so any edited copy addresses a key nobody minted. The honest mint stays
+// untouched: a later verbatim cash still succeeds.
+func TestBeginIdentityLoginRelayTamperKeysMiss(t *testing.T) {
+	uc, trp := identityUC(t, &fakeUserRP{})
+
+	url, err := uc.BeginIdentityLogin(context.Background(), "fake", "https://app.example/cb", "/report/a")
+	if err != nil {
+		t.Fatalf("begin: %v", err)
+	}
+	state := strings.TrimPrefix(url, "https://idp.example/auth/fake?state=")
+	token, _, _ := strings.Cut(state, ".")
+
+	tampered := token + "." + base64.RawURLEncoding.EncodeToString([]byte("/evil"))
+	if _, _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", tampered, identityReq("fake", tampered)); !systempb.IsSystemIdentityExchangeFailed(err) {
+		t.Fatalf("tampered relay: want EXCHANGE_FAILED, got %v", err)
+	}
+	stripped := token
+	if _, _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", stripped, identityReq("fake", stripped)); !systempb.IsSystemIdentityExchangeFailed(err) {
+		t.Fatalf("stripped relay: want EXCHANGE_FAILED, got %v", err)
+	}
+	if _, gerr := trp.Get(context.Background(), identityStatePrefix+state); gerr != nil {
+		t.Fatal("tamper leg: honest mint consumed, want untouched")
+	}
+
+	if _, _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state)); !systempb.IsSystemIdentityExchangeFailed(err) {
+		t.Fatalf("verbatim cash after tamper: want EXCHANGE_FAILED (unbound), got %v", err)
+	}
+	if _, gerr := trp.Get(context.Background(), identityStatePrefix+state); gerr == nil {
+		t.Fatal("verbatim cash: honest mint still stored, want consumed")
+	}
+}
+
+// The 128-char state cap is wechat's own; a next whose fold would exceed
+// it is dropped, not refused — the login answers its completeness branch
+// on a bare token exactly like a relayless begin.
+func TestBeginIdentityLoginRelayCapDegrades(t *testing.T) {
+	uc, trp := identityUC(t, &fakeUserRP{})
+	next := "/" + strings.Repeat("a", 80)
+
+	url, err := uc.BeginIdentityLogin(context.Background(), "fake", "https://app.example/cb", next)
+	if err != nil {
+		t.Fatalf("begin: %v", err)
+	}
+	state := strings.TrimPrefix(url, "https://idp.example/auth/fake?state=")
+	if strings.Contains(state, ".") || len(state) != 64 {
+		t.Fatalf("begin: capped state = %q, want a bare 64-char token", state)
+	}
+	if _, gerr := trp.Get(context.Background(), identityStatePrefix+state); gerr != nil {
+		t.Fatal("begin: capped bare mint not stored")
 	}
 }
 
@@ -1121,7 +1416,7 @@ func TestLoginByIdentityUnknownProvider(t *testing.T) {
 	uc, _ := identityUC(t, &fakeUserRP{})
 
 	for _, key := range []string{"ghost", "off"} {
-		if _, _, _, err := uc.LoginByIdentity(context.Background(), key, "st-x", identityReq(key, "st-x")); !systempb.IsSystemIdentityProviderUnknown(err) {
+		if _, _, _, _, err := uc.LoginByIdentity(context.Background(), key, "st-x", identityReq(key, "st-x")); !systempb.IsSystemIdentityProviderUnknown(err) {
 			t.Fatalf("provider %q: want PROVIDER_UNKNOWN, got %v", key, err)
 		}
 	}
@@ -1133,7 +1428,7 @@ func TestLoginByIdentityUnboundFailsAsExchange(t *testing.T) {
 	uc, trp := identityUC(t, &fakeUserRP{})
 	state := issueState(t, trp, "fake")
 
-	if _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state)); !systempb.IsSystemIdentityExchangeFailed(err) {
+	if _, _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state)); !systempb.IsSystemIdentityExchangeFailed(err) {
 		t.Fatalf("unbound: want EXCHANGE_FAILED, got %v", err)
 	}
 }
@@ -1148,7 +1443,7 @@ func TestLoginByIdentityAutoRegisterBirthsMember(t *testing.T) {
 	uc, trp := autoUC(t, uf)
 	state := issueState(t, trp, "auto")
 
-	token, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state))
+	token, _, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state))
 	if err != nil {
 		t.Fatalf("auto-register: %v", err)
 	}
@@ -1192,7 +1487,7 @@ func TestLoginByIdentityUnboundBirthsFresh(t *testing.T) {
 	uc, trp := autoUC(t, uf)
 	state := issueState(t, trp, "auto")
 
-	token, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state))
+	token, _, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state))
 	if err != nil {
 		t.Fatalf("unbound re-login: %v", err)
 	}
@@ -1220,7 +1515,7 @@ func TestLoginByIdentityExchangeFailureSurfaces(t *testing.T) {
 	uc, trp := identityUC(t, &fakeUserRP{})
 	state := issueState(t, trp, "failing")
 
-	if _, _, _, err := uc.LoginByIdentity(context.Background(), "failing", state, identityReq("failing", state)); !systempb.IsSystemIdentityExchangeFailed(err) {
+	if _, _, _, _, err := uc.LoginByIdentity(context.Background(), "failing", state, identityReq("failing", state)); !systempb.IsSystemIdentityExchangeFailed(err) {
 		t.Fatalf("exchange failure: want EXCHANGE_FAILED, got %v", err)
 	}
 }
@@ -1240,7 +1535,7 @@ func TestLoginByIdentityPicksProviderSeat(t *testing.T) {
 	}}, uf, &fakeAuthzRP{}, trp, &fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
 	state := issueState(t, trp, "auto")
 
-	token, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state))
+	token, _, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state))
 	if err != nil {
 		t.Fatalf("directed seat: %v", err)
 	}
@@ -1264,7 +1559,7 @@ func TestLoginByIdentityEnsuresSeatForBoundIdentity(t *testing.T) {
 	}}, uf, &fakeAuthzRP{}, trp, &fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
 	state := issueState(t, trp, "auto")
 
-	token, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state))
+	token, _, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state))
 	if err != nil {
 		t.Fatalf("bound entry: %v", err)
 	}
@@ -1292,7 +1587,7 @@ func TestLoginByIdentityUnknownPopulation(t *testing.T) {
 	state := issueState(t, trp, "auto")
 
 	before := fakeExchanges
-	if _, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state)); !systempb.IsSystemPopulationNotFound(err) {
+	if _, _, _, _, err := uc.LoginByIdentity(context.Background(), "auto", state, identityReq("auto", state)); !systempb.IsSystemPopulationNotFound(err) {
 		t.Fatalf("unknown population: want POPULATION_NOT_FOUND, got %v", err)
 	}
 	if fakeExchanges != before || len(uf.createdCreds) != 0 {
@@ -1317,15 +1612,35 @@ func TestBindCredentialLaws(t *testing.T) {
 	uf := &fakeUserRP{}
 	uc, trp := identityUC(t, uf)
 	before := fakeExchanges
-	if err := uc.BindCredential(ctx, "fake", "st-missing", newReq("st-missing")); !systempb.IsSystemIdentityExchangeFailed(err) {
+	if _, err := uc.BindCredential(ctx, "fake", "st-missing", newReq("st-missing")); !systempb.IsSystemIdentityExchangeFailed(err) {
 		t.Fatalf("stateless bind: want EXCHANGE_FAILED, got %v", err)
 	}
 	if fakeExchanges != before || len(uf.createdCreds) != 0 {
 		t.Fatal("stateless bind: the exchange ran or a credential landed")
 	}
 
-	state := issueState(t, trp, "fake")
-	if err := uc.BindCredential(ctx, "fake", state, newReq(state)); err != nil {
+	// The session-tie law: an anonymous mint (the public login rung's
+	// shape) and a foreign session's mint both answer as a failed
+	// exchange, before any provider call.
+	anon := issueState(t, trp, "fake")
+	before = fakeExchanges
+	if _, err := uc.BindCredential(ctx, "fake", anon, newReq(anon)); !systempb.IsSystemIdentityExchangeFailed(err) {
+		t.Fatalf("anonymous state: want EXCHANGE_FAILED, got %v", err)
+	}
+	if fakeExchanges != before || len(uf.createdCreds) != 0 {
+		t.Fatal("anonymous state: the exchange ran or a credential landed")
+	}
+	foreign := issueBoundState(t, trp, "fake", "u9")
+	before = fakeExchanges
+	if _, err := uc.BindCredential(ctx, "fake", foreign, newReq(foreign)); !systempb.IsSystemIdentityExchangeFailed(err) {
+		t.Fatalf("foreign state: want EXCHANGE_FAILED, got %v", err)
+	}
+	if fakeExchanges != before || len(uf.createdCreds) != 0 {
+		t.Fatal("foreign state: the exchange ran or a credential landed")
+	}
+
+	state := issueBoundState(t, trp, "fake", "u1")
+	if _, err := uc.BindCredential(ctx, "fake", state, newReq(state)); err != nil {
 		t.Fatalf("bind: %v", err)
 	}
 	if len(uf.createdCreds) != 1 || uf.createdCreds[0].UserID != "u1" {
@@ -1334,8 +1649,9 @@ func TestBindCredentialLaws(t *testing.T) {
 
 	bind := func(uf *fakeUserRP) error {
 		uc, trp := identityUC(t, uf)
-		state := issueState(t, trp, "fake")
-		return uc.BindCredential(ctx, "fake", state, newReq(state))
+		state := issueBoundState(t, trp, "fake", "u1")
+		_, err := uc.BindCredential(ctx, "fake", state, newReq(state))
+		return err
 	}
 	same := &fakeUserRP{credentials: map[string]*user.Credential{
 		fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u1"},
@@ -1360,8 +1676,145 @@ func TestBindCredentialLaws(t *testing.T) {
 	}
 
 	noUC, noTrp := identityUC(t, &fakeUserRP{})
-	noState := issueState(t, noTrp, "fake")
-	if err := noUC.BindCredential(context.Background(), "fake", noState, newReq(noState)); !errorspb.IsGeneralErrorUnauthenticated(err) {
+	noState := issueBoundState(t, noTrp, "fake", "u1")
+	if _, err := noUC.BindCredential(context.Background(), "fake", noState, newReq(noState)); !errorspb.IsGeneralErrorUnauthenticated(err) {
+		t.Fatalf("no session: want 401, got %v", err)
+	}
+}
+
+// The begin twin of the bind flow: an authenticated rung mints a state
+// carrying the session, and the mint is refused without one.
+func TestBeginBindCredentialBindsMint(t *testing.T) {
+	uc, trp := identityUC(t, &fakeUserRP{})
+
+	ctx := security.WithSubject(context.Background(), &security.Subject{UserID: "u1", TenantID: "t1"})
+	url, err := uc.BeginBindCredential(ctx, "fake", "https://app.example/cb")
+	if err != nil {
+		t.Fatalf("begin bind: %v", err)
+	}
+	state := strings.TrimPrefix(url, "https://idp.example/auth/fake?state=")
+	got, gerr := trp.Get(context.Background(), identityStatePrefix+state)
+	if gerr != nil {
+		t.Fatalf("begin bind: stored state err=%v", gerr)
+	}
+	if val, uerr := utils.Unmarshal[identityStateValue](got); uerr != nil || val.Provider != "fake" || val.BindUser != "u1" {
+		t.Fatalf("begin bind: stored state = %q (%v), want a u1-bound fake mint", got, uerr)
+	}
+
+	if _, err := uc.BeginBindCredential(context.Background(), "fake", "https://app.example/cb"); !errorspb.IsGeneralErrorUnauthenticated(err) {
+		t.Fatalf("begin bind without session: want 401, got %v", err)
+	}
+}
+
+// Merge laws: proof + session-bound state, the poor side must be
+// system-side weightless, the absorption is one write set (move +
+// disable + ledger) with the disable's follow-ups, and every refusal
+// answers with its own reason before any write lands.
+
+func TestResetPasswordLaws(t *testing.T) {
+	key := "fake"
+	phone := "13900001111"
+	code := "123456"
+	newPw := "secret1"
+	req := func(state string) *systempb.ResetPasswordRequest {
+		return &systempb.ResetPasswordRequest{Provider: &key, State: &state, NewPassword: &newPw,
+			Payload: &systempb.ResetPasswordRequest_Sms{Sms: &systempb.SmsIdentityPayload{Phone: &phone, Code: &code}}}
+	}
+	reset := func(uf *fakeUserRP, trp *fakeTokenRP, state string) error {
+		uc := newAuthUCConf(fakeProviderConf(), uf, &fakeAuthzRP{}, trp, &fakeTenantRP{})
+		return uc.ResetPassword(context.Background(), "fake", state, "secret1", req(state))
+	}
+
+	// The proof names the account: the sms credential's owner is rehashed,
+	// sessions stand (a rotation is not a revocation — no revoke call).
+	empty := ""
+	uf := &fakeUserRP{
+		row: &user.User{ID: "u9", Account: &empty, PasswordHash: &empty, Enabled: true},
+		credentials: map[string]*user.Credential{
+			fakeKind + "|oid-x": {Kind: fakeKind, Identifier: "oid-x", UserID: "u9"},
+		},
+	}
+	trp := newTokenStore()
+	if err := reset(uf, trp, issueState(t, trp, "fake")); err != nil {
+		t.Fatalf("reset: %v", err)
+	}
+	if len(uf.updates) != 1 || uf.updates[0].u.ID != "u9" || uf.updates[0].u.PasswordHash == nil ||
+		!slices.Contains(uf.updates[0].fields, "password") {
+		t.Fatalf("reset: updates = %+v, want one password write on u9", uf.updates)
+	}
+	if len(uf.revoked) != 0 {
+		t.Fatalf("reset: revoked = %v, want sessions standing", uf.revoked)
+	}
+
+	// A phone no account holds and a state nobody minted both refuse.
+	free := &fakeUserRP{}
+	if err := reset(free, trp, issueState(t, trp, "fake")); !systempb.IsSystemUserNotFound(err) {
+		t.Fatalf("no owner: want USER_NOT_FOUND, got %v", err)
+	}
+	if err := reset(uf, newTokenStore(), "st-unknown"); !systempb.IsSystemIdentityExchangeFailed(err) {
+		t.Fatalf("unknown state: want EXCHANGE_FAILED, got %v", err)
+	}
+
+	// The composition law (Q3-①): a proof-backed but weak candidate is
+	// refused after the exchange, before any digest write.
+	weak := "secret"
+	wstate := issueState(t, trp, "fake")
+	wreq := &systempb.ResetPasswordRequest{Provider: &key, State: &wstate, NewPassword: &weak,
+		Payload: &systempb.ResetPasswordRequest_Sms{Sms: &systempb.SmsIdentityPayload{Phone: &phone, Code: &code}}}
+	if err := newAuthUCConf(fakeProviderConf(), uf, &fakeAuthzRP{}, trp, &fakeTenantRP{}).
+		ResetPassword(context.Background(), "fake", wstate, weak, wreq); !systempb.IsSystemPasswordPolicy(err) {
+		t.Fatalf("weak new password: want PASSWORD_POLICY, got %v", err)
+	}
+	if len(uf.updates) != 1 {
+		t.Fatalf("weak new password: updates = %d, want still one (the earlier strong reset only)", len(uf.updates))
+	}
+}
+
+// The pay-enrichment read's two laws: the answer is raw, not the masked
+// display form (the unified order consumes the identifier itself), and a
+// caller with no wechat binding answers nil — the consumer's refusal to
+// act on it lives in the order service.
+
+func TestGetSecurityStatusLaws(t *testing.T) {
+	ctx := security.WithSubject(context.Background(), &security.Subject{UserID: "u1", TenantID: "t1"})
+	status := func(hash string) *SecurityStatus {
+		empty := ""
+		row := &user.User{ID: "u1", Account: &empty, Enabled: true}
+		if hash != "" {
+			row.PasswordHash = &hash
+		}
+		uf := &fakeUserRP{
+			row: row,
+			credentials: map[string]*user.Credential{
+				smsKind + "|13900001111":            {Kind: smsKind, Identifier: "13900001111", UserID: "u1"},
+				fakeKind + "|oABCDEFG1234567890xyz": {Kind: fakeKind, Identifier: "oABCDEFG1234567890xyz", UserID: "u1"},
+			},
+		}
+		s, err := newAuthUCConf(fakeProviderConf(), uf, &fakeAuthzRP{}, newTokenStore(), &fakeTenantRP{}).
+			GetSecurityStatus(ctx)
+		if err != nil {
+			t.Fatalf("status: %v", err)
+		}
+		return s
+	}
+
+	withPw := status("hashed")
+	if !withPw.HasPassword || len(withPw.Credentials) != 2 {
+		t.Fatalf("with password: %+v", withPw)
+	}
+	masks := map[string]string{}
+	for _, c := range withPw.Credentials {
+		masks[c.Kind] = c.Identifier
+	}
+	if masks[smsKind] != "139****1111" || masks[fakeKind] != "oAB****0xyz" {
+		t.Fatalf("masks = %v, want phone 3-****-4 and openid head-tail", masks)
+	}
+	if status("").HasPassword {
+		t.Fatal("without password: want has_password=false")
+	}
+
+	if _, err := newAuthUCConf(fakeProviderConf(), &fakeUserRP{}, &fakeAuthzRP{}, newTokenStore(), &fakeTenantRP{}).
+		GetSecurityStatus(context.Background()); !errorspb.IsGeneralErrorUnauthenticated(err) {
 		t.Fatalf("no session: want 401, got %v", err)
 	}
 }
@@ -1374,7 +1827,7 @@ func TestLoginByIdentityStateCashInfraPassthrough(t *testing.T) {
 	state := issueState(t, trp, "fake")
 	trp.getErr = errorspb.ErrorInfraErrorNetworkConnection("")
 
-	if _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state)); !errorspb.IsInfraErrorNetworkConnection(err) {
+	if _, _, _, _, err := uc.LoginByIdentity(context.Background(), "fake", state, identityReq("fake", state)); !errorspb.IsInfraErrorNetworkConnection(err) {
 		t.Fatalf("cash outage: want infra passthrough, got %v", err)
 	}
 }
@@ -1385,5 +1838,112 @@ func TestNewAuthUCRejectsUnregisteredKind(t *testing.T) {
 	bad := &conf.Auth{Providers: []*conf.Auth_Provider{{Key: "x", Kind: "ghost"}}}
 	if _, err := NewAuthUC(slog.New(slog.NewTextHandler(io.Discard, nil)), nil, bad, nil, nil, nil, nil, nil, nil); err == nil {
 		t.Fatal("unregistered kind: want construction error")
+	}
+}
+
+// ImportAccounts --------------------------------------------------------------------------------------------------------
+
+// The mixed batch walks every row verdict in one pass: a taken phone skips
+// with its owning id riding along, a non-mainland number and an in-file
+// repeat both land INVALID, and a fresh number births the same triple the
+// sms auto-registration writes — user with a sealed password plane,
+// credential on the canon number, seat in the provider's landing population.
+func TestImportAccountsMixedBatchVerdicts(t *testing.T) {
+	u := &fakeUserRP{credentials: map[string]*user.Credential{
+		"sms|13800138000": {UserID: "u-taken"},
+	}}
+	uc := newAuthUCConf(fakeProviderConf(), u, &fakeAuthzRP{}, newTokenStore(),
+		&fakeTenantRP{row: &tenant.Tenant{Code: "any", Enabled: true}})
+
+	out, err := uc.ImportAccounts(context.Background(), &ImportAccountsIn{Rows: []string{
+		"13800138000", "not-a-phone", "15912345678", "15912345678",
+	}})
+	if err != nil {
+		t.Fatalf("import: %v", err)
+	}
+	if out.Created != 1 || out.Skipped != 1 || out.Invalid != 2 {
+		t.Fatalf("counters: created=%d skipped=%d invalid=%d", out.Created, out.Skipped, out.Invalid)
+	}
+	want := []systempb.AccountImportStatus{
+		systempb.AccountImportStatus_ACCOUNT_IMPORT_STATUS_SKIPPED_DUPLICATE,
+		systempb.AccountImportStatus_ACCOUNT_IMPORT_STATUS_INVALID,
+		systempb.AccountImportStatus_ACCOUNT_IMPORT_STATUS_CREATED,
+		systempb.AccountImportStatus_ACCOUNT_IMPORT_STATUS_INVALID,
+	}
+	for i, r := range out.Results {
+		if r.Status != want[i] || r.RowIndex != int32(i+1) {
+			t.Fatalf("row %d: status=%v index=%d", i, r.Status, r.RowIndex)
+		}
+	}
+	if id := out.Results[0].UserID; id != "u-taken" {
+		t.Fatalf("taken row id: %q", id)
+	}
+	born := u.createdUsers[0]
+	if born.PasswordHash == nil || *born.PasswordHash != "" || !born.Enabled {
+		t.Fatalf("born shape: %+v", born)
+	}
+	if c := u.createdCreds[0]; c.Kind != smsKind || c.Identifier != "15912345678" {
+		t.Fatalf("credential: %+v", c)
+	}
+	seat := u.seats[len(u.seats)-1]
+	if seat.TenantID != security.DefaultTenant || seat.Population != security.DefaultPopulation {
+		t.Fatalf("seat: %+v", seat)
+	}
+}
+
+// The channel anchors on the enabled sms row; without one the whole call
+// refuses before any row is read.
+func TestImportAccountsRequiresSmsChannel(t *testing.T) {
+	conf := &conf.Auth{Providers: []*conf.Auth_Provider{{Key: "sms", Kind: smsKind}}} // Enabled: false
+	uc := newAuthUCConf(conf, &fakeUserRP{}, &fakeAuthzRP{}, newTokenStore(), &fakeTenantRP{row: &tenant.Tenant{Code: "any", Enabled: true}})
+
+	if _, err := uc.ImportAccounts(context.Background(), &ImportAccountsIn{Rows: []string{"15912345678"}}); !systempb.IsSystemIdentityProviderUnknown(err) {
+		t.Fatalf("no sms row: want IDENTITY_PROVIDER_UNKNOWN, got %v", err)
+	}
+}
+
+// The landing population must resolve: a provider pointing at a population
+// the registry does not know refuses the whole batch up front.
+func TestImportAccountsUnknownLandingPopulation(t *testing.T) {
+	conf := &conf.Auth{Providers: []*conf.Auth_Provider{
+		{Key: "sms", Kind: smsKind, Enabled: true, Population: "ghost"},
+	}}
+	uc := newAuthUCConf(conf, &fakeUserRP{}, &fakeAuthzRP{}, newTokenStore(), &fakeTenantRP{row: &tenant.Tenant{Code: "any", Enabled: true}})
+
+	if _, err := uc.ImportAccounts(context.Background(), &ImportAccountsIn{Rows: []string{"15912345678"}}); !systempb.IsSystemPopulationNotFound(err) {
+		t.Fatalf("ghost population: want POPULATION_NOT_FOUND, got %v", err)
+	}
+}
+
+// A credential lookup failing any way other than not-found is infra: the
+// batch aborts verbatim rather than misclassifying the row.
+func TestImportAccountsCredentialLookupFailureAborts(t *testing.T) {
+	u := &fakeUserRP{findCredErr: fmt.Errorf("boom")}
+	uc := newAuthUCConf(fakeProviderConf(), u, &fakeAuthzRP{}, newTokenStore(),
+		&fakeTenantRP{row: &tenant.Tenant{Code: "any", Enabled: true}})
+
+	if _, err := uc.ImportAccounts(context.Background(), &ImportAccountsIn{Rows: []string{"15912345678"}}); err == nil || err.Error() != "boom" {
+		t.Fatalf("lookup failure: got %v", err)
+	}
+}
+
+// Rows are independent transactions: a failure on row two stops the batch
+// mid-row (its seat never lands) with row one's writes still landed — the
+// operator replays the file, the taken rows skip, the failed row retries
+// alone. The passthrough tx cannot roll back, so the law asserted is the
+// abort point and the stop, not the undo.
+func TestImportAccountsTxFailureStopsBatch(t *testing.T) {
+	u := &fakeUserRP{createCredErrs: []error{nil, fmt.Errorf("tx blew up")}}
+	uc := newAuthUCConf(fakeProviderConf(), u, &fakeAuthzRP{}, newTokenStore(),
+		&fakeTenantRP{row: &tenant.Tenant{Code: "any", Enabled: true}})
+
+	if _, err := uc.ImportAccounts(context.Background(), &ImportAccountsIn{Rows: []string{"15912345678", "15900009999"}}); err == nil || err.Error() != "tx blew up" {
+		t.Fatalf("tx failure: got %v", err)
+	}
+	if len(u.createdCreds) != 1 {
+		t.Fatalf("credentials landed: %d", len(u.createdCreds))
+	}
+	if len(u.seats) != 2 { // the seed plus row one's landing — row two never reached its seat
+		t.Fatalf("seats: %d", len(u.seats))
 	}
 }

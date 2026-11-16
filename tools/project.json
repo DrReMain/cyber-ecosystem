@@ -24,6 +24,13 @@
         "command": "buf format -w"
       }
     },
+    "go:fmt": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "out=$(gofmt -l app shared-go); test -z \"$out\" || { echo \"$out\" >&2; echo \"gofmt needed (run: gofmt -w the files above)\" >&2; exit 1; }"
+      }
+    },
     "go:lint": {
       "executor": "nx:run-commands",
       "options": {
@@ -42,16 +49,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
-        "commands": ["go test ./..."]
-      }
-    },
-    "paraglide:check": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "{workspaceRoot}",
-        "commands": [
-          "node tools/scripts/paraglide-parity.cjs"
-        ]
+        "commands": ["go test -count=1 ./..."]
       }
     }
   }

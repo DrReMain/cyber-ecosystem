@@ -26,7 +26,7 @@ import (
 	"cyber-ecosystem/app/services/system/internal/conf"
 	"cyber-ecosystem/app/services/system/internal/ent"
 	entrole "cyber-ecosystem/app/services/system/internal/ent/role"
-	local_mixins "cyber-ecosystem/app/services/system/internal/ent/schema/local_mixins"
+	"cyber-ecosystem/app/services/system/internal/ent/schema/local_mixins"
 	"cyber-ecosystem/app/services/system/internal/platform"
 )
 

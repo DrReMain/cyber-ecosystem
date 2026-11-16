@@ -4,6 +4,7 @@ package runtime
 
 import (
 	"cyber-ecosystem/app/services/agent/internal/ent/agentconfig"
+	"cyber-ecosystem/app/services/agent/internal/ent/auditlog"
 	"cyber-ecosystem/app/services/agent/internal/ent/chatmessage"
 	"cyber-ecosystem/app/services/agent/internal/ent/chatsession"
 	"cyber-ecosystem/app/services/agent/internal/ent/schema"
@@ -94,6 +95,109 @@ func init() {
 	agentconfig.DefaultID = agentconfigDescID.Default.(func() string)
 	// agentconfig.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	agentconfig.IDValidator = agentconfigDescID.Validators[0].(func(string) error)
+	auditlogMixin := schema.AuditLog{}.Mixin()
+	auditlogMixinFields0 := auditlogMixin[0].Fields()
+	_ = auditlogMixinFields0
+	auditlogMixinFields1 := auditlogMixin[1].Fields()
+	_ = auditlogMixinFields1
+	auditlogFields := schema.AuditLog{}.Fields()
+	_ = auditlogFields
+	// auditlogDescCreatedAt is the schema descriptor for created_at field.
+	auditlogDescCreatedAt := auditlogMixinFields1[0].Descriptor()
+	// auditlog.DefaultCreatedAt holds the default value on creation for the created_at field.
+	auditlog.DefaultCreatedAt = auditlogDescCreatedAt.Default.(func() time.Time)
+	// auditlogDescUpdatedAt is the schema descriptor for updated_at field.
+	auditlogDescUpdatedAt := auditlogMixinFields1[1].Descriptor()
+	// auditlog.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	auditlog.DefaultUpdatedAt = auditlogDescUpdatedAt.Default.(func() time.Time)
+	// auditlog.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	auditlog.UpdateDefaultUpdatedAt = auditlogDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// auditlogDescTenant is the schema descriptor for tenant field.
+	auditlogDescTenant := auditlogFields[0].Descriptor()
+	// auditlog.DefaultTenant holds the default value on creation for the tenant field.
+	auditlog.DefaultTenant = auditlogDescTenant.Default.(string)
+	// auditlog.TenantValidator is a validator for the "tenant" field. It is called by the builders before save.
+	auditlog.TenantValidator = auditlogDescTenant.Validators[0].(func(string) error)
+	// auditlogDescActor is the schema descriptor for actor field.
+	auditlogDescActor := auditlogFields[1].Descriptor()
+	// auditlog.DefaultActor holds the default value on creation for the actor field.
+	auditlog.DefaultActor = auditlogDescActor.Default.(string)
+	// auditlog.ActorValidator is a validator for the "actor" field. It is called by the builders before save.
+	auditlog.ActorValidator = auditlogDescActor.Validators[0].(func(string) error)
+	// auditlogDescPrincipalType is the schema descriptor for principal_type field.
+	auditlogDescPrincipalType := auditlogFields[2].Descriptor()
+	// auditlog.DefaultPrincipalType holds the default value on creation for the principal_type field.
+	auditlog.DefaultPrincipalType = auditlogDescPrincipalType.Default.(string)
+	// auditlog.PrincipalTypeValidator is a validator for the "principal_type" field. It is called by the builders before save.
+	auditlog.PrincipalTypeValidator = auditlogDescPrincipalType.Validators[0].(func(string) error)
+	// auditlogDescOperation is the schema descriptor for operation field.
+	auditlogDescOperation := auditlogFields[3].Descriptor()
+	// auditlog.OperationValidator is a validator for the "operation" field. It is called by the builders before save.
+	auditlog.OperationValidator = func() func(string) error {
+		validators := auditlogDescOperation.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(operation string) error {
+			for _, fn := range fns {
+				if err := fn(operation); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// auditlogDescHTTPMethod is the schema descriptor for http_method field.
+	auditlogDescHTTPMethod := auditlogFields[4].Descriptor()
+	// auditlog.DefaultHTTPMethod holds the default value on creation for the http_method field.
+	auditlog.DefaultHTTPMethod = auditlogDescHTTPMethod.Default.(string)
+	// auditlog.HTTPMethodValidator is a validator for the "http_method" field. It is called by the builders before save.
+	auditlog.HTTPMethodValidator = auditlogDescHTTPMethod.Validators[0].(func(string) error)
+	// auditlogDescHTTPPath is the schema descriptor for http_path field.
+	auditlogDescHTTPPath := auditlogFields[5].Descriptor()
+	// auditlog.DefaultHTTPPath holds the default value on creation for the http_path field.
+	auditlog.DefaultHTTPPath = auditlogDescHTTPPath.Default.(string)
+	// auditlog.HTTPPathValidator is a validator for the "http_path" field. It is called by the builders before save.
+	auditlog.HTTPPathValidator = auditlogDescHTTPPath.Validators[0].(func(string) error)
+	// auditlogDescStatus is the schema descriptor for status field.
+	auditlogDescStatus := auditlogFields[6].Descriptor()
+	// auditlog.DefaultStatus holds the default value on creation for the status field.
+	auditlog.DefaultStatus = auditlogDescStatus.Default.(int)
+	// auditlogDescLatencyMs is the schema descriptor for latency_ms field.
+	auditlogDescLatencyMs := auditlogFields[7].Descriptor()
+	// auditlog.DefaultLatencyMs holds the default value on creation for the latency_ms field.
+	auditlog.DefaultLatencyMs = auditlogDescLatencyMs.Default.(int)
+	// auditlogDescIP is the schema descriptor for ip field.
+	auditlogDescIP := auditlogFields[8].Descriptor()
+	// auditlog.DefaultIP holds the default value on creation for the ip field.
+	auditlog.DefaultIP = auditlogDescIP.Default.(string)
+	// auditlog.IPValidator is a validator for the "ip" field. It is called by the builders before save.
+	auditlog.IPValidator = auditlogDescIP.Validators[0].(func(string) error)
+	// auditlogDescUserAgent is the schema descriptor for user_agent field.
+	auditlogDescUserAgent := auditlogFields[9].Descriptor()
+	// auditlog.DefaultUserAgent holds the default value on creation for the user_agent field.
+	auditlog.DefaultUserAgent = auditlogDescUserAgent.Default.(string)
+	// auditlog.UserAgentValidator is a validator for the "user_agent" field. It is called by the builders before save.
+	auditlog.UserAgentValidator = auditlogDescUserAgent.Validators[0].(func(string) error)
+	// auditlogDescDenyReason is the schema descriptor for deny_reason field.
+	auditlogDescDenyReason := auditlogFields[10].Descriptor()
+	// auditlog.DefaultDenyReason holds the default value on creation for the deny_reason field.
+	auditlog.DefaultDenyReason = auditlogDescDenyReason.Default.(string)
+	// auditlog.DenyReasonValidator is a validator for the "deny_reason" field. It is called by the builders before save.
+	auditlog.DenyReasonValidator = auditlogDescDenyReason.Validators[0].(func(string) error)
+	// auditlogDescEventID is the schema descriptor for event_id field.
+	auditlogDescEventID := auditlogFields[11].Descriptor()
+	// auditlog.DefaultEventID holds the default value on creation for the event_id field.
+	auditlog.DefaultEventID = auditlogDescEventID.Default.(string)
+	// auditlog.EventIDValidator is a validator for the "event_id" field. It is called by the builders before save.
+	auditlog.EventIDValidator = auditlogDescEventID.Validators[0].(func(string) error)
+	// auditlogDescID is the schema descriptor for id field.
+	auditlogDescID := auditlogMixinFields0[0].Descriptor()
+	// auditlog.DefaultID holds the default value on creation for the id field.
+	auditlog.DefaultID = auditlogDescID.Default.(func() string)
+	// auditlog.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	auditlog.IDValidator = auditlogDescID.Validators[0].(func(string) error)
 	chatmessageMixin := schema.ChatMessage{}.Mixin()
 	chatmessageMixinHooks2 := chatmessageMixin[2].Hooks()
 	chatmessageMixinHooks3 := chatmessageMixin[3].Hooks()

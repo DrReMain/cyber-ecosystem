@@ -25,9 +25,13 @@ import (
 // at that hop.
 var bannedImports = map[string][]string{
 	// The engine reads ent tables directly and never sibling modules.
+	// Sibling census: this list must name every module/* directory — a new
+	// module missing here loses the ban silently (the enumeration-rot the
+	// mixin census also guards against).
 	"module/authz": {
 		"module/role", "module/policy", "module/dept", "module/user",
 		"module/auth", "module/resource", "module/transfer",
+		"module/tenant", "module/population",
 	},
 	// role may read the authz port (diagnostics trio); the others must not.
 	"module/policy": {"module/authz"},

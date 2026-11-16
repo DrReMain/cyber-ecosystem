@@ -36,3 +36,16 @@ func TestSliceMapErr(t *testing.T) {
 		t.Errorf("SliceMapErr error case: expected error, got nil")
 	}
 }
+
+func TestSliceAny(t *testing.T) {
+	if got := SliceAny[int](nil); got != nil {
+		t.Errorf("SliceAny(nil) = %v, want nil", got)
+	}
+	if got := SliceAny([]string{}); got != nil {
+		t.Errorf("SliceAny(empty) = %v, want nil", got)
+	}
+	got := SliceAny([]string{"a", "b"})
+	if len(got) != 2 || got[0] != "a" || got[1] != "b" {
+		t.Errorf("SliceAny([a b]) = %v, want [a b]", got)
+	}
+}

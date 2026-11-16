@@ -59,14 +59,14 @@ type RoleMember struct {
 	CreatedAt     time.Time
 }
 
-type RoleListIn struct {
+type ListIn struct {
 	*commonpb.PageRequest
 	OrderBy []string
 	Code    *string
 	Name    *string
 }
 
-type RoleListOut struct {
+type ListOut struct {
 	*commonpb.PageResponse
 	List []*Role
 }
@@ -89,7 +89,7 @@ type RoleRP interface {
 	Update(ctx context.Context, fieldsMask []string, r *Role) (*Role, error)
 	UpdateStatus(ctx context.Context, id string, enabled bool) (*Role, error)
 	Delete(ctx context.Context, id string) (string, error)
-	List(ctx context.Context, in *RoleListIn) (*RoleListOut, error)
+	List(ctx context.Context, in *ListIn) (*ListOut, error)
 	FindByID(ctx context.Context, id string) (*Role, error)
 	ExistsBindings(ctx context.Context, roleID string) (bool, error)
 	CountBindings(ctx context.Context, roleID string) (int64, error)
@@ -205,7 +205,7 @@ func (uc *RoleUC) Delete(ctx context.Context, id string) (string, error) {
 	return out, nil
 }
 
-func (uc *RoleUC) List(ctx context.Context, in *RoleListIn) (*RoleListOut, error) {
+func (uc *RoleUC) List(ctx context.Context, in *ListIn) (*ListOut, error) {
 	return uc.roleRP.List(ctx, in)
 }
 

@@ -81,8 +81,8 @@ func (f *fakeDeptRP) ListMembers(_ context.Context, _ *MemberListIn) (*MemberLis
 	return f.membersOut, nil
 }
 
-func (f *fakeDeptRP) List(_ context.Context, _ *DeptListIn) (*DeptListOut, error) {
-	return &DeptListOut{}, nil
+func (f *fakeDeptRP) List(_ context.Context, _ *ListIn) (*ListOut, error) {
+	return &ListOut{}, nil
 }
 
 func newDeptUC(rp *fakeDeptRP) *DeptUC {
@@ -256,7 +256,7 @@ func TestListAndGetDelegate(t *testing.T) {
 	rp := &fakeDeptRP{rows: map[string]*Dept{"d1": {ID: "d1"}}}
 	uc := newDeptUC(rp)
 
-	if _, err := uc.List(context.Background(), &DeptListIn{}); err != nil {
+	if _, err := uc.List(context.Background(), &ListIn{}); err != nil {
 		t.Fatalf("list: %v", err)
 	}
 	if _, err := uc.Get(context.Background(), "d1"); err != nil {

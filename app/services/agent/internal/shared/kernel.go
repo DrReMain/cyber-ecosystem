@@ -7,8 +7,6 @@ import (
 	"cyber-ecosystem/app/services/agent/internal/platform"
 )
 
-const ExtraAccount = "account"
-
 // MinMasterKeyBytes is the sealing master-key floor shared by every
 // consumer: HKDF derivation cannot add entropy, so a shorter key would
 // silently weaken everything sealed under it — construction refuses it.

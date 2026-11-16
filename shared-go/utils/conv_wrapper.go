@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"reflect"
+
 	"google.golang.org/protobuf/types/known/wrapperspb"
 )
 
@@ -17,6 +19,13 @@ func Unwrap[T any](w interface {
 	GetValue() T
 }) *T {
 	if w == nil {
+		return nil
+	}
+	// A typed nil (e.g. (*wrapperspb.StringValue)(nil)) boxed in the
+	// interface passes the check above, yet GetValue answers the zero T —
+	// read the pointer through reflection so "absent" stays absent instead
+	// of coming back as &"".
+	if rv := reflect.ValueOf(w); rv.Kind() == reflect.Pointer && rv.IsNil() {
 		return nil
 	}
 	v := w.GetValue()

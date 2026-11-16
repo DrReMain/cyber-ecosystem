@@ -7,6 +7,6 @@ description: TanStack client change & verification — use when creating or edit
 
 Read first: the read map in `docs/conventions/tanstack/CONVENTIONS.md` — it routes skin-preset paths to `docs/conventions/skin/CONVENTIONS.md`.
 
-Chain (order is law, all exit 0, `--skip-nx-cache`), per affected client: `<client>:build` FIRST (regenerates routeTree + paraglide) → `:typecheck` → `:check`; plus `tools:paraglide:check`. A `shared-ts` edit also runs the touched package's own chain (`:typecheck`, `:check`, `:test` where the package has it), and the consuming clients' chain still runs.
+Chain (order is law, all exit 0, `--skip-nx-cache`), per affected client: `<client>:build` FIRST (regenerates routeTree + paraglide) → `:typecheck` → `:check`. A `shared-ts` edit also runs the touched package's own chain (`:typecheck`, `:check`, `:test` where the package has it), and the consuming clients' chain still runs.
 
 Traps: §11 reachable-surface rule — changes on login pages, guard redirects, or the SSR entry need live browser verification before done; library-seam changes get the §11 behavioral pairing review. No browser-automation tool connected when live verification is due → recommend `docs/environment/README.md` (never auto-install); a manual developer walkthrough is the degraded form. Close per §11 Close.

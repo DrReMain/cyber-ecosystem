@@ -26,6 +26,18 @@ var (
 // this kernel package keep their own conventions.
 var guardDirs = []string{"module", "client", "server", "platform", "bootstrap"}
 
+// guardExempt names the internal/ layers outside the comment-law walk, each
+// with its standing reason; TestLayerCensus fails when a NEW layer appears
+// that is neither walked nor exempt — an unclassified layer would escape
+// the comment law silently.
+var guardExempt = map[string]string{
+	"conf":   "generated from conf.proto",
+	"e2e":    "test-only package, never imported by production",
+	"ent":    "generated + schema (own comment class)",
+	"guards": "this kernel package (own conventions)",
+	"shared": "kernel package (own conventions)",
+}
+
 func guardGoFiles(t *testing.T) map[string]string {
 	t.Helper()
 	out := make(map[string]string)
@@ -105,6 +117,35 @@ func guardHeaderComment(lines []string) (int, bool) {
 	return -1, false
 }
 
+// TestLayerCensus: every directory under internal/ is either walked by the
+// comment law (guardDirs) or carries a standing exemption (guardExempt) —
+// a new unclassified layer fails here by name instead of escaping silently.
+func TestLayerCensus(t *testing.T) {
+	entries, err := os.ReadDir("..")
+	if err != nil {
+		t.Fatalf("read internal/: %v", err)
+	}
+	for _, e := range entries {
+		if !e.IsDir() {
+			continue
+		}
+		name := e.Name()
+		if _, exempt := guardExempt[name]; exempt {
+			continue
+		}
+		found := false
+		for _, d := range guardDirs {
+			if d == name {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("internal/%s is neither comment-law-walked nor exempt — classify it in guardDirs or guardExempt", name)
+		}
+	}
+}
+
 func TestReasonPredicates(t *testing.T) {
 	for f, src := range guardGoFiles(t) {
 		if hit := guardKratosCode.FindString(src); hit != "" {
@@ -128,18 +169,28 @@ func TestAdminRungPlaneGate(t *testing.T) {
 	if !ok {
 		t.Fatalf("server.go missing from the guard walk")
 	}
-	if !rungCarries(src, "ACCESS_ADMIN", "security.BackendPlaneGuard()") {
-		t.Errorf("server.go ADMIN rung lacks the backend plane gate")
+	if err := rungCarries(src, "ACCESS_ADMIN", "security.BackendPlaneGuard()"); err != "" {
+		t.Errorf("server.go ADMIN rung: %s", err)
 	}
-	if !rungCarries(src, "ACCESS_PLATFORM", "security.BackendPlaneGuard()") {
-		t.Errorf("server.go PLATFORM rung lacks the backend plane gate")
+	if err := rungCarries(src, "ACCESS_PLATFORM", "security.BackendPlaneGuard()"); err != "" {
+		t.Errorf("server.go PLATFORM rung: %s", err)
+	}
+	if err := rungCarries(src, "ACCESS_BUILTIN", "krauth.SessionAuth("); err != "" {
+		t.Errorf("server.go BUILTIN rung: %s", err)
 	}
 }
 
-func rungCarries(src, tier, gate string) bool {
+// rungCarries reports "" when the rung carries the gate; otherwise a
+// reason naming which half failed — a missing rung (the selector was
+// renamed or removed) is distinct from a present rung lacking its gate.
+func rungCarries(src, tier, gate string) string {
 	lines := strings.Split(src, "\n")
+	isCode := func(s string) bool {
+		t := strings.TrimSpace(s)
+		return t != "" && !strings.HasPrefix(t, "//")
+	}
 	for i, line := range lines {
-		if !strings.Contains(line, tier) {
+		if !isCode(line) || !strings.Contains(line, tier) {
 			continue
 		}
 		for j := i; j >= 0; j-- {
@@ -148,11 +199,12 @@ func rungCarries(src, tier, gate string) bool {
 			}
 			for _, l := range lines[j : i+1] {
 				if strings.Contains(l, gate) {
-					return true
+					return ""
 				}
 			}
-			return false
+			return "lacks " + gate
 		}
+		return "rung matched but no selector.Server( block found above it"
 	}
-	return false
+	return "rung " + tier + " not found — selector renamed or removed?"
 }

@@ -4,11 +4,10 @@ import {
   PageRequestSchema,
   PageResponseSchema,
 } from "@cyber-ecosystem/gen-connect-ts/cyber/shared/common/v1/pagination_pb";
-import { act, renderHook, waitFor } from "@testing-library/react";
+import { renderHook, waitFor } from "@testing-library/react";
 import type { PropsWithChildren } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { useServerStream } from "./use-server-stream";
-import { useStreamSession } from "./use-stream-session";
 
 const service = { typeName: "test.v1.StreamService" };
 
@@ -19,14 +18,6 @@ const serverMethod = {
   input: PageRequestSchema,
   output: PageResponseSchema,
 } as unknown as Parameters<typeof useServerStream>[0];
-
-const bidiMethod = {
-  methodKind: "bidi_streaming",
-  name: "Chat",
-  parent: service,
-  input: PageRequestSchema,
-  output: PageResponseSchema,
-} as unknown as Parameters<typeof useStreamSession>[0];
 
 type StreamImpl = NonNullable<Transport["stream"]>;
 
@@ -150,112 +141,5 @@ describe("useServerStream", () => {
     await waitFor(() => expect(result.current.status).toBe("done"));
     rerender({ restart: 1 });
     await waitFor(() => expect(calls).toBe(2));
-  });
-});
-
-describe("useStreamSession", () => {
-  it("runs a session: open, receive, echo sends, end", async () => {
-    const onMessage = vi.fn();
-    const receivedInput: unknown[] = [];
-    const transport = makeTransport(
-      async (
-        _method: unknown,
-        _signal?: AbortSignal,
-        _t?: unknown,
-        _h?: unknown,
-        input?: unknown,
-      ) => {
-        return {
-          stream: true,
-          service,
-          method: bidiMethod,
-          header: new Headers(),
-          trailer: new Headers(),
-          message: (async function* () {
-            yield { pageNo: 100 };
-            for await (const frame of input as AsyncIterable<Record<string, unknown>>) {
-              receivedInput.push(frame);
-              yield { pageNo: (frame.pageNo as number) + 1 };
-            }
-          })(),
-        };
-      },
-    );
-    const { result } = renderHook(() => useStreamSession(bidiMethod, { onMessage }), {
-      wrapper: wrapper(transport),
-    });
-    expect(result.current.status).toBe("idle");
-    act(() => result.current.open());
-    await waitFor(() => expect(result.current.status).toBe("streaming"));
-    await waitFor(() => expect(onMessage).toHaveBeenCalledWith({ pageNo: 100 }));
-    act(() => result.current.send({ pageNo: 5 }));
-    await waitFor(() => expect(onMessage).toHaveBeenCalledTimes(2));
-    expect(onMessage).toHaveBeenLastCalledWith({ pageNo: 6 });
-    expect(receivedInput).toEqual([{ pageNo: 5 }]);
-    act(() => result.current.end());
-    await waitFor(() => expect(result.current.status).toBe("done"));
-  });
-
-  it("lands on error when the session call fails", async () => {
-    const transport = makeTransport(async () => {
-      throw new Error("session refused");
-    });
-    const { result } = renderHook(() => useStreamSession(bidiMethod, { onMessage: vi.fn() }), {
-      wrapper: wrapper(transport),
-    });
-    act(() => result.current.open());
-    await waitFor(() => expect(result.current.status).toBe("error"));
-    expect(result.current.error).toMatchObject({ message: "session refused" });
-  });
-
-  it("ignores a second open while a session is active", async () => {
-    let calls = 0;
-    const transport = makeTransport(async () => {
-      calls += 1;
-      return {
-        stream: true,
-        service,
-        method: bidiMethod,
-        header: new Headers(),
-        trailer: new Headers(),
-        message: (async function* () {
-          await new Promise(() => {});
-        })(),
-      };
-    });
-    const { result } = renderHook(() => useStreamSession(bidiMethod, { onMessage: vi.fn() }), {
-      wrapper: wrapper(transport),
-    });
-    act(() => {
-      result.current.open();
-      result.current.open();
-    });
-    await waitFor(() => expect(result.current.status).toBe("streaming"));
-    expect(calls).toBe(1);
-  });
-
-  it("tears the socket down on unmount (boundary negative)", async () => {
-    let capturedSignal: AbortSignal | undefined;
-    const transport = makeTransport(async (_method: unknown, signal?: AbortSignal) => {
-      capturedSignal = signal;
-      return {
-        stream: true,
-        service,
-        method: bidiMethod,
-        header: new Headers(),
-        trailer: new Headers(),
-        message: (async function* () {
-          await new Promise(() => {});
-        })(),
-      };
-    });
-    const { result, unmount } = renderHook(
-      () => useStreamSession(bidiMethod, { onMessage: vi.fn() }),
-      { wrapper: wrapper(transport) },
-    );
-    act(() => result.current.open());
-    await waitFor(() => expect(result.current.status).toBe("streaming"));
-    unmount();
-    expect(capturedSignal?.aborted).toBe(true);
   });
 });

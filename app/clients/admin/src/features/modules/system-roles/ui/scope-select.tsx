@@ -8,7 +8,7 @@ const scopeOptions = () => [
   { label: m.system_roles_scope_dept_tree(), value: ScopeKind.DEPT_TREE },
 ];
 
-const SCOPE_SELECT_CLS = "m-auto min-w-[180px]";
+const SCOPE_SELECT_CLS = "m-auto min-w-45";
 
 interface ScopeSelectProps {
   value: ScopeKind | undefined;

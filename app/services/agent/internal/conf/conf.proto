@@ -6,6 +6,8 @@ import "google/protobuf/duration.proto";
 
 option go_package = "cyber-ecosystem/app/services/agent/internal/conf;conf";
 
+// Bootstrap is the whole boot config tree; every field overrides a typed
+// default, none is required at the yaml layer.
 message Bootstrap {
   Server server = 1;
   Data data = 2;
@@ -14,11 +16,12 @@ message Bootstrap {
   Crypto crypto = 5;
 }
 
+// Server: the three listen faces; addr host:port.
 message Server {
   message HTTP {
-    string network = 1;
+    string network = 1; // tcp | unix
     string addr = 2;
-    google.protobuf.Duration timeout = 3;
+    google.protobuf.Duration timeout = 3; // whole-handler ceiling
   }
   message GRPC {
     string network = 1;
@@ -35,9 +38,10 @@ message Server {
   Connect connect = 3;
 }
 
+// Data: the persistence plane — database only (no redis/storage/mq here).
 message Data {
   message Database {
-    string driver = 1;
+    string driver = 1; // postgres
     string host = 2;
     int32 port = 3;
     string user = 4;
@@ -50,10 +54,11 @@ message Data {
   Database database = 1;
 }
 
+// Observability: telemetry sinks share one collector endpoint.
 message Observability {
   message Trace {
     bool enabled = 1;
-    double sampling_ratio = 2;
+    double sampling_ratio = 2; // 0–1
   }
   message Metrics {
     bool enabled = 1;
@@ -66,28 +71,28 @@ message Observability {
       int32 max_age_days = 4;
       bool compress = 5;
     }
-    string level = 1;
+    string level = 1; // debug | info | warn | error
     bool console = 2;
     bool otlp = 3;
-    FileOutput file = 4;
+    FileOutput file = 4; // absent = no file sink
   }
   message SlowQuery {
-    google.protobuf.Duration db = 1; // slow SQL threshold; 0/omit = disabled
+    google.protobuf.Duration db = 1; // slow sql threshold; 0/omit = off
   }
-  string endpoint = 1;
-  bool insecure = 2;
+  string endpoint = 1; // otlp http collector
+  bool insecure = 2; // skip tls to the collector
   Trace trace = 3;
   Metrics metrics = 4;
   Log log = 5;
   SlowQuery slow_query = 6;
 }
 
-// Remote holds endpoints of other services this service calls (ACL targets).
+// Remote: endpoints of other services this service calls (ACL targets).
 message Remote {
-  string system_connect = 1; // system service connect face (session introspection)
+  string system_connect = 1; // system connect face (session introspection)
 }
 
-// Crypto holds keys for at-rest encryption of service-held secrets.
+// Crypto: at-rest encryption keys for service-held secrets.
 message Crypto {
-  string master_key = 1; // api_key column encryption; high-entropy secret injected via env (HKDF-derived to AES-256-GCM); never a human passphrase, never committed
+  string master_key = 1; // api_key column encryption; high-entropy secret via env (HKDF-derived to AES-256-GCM); never a human passphrase, never committed
 }

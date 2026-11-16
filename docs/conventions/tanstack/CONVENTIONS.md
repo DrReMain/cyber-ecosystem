@@ -1,5 +1,7 @@
 # TanStack Start Client Conventions
 
+**Status:** ACTIVE
+
 > Rules here win over precedent in code when they conflict.
 
 Applies to web clients built on TanStack Start (`app/clients/*`) and to the
@@ -12,22 +14,22 @@ Applies to web clients built on TanStack Start (`app/clients/*`) and to the
 | `src/routes/**` | §3 |
 | `features/modules/<m>/page.tsx` | §1 transport shapes, §3 read-set, §5 UI/logic split |
 | `features/modules/<m>/ui/**`, flat module `.ts` logic | §5 |
-| `features/layout-*/**`, `features/login-*/**` | §2, §5 grammar, §10 |
+| `features/layout-*/**`, `features/login-*/**` | §2, §5 grammar, §8 route constants, §10 |
 | `messages/**` | §6 |
 | `domains/**` | §4, §9 |
 | `shared-ts/antd/src/skin-presets/**` | `docs/conventions/skin/CONVENTIONS.md` (own doc) |
-| anything else under `app/clients/*` or `shared-ts/**` | §1, the touched layer's section, §7 for `shared-ts/<domain>/src/**`, §11 |
+| anything else under `app/clients/*` or `shared-ts/**` | §1 layering, the touched layer's section, §9 for `shared-ts/<domain>/src/**`, §11 |
 
 ---
 
-## 1. Layering model
+## 1) Layering model
 
 | Layer | Location | Rule |
 |---|---|---|
 | Route declaration | `src/routes/` | Only `createFileRoute` wiring — no components, no logic (§3) |
 | App shell utilities | `src/features/app/` | The base's generic subpath: shell screens, boundaries, shared helpers; may import domains (§7) |
 | Areas | `src/features/layout-<name>/`, `src/features/login-<name>/` | An area = one layout directory (the owner) + one login UI kit (§2) |
-| Formal pages | `src/features/modules/<route-name>/` | One directory per route, `page.tsx` entry |
+| Formal pages | `src/features/modules/<route-name>/` | One directory per route family — co-owned pages share it (`profile/`), entries stay `*-page.tsx` |
 | App-level components | `src/components/` | Self-contained only — no project-internal dependencies; depended on, never depending |
 | Domains | `src/domains/` | Admission-gated (§4) |
 | Infra | `src/stores/`, `src/services/`, `src/libs/` | As conventional — `libs` holds app-agnostic utilities (zero app semantics; local imports reach only siblings and paraglide) |
@@ -49,7 +51,10 @@ response through proto-es `toJson`: WKT wrappers arrive flattened to scalars,
 proto `map` fields as plain objects, enums as value-name strings. The
 generated TS types claim Message/Map shapes the runtime does not deliver —
 consume accordingly (`Object.entries` over maps, string/index access for
-enums).
+enums). protojson also drops zero-valued scalars: a row field consumed from a
+transport response narrows at the row (`row.count ?? 0`), never at the
+aggregate — an absent number and a present zero are the same wire fact and
+render the same honest value.
 
 **Server-streaming is consumed imperatively, outside the query cache.** The
 transport's stream entry takes a generated method descriptor (`*_pb.ts`) plus
@@ -190,9 +195,10 @@ transport the app actually uses.
 
 ## 5) Component file discipline
 
-- **One React component per `.tsx` file** (Fast Refresh boundaries are
-  files; co-located components widen every hot-reload blast radius). Helper
-  components get their own file and an `export`.
+- **One exported React component per `.tsx` file** (Fast Refresh boundaries
+  are files; co-located exports widen every hot-reload blast radius). A
+  page's private, non-exported sub-components may live in the page file;
+  any component another module imports gets its own file and an `export`.
 - **Exported component name = file name** in PascalCase
   (`tabbar.tsx` → `Tabbar`, no legacy area prefixes).
 - **UI/logic separation** — a formal-page module splits three ways:
@@ -234,14 +240,13 @@ nested subpaths per the ≥4-graduation rule below).
 - Same-family files share a kebab prefix; the prefix is the future
   subdirectory name (a family of ≥4 files graduates to a subdirectory).
 
-**UI-library integration laws** (each pinned by a live regression): antd
-`Watermark` wraps children in an inline `overflow: hidden` — sticky descendants
-never stick inside one; keep sticky elements outside the watermark. antd v6
-`Drawer` sizes via `size` presets — numeric `width` is the retired v5
-vocabulary. antdx composition pieces (`Creation` regions, `Sender` attachments)
-mount through their declared slots, never children injection. Tailwind v4's
-class extractor tokenizes on dots — arbitrary values containing decimal points
-split into dead classes; prefer scale values or CSS variables.
+**Tailwind v4 vocabulary law** (pinned by live regressions): Tailwind v4
+prefers its native vocabulary over arbitrary values where one exists —
+scale steps (`gap-2.75`, not `gap-[11px]`) and standing palette/token
+classes (`bg-gray-500/18`, not `bg-[rgba(107,114,128,0.18)]`). Where no
+native form exists (font sizes, gradients, shadows, `clamp()`), the
+arbitrary value is the canonical form — do not mint theme variables to
+avoid it. Container-query variants keep their bracket forms.
 
 **Skin presets** (`shared-ts/antd/src/skin-presets/**`) are business-agnostic and low-frequency — they have their own doc: `docs/conventions/skin/CONVENTIONS.md`.
 
@@ -271,10 +276,10 @@ render vocabulary → status vocabulary → `act_` → empty states.
 
 - `messages/common/`, `messages/error/`, `messages/not-found/` — base-owned
   (keep these lean: only what the shell renders). `messages/error/` mixes
-  two key families by design: STATUS titles (`error_<word>_title`,
+  three key families by design: STATUS titles (`error_<word>_title`,
   lowercase) and the reason vocabulary mapped 1:1 from proto reasons
-  (SCREAMING, e.g. `error_GENERAL_ERROR_INTERNAL`) — one directory, one
-  semantic domain.
+  (SCREAMING, e.g. `error_GENERAL_ERROR_INTERNAL`), plus the error pages'
+  own chrome labels (`error_home`) — one directory, one semantic domain.
 - `messages/<module>/` — owned by a formal module.
 - `messages/layout-<name>/`, `messages/login-<name>/` — owned by an area;
   deleted with it.
@@ -294,9 +299,10 @@ Adding a locale is a three-point registration: the `locales` array in
 `project.inlang/settings.json` (the `{locale}` pathPattern entries pick the
 files up automatically), the antd/dayjs entry in `src/domains/antd/locale.ts`,
 and a native-name match arm in `common_locale_name` (the fallback prints the
-raw tag). Every directory needs a complete file per locale before the
-parity check (key order, key set, `{placeholder}` set against the base
-locale) passes.
+raw tag). Every directory needs a complete file per locale, with key
+order, key set, and `{placeholder}` set kept identical against the base
+locale — verified by hand whenever locale files change (no gate owns
+this yet).
 
 ## 7) features/app (base utilities home)
 
@@ -447,9 +453,7 @@ is no `*.tsbuildinfo` to go stale; every typecheck is a full check. The
 stale-green risk lives one level up, in the Nx task cache — hence
 `--skip-nx-cache` on every gate leg.
 
-Per change, also run `./nx run tools:paraglide:check` — the build compiles a key
-missing from one locale from the base locale and exits 0, so locale parity has
-no other gate.
+**Testability is a component-design constraint.** A component's logic runs through props and injected interfaces (a page injects its store interface, never an ambient singleton) — what jsdom cannot fake is a layering leak, not a fixture problem.
 
 **Tests have two homes** (the web face of kratos §7): unit tests run in
 vitest, colocated as `<file>.test.ts(x)` beside their source — jsdom carries
@@ -459,13 +463,19 @@ every package with a `test` target runs `vitest run`; end-to-end tests run in
 `playwright.config.ts` booting the dev server on a dedicated port via
 `webServer` — an explicit `<client>:e2e` target outside the regular chain
 (the web counterpart of ENT_E2E). A fresh environment installs browser
-binaries once (`pnpm exec playwright install`); artifacts (`test-results/`,
+binaries once — a manual user-plane step (`playwright install`); artifacts
+(`test-results/`,
 `playwright-report/`) stay out of git and out of biome. The config and the
 spec files belong in the client's tsconfig include — a file outside the
 include is outside the type gate, and the editor's inferred-project fallback
 is the only thing that will ever tell you. The playwright suite is the
 automatable half of the reachable-surface rule below; the browser loop stays
 the finishing pass.
+
+**A fidelity anchor migrates with its face.** When a lawfully changed face
+(copy, layout, state) leaves an anchored expectation red, re-anchoring is
+the changing slice's closing duty — a red anchor is a stale contract or a
+regression, never a fixture to tolerate.
 
 **Behavioral review for library seams** (typecheck cannot see these — they
 are the recurring bug class): whenever code wires into, migrates between,
@@ -484,11 +494,11 @@ MutationObserver for one-shot notices), never with after-the-fact polling.
 Auth-only surfaces (tabbar interactions, chrome) carry an explicit
 user-verification list in the change report instead.
 
-**Close.** Surface-facing changes close with a browser loop — viewports,
-locales, zero console errors; without a browser-automation tool connected,
+**Close.** Surface-facing changes close with a browser loop — responsive
+viewports, zero console errors; without a browser-automation tool connected,
 a manual developer walkthrough is the degraded form, declared as such. The
-report declares what ran and what was observed, with counted evidence
-("proven by: chain green; browser loop clean at 2 viewports × 2 locales").
+report declares what ran and what was observed, with evidence
+("proven by: chain green; browser loop clean at 2 viewports, zero console errors").
 Absorbing a reviewed slice adds the mechanical checks: deleted tokens/keys
 grepped for remaining consumers, new utility classes traced to their token
 source, the integration diff equal to the absorbed slice's file set.

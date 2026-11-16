@@ -5,6 +5,16 @@
 import { TenantService } from "./tenant_pb";
 
 /**
+ * @generated from rpc cyber.system.v1.TenantService.CreateTenant
+ */
+export const createTenant = TenantService.method.createTenant;
+
+/**
+ * @generated from rpc cyber.system.v1.TenantService.AddTenantAdmin
+ */
+export const addTenantAdmin = TenantService.method.addTenantAdmin;
+
+/**
  * @generated from rpc cyber.system.v1.TenantService.UpdateTenantStatus
  */
 export const updateTenantStatus = TenantService.method.updateTenantStatus;

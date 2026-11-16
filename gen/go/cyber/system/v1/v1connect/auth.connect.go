@@ -43,14 +43,32 @@ const (
 	AuthServiceBeginIdentityLoginProcedure = "/cyber.system.v1.AuthService/BeginIdentityLogin"
 	// AuthServiceSendSmsCodeProcedure is the fully-qualified name of the AuthService's SendSmsCode RPC.
 	AuthServiceSendSmsCodeProcedure = "/cyber.system.v1.AuthService/SendSmsCode"
+	// AuthServiceGetLoginConfigProcedure is the fully-qualified name of the AuthService's
+	// GetLoginConfig RPC.
+	AuthServiceGetLoginConfigProcedure = "/cyber.system.v1.AuthService/GetLoginConfig"
 	// AuthServiceBindCredentialProcedure is the fully-qualified name of the AuthService's
 	// BindCredential RPC.
 	AuthServiceBindCredentialProcedure = "/cyber.system.v1.AuthService/BindCredential"
+	// AuthServiceBeginBindCredentialProcedure is the fully-qualified name of the AuthService's
+	// BeginBindCredential RPC.
+	AuthServiceBeginBindCredentialProcedure = "/cyber.system.v1.AuthService/BeginBindCredential"
+	// AuthServiceSendBindSmsCodeProcedure is the fully-qualified name of the AuthService's
+	// SendBindSmsCode RPC.
+	AuthServiceSendBindSmsCodeProcedure = "/cyber.system.v1.AuthService/SendBindSmsCode"
+	// AuthServiceResetPasswordProcedure is the fully-qualified name of the AuthService's ResetPassword
+	// RPC.
+	AuthServiceResetPasswordProcedure = "/cyber.system.v1.AuthService/ResetPassword"
+	// AuthServiceGetSecurityStatusProcedure is the fully-qualified name of the AuthService's
+	// GetSecurityStatus RPC.
+	AuthServiceGetSecurityStatusProcedure = "/cyber.system.v1.AuthService/GetSecurityStatus"
 	// AuthServiceLogoutProcedure is the fully-qualified name of the AuthService's Logout RPC.
 	AuthServiceLogoutProcedure = "/cyber.system.v1.AuthService/Logout"
 	// AuthServiceGetCurrentUserProcedure is the fully-qualified name of the AuthService's
 	// GetCurrentUser RPC.
 	AuthServiceGetCurrentUserProcedure = "/cyber.system.v1.AuthService/GetCurrentUser"
+	// AuthServiceImportAccountsProcedure is the fully-qualified name of the AuthService's
+	// ImportAccounts RPC.
+	AuthServiceImportAccountsProcedure = "/cyber.system.v1.AuthService/ImportAccounts"
 )
 
 // AuthServiceClient is a client for the cyber.system.v1.AuthService service.
@@ -59,9 +77,21 @@ type AuthServiceClient interface {
 	LoginByIdentity(context.Context, *connect.Request[v1.LoginByIdentityRequest]) (*connect.Response[v1.LoginByIdentityResponse], error)
 	BeginIdentityLogin(context.Context, *connect.Request[v1.BeginIdentityLoginRequest]) (*connect.Response[v1.BeginIdentityLoginResponse], error)
 	SendSmsCode(context.Context, *connect.Request[v1.SendSmsCodeRequest]) (*connect.Response[v1.SendSmsCodeResponse], error)
+	GetLoginConfig(context.Context, *connect.Request[v1.GetLoginConfigRequest]) (*connect.Response[v1.GetLoginConfigResponse], error)
 	BindCredential(context.Context, *connect.Request[v1.BindCredentialRequest]) (*connect.Response[v1.BindCredentialResponse], error)
+	BeginBindCredential(context.Context, *connect.Request[v1.BeginBindCredentialRequest]) (*connect.Response[v1.BeginBindCredentialResponse], error)
+	SendBindSmsCode(context.Context, *connect.Request[v1.SendBindSmsCodeRequest]) (*connect.Response[v1.SendBindSmsCodeResponse], error)
+	ResetPassword(context.Context, *connect.Request[v1.ResetPasswordRequest]) (*connect.Response[v1.ResetPasswordResponse], error)
+	GetSecurityStatus(context.Context, *connect.Request[v1.GetSecurityStatusRequest]) (*connect.Response[v1.GetSecurityStatusResponse], error)
 	Logout(context.Context, *connect.Request[v1.LogoutRequest]) (*connect.Response[v1.LogoutResponse], error)
 	GetCurrentUser(context.Context, *connect.Request[v1.GetCurrentUserRequest]) (*connect.Response[v1.GetCurrentUserResponse], error)
+	// Bulk registration on the operator's behalf: one file's rows become
+	// accounts with an sms credential each — the exact dance the sms login's
+	// auto-registration runs, minus the proof (the operator collected the
+	// numbers off-line). A phone that already names an account skips — the
+	// credential table's own uniqueness, read ahead of the write — and
+	// nothing rolls back the rows that already landed.
+	ImportAccounts(context.Context, *connect.Request[v1.ImportAccountsRequest]) (*connect.Response[v1.ImportAccountsResponse], error)
 }
 
 // NewAuthServiceClient constructs a client for the cyber.system.v1.AuthService service. By default,
@@ -99,10 +129,40 @@ func NewAuthServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(authServiceMethods.ByName("SendSmsCode")),
 			connect.WithClientOptions(opts...),
 		),
+		getLoginConfig: connect.NewClient[v1.GetLoginConfigRequest, v1.GetLoginConfigResponse](
+			httpClient,
+			baseURL+AuthServiceGetLoginConfigProcedure,
+			connect.WithSchema(authServiceMethods.ByName("GetLoginConfig")),
+			connect.WithClientOptions(opts...),
+		),
 		bindCredential: connect.NewClient[v1.BindCredentialRequest, v1.BindCredentialResponse](
 			httpClient,
 			baseURL+AuthServiceBindCredentialProcedure,
 			connect.WithSchema(authServiceMethods.ByName("BindCredential")),
+			connect.WithClientOptions(opts...),
+		),
+		beginBindCredential: connect.NewClient[v1.BeginBindCredentialRequest, v1.BeginBindCredentialResponse](
+			httpClient,
+			baseURL+AuthServiceBeginBindCredentialProcedure,
+			connect.WithSchema(authServiceMethods.ByName("BeginBindCredential")),
+			connect.WithClientOptions(opts...),
+		),
+		sendBindSmsCode: connect.NewClient[v1.SendBindSmsCodeRequest, v1.SendBindSmsCodeResponse](
+			httpClient,
+			baseURL+AuthServiceSendBindSmsCodeProcedure,
+			connect.WithSchema(authServiceMethods.ByName("SendBindSmsCode")),
+			connect.WithClientOptions(opts...),
+		),
+		resetPassword: connect.NewClient[v1.ResetPasswordRequest, v1.ResetPasswordResponse](
+			httpClient,
+			baseURL+AuthServiceResetPasswordProcedure,
+			connect.WithSchema(authServiceMethods.ByName("ResetPassword")),
+			connect.WithClientOptions(opts...),
+		),
+		getSecurityStatus: connect.NewClient[v1.GetSecurityStatusRequest, v1.GetSecurityStatusResponse](
+			httpClient,
+			baseURL+AuthServiceGetSecurityStatusProcedure,
+			connect.WithSchema(authServiceMethods.ByName("GetSecurityStatus")),
 			connect.WithClientOptions(opts...),
 		),
 		logout: connect.NewClient[v1.LogoutRequest, v1.LogoutResponse](
@@ -117,18 +177,30 @@ func NewAuthServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(authServiceMethods.ByName("GetCurrentUser")),
 			connect.WithClientOptions(opts...),
 		),
+		importAccounts: connect.NewClient[v1.ImportAccountsRequest, v1.ImportAccountsResponse](
+			httpClient,
+			baseURL+AuthServiceImportAccountsProcedure,
+			connect.WithSchema(authServiceMethods.ByName("ImportAccounts")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // authServiceClient implements AuthServiceClient.
 type authServiceClient struct {
-	login              *connect.Client[v1.LoginRequest, v1.LoginResponse]
-	loginByIdentity    *connect.Client[v1.LoginByIdentityRequest, v1.LoginByIdentityResponse]
-	beginIdentityLogin *connect.Client[v1.BeginIdentityLoginRequest, v1.BeginIdentityLoginResponse]
-	sendSmsCode        *connect.Client[v1.SendSmsCodeRequest, v1.SendSmsCodeResponse]
-	bindCredential     *connect.Client[v1.BindCredentialRequest, v1.BindCredentialResponse]
-	logout             *connect.Client[v1.LogoutRequest, v1.LogoutResponse]
-	getCurrentUser     *connect.Client[v1.GetCurrentUserRequest, v1.GetCurrentUserResponse]
+	login               *connect.Client[v1.LoginRequest, v1.LoginResponse]
+	loginByIdentity     *connect.Client[v1.LoginByIdentityRequest, v1.LoginByIdentityResponse]
+	beginIdentityLogin  *connect.Client[v1.BeginIdentityLoginRequest, v1.BeginIdentityLoginResponse]
+	sendSmsCode         *connect.Client[v1.SendSmsCodeRequest, v1.SendSmsCodeResponse]
+	getLoginConfig      *connect.Client[v1.GetLoginConfigRequest, v1.GetLoginConfigResponse]
+	bindCredential      *connect.Client[v1.BindCredentialRequest, v1.BindCredentialResponse]
+	beginBindCredential *connect.Client[v1.BeginBindCredentialRequest, v1.BeginBindCredentialResponse]
+	sendBindSmsCode     *connect.Client[v1.SendBindSmsCodeRequest, v1.SendBindSmsCodeResponse]
+	resetPassword       *connect.Client[v1.ResetPasswordRequest, v1.ResetPasswordResponse]
+	getSecurityStatus   *connect.Client[v1.GetSecurityStatusRequest, v1.GetSecurityStatusResponse]
+	logout              *connect.Client[v1.LogoutRequest, v1.LogoutResponse]
+	getCurrentUser      *connect.Client[v1.GetCurrentUserRequest, v1.GetCurrentUserResponse]
+	importAccounts      *connect.Client[v1.ImportAccountsRequest, v1.ImportAccountsResponse]
 }
 
 // Login calls cyber.system.v1.AuthService.Login.
@@ -151,9 +223,34 @@ func (c *authServiceClient) SendSmsCode(ctx context.Context, req *connect.Reques
 	return c.sendSmsCode.CallUnary(ctx, req)
 }
 
+// GetLoginConfig calls cyber.system.v1.AuthService.GetLoginConfig.
+func (c *authServiceClient) GetLoginConfig(ctx context.Context, req *connect.Request[v1.GetLoginConfigRequest]) (*connect.Response[v1.GetLoginConfigResponse], error) {
+	return c.getLoginConfig.CallUnary(ctx, req)
+}
+
 // BindCredential calls cyber.system.v1.AuthService.BindCredential.
 func (c *authServiceClient) BindCredential(ctx context.Context, req *connect.Request[v1.BindCredentialRequest]) (*connect.Response[v1.BindCredentialResponse], error) {
 	return c.bindCredential.CallUnary(ctx, req)
+}
+
+// BeginBindCredential calls cyber.system.v1.AuthService.BeginBindCredential.
+func (c *authServiceClient) BeginBindCredential(ctx context.Context, req *connect.Request[v1.BeginBindCredentialRequest]) (*connect.Response[v1.BeginBindCredentialResponse], error) {
+	return c.beginBindCredential.CallUnary(ctx, req)
+}
+
+// SendBindSmsCode calls cyber.system.v1.AuthService.SendBindSmsCode.
+func (c *authServiceClient) SendBindSmsCode(ctx context.Context, req *connect.Request[v1.SendBindSmsCodeRequest]) (*connect.Response[v1.SendBindSmsCodeResponse], error) {
+	return c.sendBindSmsCode.CallUnary(ctx, req)
+}
+
+// ResetPassword calls cyber.system.v1.AuthService.ResetPassword.
+func (c *authServiceClient) ResetPassword(ctx context.Context, req *connect.Request[v1.ResetPasswordRequest]) (*connect.Response[v1.ResetPasswordResponse], error) {
+	return c.resetPassword.CallUnary(ctx, req)
+}
+
+// GetSecurityStatus calls cyber.system.v1.AuthService.GetSecurityStatus.
+func (c *authServiceClient) GetSecurityStatus(ctx context.Context, req *connect.Request[v1.GetSecurityStatusRequest]) (*connect.Response[v1.GetSecurityStatusResponse], error) {
+	return c.getSecurityStatus.CallUnary(ctx, req)
 }
 
 // Logout calls cyber.system.v1.AuthService.Logout.
@@ -166,15 +263,32 @@ func (c *authServiceClient) GetCurrentUser(ctx context.Context, req *connect.Req
 	return c.getCurrentUser.CallUnary(ctx, req)
 }
 
+// ImportAccounts calls cyber.system.v1.AuthService.ImportAccounts.
+func (c *authServiceClient) ImportAccounts(ctx context.Context, req *connect.Request[v1.ImportAccountsRequest]) (*connect.Response[v1.ImportAccountsResponse], error) {
+	return c.importAccounts.CallUnary(ctx, req)
+}
+
 // AuthServiceHandler is an implementation of the cyber.system.v1.AuthService service.
 type AuthServiceHandler interface {
 	Login(context.Context, *connect.Request[v1.LoginRequest]) (*connect.Response[v1.LoginResponse], error)
 	LoginByIdentity(context.Context, *connect.Request[v1.LoginByIdentityRequest]) (*connect.Response[v1.LoginByIdentityResponse], error)
 	BeginIdentityLogin(context.Context, *connect.Request[v1.BeginIdentityLoginRequest]) (*connect.Response[v1.BeginIdentityLoginResponse], error)
 	SendSmsCode(context.Context, *connect.Request[v1.SendSmsCodeRequest]) (*connect.Response[v1.SendSmsCodeResponse], error)
+	GetLoginConfig(context.Context, *connect.Request[v1.GetLoginConfigRequest]) (*connect.Response[v1.GetLoginConfigResponse], error)
 	BindCredential(context.Context, *connect.Request[v1.BindCredentialRequest]) (*connect.Response[v1.BindCredentialResponse], error)
+	BeginBindCredential(context.Context, *connect.Request[v1.BeginBindCredentialRequest]) (*connect.Response[v1.BeginBindCredentialResponse], error)
+	SendBindSmsCode(context.Context, *connect.Request[v1.SendBindSmsCodeRequest]) (*connect.Response[v1.SendBindSmsCodeResponse], error)
+	ResetPassword(context.Context, *connect.Request[v1.ResetPasswordRequest]) (*connect.Response[v1.ResetPasswordResponse], error)
+	GetSecurityStatus(context.Context, *connect.Request[v1.GetSecurityStatusRequest]) (*connect.Response[v1.GetSecurityStatusResponse], error)
 	Logout(context.Context, *connect.Request[v1.LogoutRequest]) (*connect.Response[v1.LogoutResponse], error)
 	GetCurrentUser(context.Context, *connect.Request[v1.GetCurrentUserRequest]) (*connect.Response[v1.GetCurrentUserResponse], error)
+	// Bulk registration on the operator's behalf: one file's rows become
+	// accounts with an sms credential each — the exact dance the sms login's
+	// auto-registration runs, minus the proof (the operator collected the
+	// numbers off-line). A phone that already names an account skips — the
+	// credential table's own uniqueness, read ahead of the write — and
+	// nothing rolls back the rows that already landed.
+	ImportAccounts(context.Context, *connect.Request[v1.ImportAccountsRequest]) (*connect.Response[v1.ImportAccountsResponse], error)
 }
 
 // NewAuthServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -208,10 +322,40 @@ func NewAuthServiceHandler(svc AuthServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(authServiceMethods.ByName("SendSmsCode")),
 		connect.WithHandlerOptions(opts...),
 	)
+	authServiceGetLoginConfigHandler := connect.NewUnaryHandler(
+		AuthServiceGetLoginConfigProcedure,
+		svc.GetLoginConfig,
+		connect.WithSchema(authServiceMethods.ByName("GetLoginConfig")),
+		connect.WithHandlerOptions(opts...),
+	)
 	authServiceBindCredentialHandler := connect.NewUnaryHandler(
 		AuthServiceBindCredentialProcedure,
 		svc.BindCredential,
 		connect.WithSchema(authServiceMethods.ByName("BindCredential")),
+		connect.WithHandlerOptions(opts...),
+	)
+	authServiceBeginBindCredentialHandler := connect.NewUnaryHandler(
+		AuthServiceBeginBindCredentialProcedure,
+		svc.BeginBindCredential,
+		connect.WithSchema(authServiceMethods.ByName("BeginBindCredential")),
+		connect.WithHandlerOptions(opts...),
+	)
+	authServiceSendBindSmsCodeHandler := connect.NewUnaryHandler(
+		AuthServiceSendBindSmsCodeProcedure,
+		svc.SendBindSmsCode,
+		connect.WithSchema(authServiceMethods.ByName("SendBindSmsCode")),
+		connect.WithHandlerOptions(opts...),
+	)
+	authServiceResetPasswordHandler := connect.NewUnaryHandler(
+		AuthServiceResetPasswordProcedure,
+		svc.ResetPassword,
+		connect.WithSchema(authServiceMethods.ByName("ResetPassword")),
+		connect.WithHandlerOptions(opts...),
+	)
+	authServiceGetSecurityStatusHandler := connect.NewUnaryHandler(
+		AuthServiceGetSecurityStatusProcedure,
+		svc.GetSecurityStatus,
+		connect.WithSchema(authServiceMethods.ByName("GetSecurityStatus")),
 		connect.WithHandlerOptions(opts...),
 	)
 	authServiceLogoutHandler := connect.NewUnaryHandler(
@@ -226,6 +370,12 @@ func NewAuthServiceHandler(svc AuthServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(authServiceMethods.ByName("GetCurrentUser")),
 		connect.WithHandlerOptions(opts...),
 	)
+	authServiceImportAccountsHandler := connect.NewUnaryHandler(
+		AuthServiceImportAccountsProcedure,
+		svc.ImportAccounts,
+		connect.WithSchema(authServiceMethods.ByName("ImportAccounts")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/cyber.system.v1.AuthService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case AuthServiceLoginProcedure:
@@ -236,12 +386,24 @@ func NewAuthServiceHandler(svc AuthServiceHandler, opts ...connect.HandlerOption
 			authServiceBeginIdentityLoginHandler.ServeHTTP(w, r)
 		case AuthServiceSendSmsCodeProcedure:
 			authServiceSendSmsCodeHandler.ServeHTTP(w, r)
+		case AuthServiceGetLoginConfigProcedure:
+			authServiceGetLoginConfigHandler.ServeHTTP(w, r)
 		case AuthServiceBindCredentialProcedure:
 			authServiceBindCredentialHandler.ServeHTTP(w, r)
+		case AuthServiceBeginBindCredentialProcedure:
+			authServiceBeginBindCredentialHandler.ServeHTTP(w, r)
+		case AuthServiceSendBindSmsCodeProcedure:
+			authServiceSendBindSmsCodeHandler.ServeHTTP(w, r)
+		case AuthServiceResetPasswordProcedure:
+			authServiceResetPasswordHandler.ServeHTTP(w, r)
+		case AuthServiceGetSecurityStatusProcedure:
+			authServiceGetSecurityStatusHandler.ServeHTTP(w, r)
 		case AuthServiceLogoutProcedure:
 			authServiceLogoutHandler.ServeHTTP(w, r)
 		case AuthServiceGetCurrentUserProcedure:
 			authServiceGetCurrentUserHandler.ServeHTTP(w, r)
+		case AuthServiceImportAccountsProcedure:
+			authServiceImportAccountsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -267,8 +429,28 @@ func (UnimplementedAuthServiceHandler) SendSmsCode(context.Context, *connect.Req
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.AuthService.SendSmsCode is not implemented"))
 }
 
+func (UnimplementedAuthServiceHandler) GetLoginConfig(context.Context, *connect.Request[v1.GetLoginConfigRequest]) (*connect.Response[v1.GetLoginConfigResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.AuthService.GetLoginConfig is not implemented"))
+}
+
 func (UnimplementedAuthServiceHandler) BindCredential(context.Context, *connect.Request[v1.BindCredentialRequest]) (*connect.Response[v1.BindCredentialResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.AuthService.BindCredential is not implemented"))
+}
+
+func (UnimplementedAuthServiceHandler) BeginBindCredential(context.Context, *connect.Request[v1.BeginBindCredentialRequest]) (*connect.Response[v1.BeginBindCredentialResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.AuthService.BeginBindCredential is not implemented"))
+}
+
+func (UnimplementedAuthServiceHandler) SendBindSmsCode(context.Context, *connect.Request[v1.SendBindSmsCodeRequest]) (*connect.Response[v1.SendBindSmsCodeResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.AuthService.SendBindSmsCode is not implemented"))
+}
+
+func (UnimplementedAuthServiceHandler) ResetPassword(context.Context, *connect.Request[v1.ResetPasswordRequest]) (*connect.Response[v1.ResetPasswordResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.AuthService.ResetPassword is not implemented"))
+}
+
+func (UnimplementedAuthServiceHandler) GetSecurityStatus(context.Context, *connect.Request[v1.GetSecurityStatusRequest]) (*connect.Response[v1.GetSecurityStatusResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.AuthService.GetSecurityStatus is not implemented"))
 }
 
 func (UnimplementedAuthServiceHandler) Logout(context.Context, *connect.Request[v1.LogoutRequest]) (*connect.Response[v1.LogoutResponse], error) {
@@ -277,4 +459,8 @@ func (UnimplementedAuthServiceHandler) Logout(context.Context, *connect.Request[
 
 func (UnimplementedAuthServiceHandler) GetCurrentUser(context.Context, *connect.Request[v1.GetCurrentUserRequest]) (*connect.Response[v1.GetCurrentUserResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.AuthService.GetCurrentUser is not implemented"))
+}
+
+func (UnimplementedAuthServiceHandler) ImportAccounts(context.Context, *connect.Request[v1.ImportAccountsRequest]) (*connect.Response[v1.ImportAccountsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.AuthService.ImportAccounts is not implemented"))
 }

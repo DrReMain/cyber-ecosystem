@@ -6,6 +6,8 @@ import "google/protobuf/duration.proto";
 
 option go_package = "cyber-ecosystem/app/services/system/internal/conf;conf";
 
+// Bootstrap is the whole boot config tree; every field overrides a typed
+// default, none is required at the yaml layer.
 message Bootstrap {
   Server server = 1;
   Data data = 2;
@@ -15,11 +17,12 @@ message Bootstrap {
   Seed seed = 6;
 }
 
+// Server: the three listen faces; addr host:port.
 message Server {
   message HTTP {
-    string network = 1;
+    string network = 1; // tcp | unix
     string addr = 2;
-    google.protobuf.Duration timeout = 3;
+    google.protobuf.Duration timeout = 3; // whole-handler ceiling
   }
   message GRPC {
     string network = 1;
@@ -36,9 +39,10 @@ message Server {
   Connect connect = 3;
 }
 
+// Data: the persistence plane — database, redis, storage, mq.
 message Data {
   message Database {
-    string driver = 1;
+    string driver = 1; // postgres
     string host = 2;
     int32 port = 3;
     string user = 4;
@@ -52,7 +56,7 @@ message Data {
     string network = 1;
     string addr = 2;
     string password = 3;
-    int32 db = 4;
+    int32 db = 4; // logical db index 0–15
     int32 pool_size = 5;
     int32 min_idle_conns = 6;
     google.protobuf.Duration conn_max_lifetime = 7;
@@ -61,42 +65,44 @@ message Data {
     google.protobuf.Duration dial_timeout = 10;
     google.protobuf.Duration pool_timeout = 11;
   }
+  // Storage: the s3-compatible object plane; one backend today.
   message Storage {
     message S3 {
-      string endpoint = 1;
+      string endpoint = 1; // service-facing api base
       string access_key = 2;
       string secret_key = 3;
       string bucket = 4;
       string region = 5;
-      bool use_path_style = 6;
-      int64 multipart_threshold = 7;
-      int64 part_size = 8;
-      google.protobuf.Duration presign_ttl = 9;
-      int64 max_file_size = 10; // bytes; 0 → no limit (consumed only by the s3 backend)
-      string public_endpoint = 11; // browser-facing base for presigned URLs; empty = endpoint
+      bool use_path_style = 6; // true for minio-style endpoints
+      int64 multipart_threshold = 7; // bytes; uploads above split
+      int64 part_size = 8; // bytes; multipart part size
+      google.protobuf.Duration presign_ttl = 9; // presigned url validity
+      int64 max_file_size = 10; // bytes; 0 = unlimited (s3 backend only)
+      string public_endpoint = 11; // browser-facing base for presigned urls; empty = endpoint
     }
     S3 s3 = 1;
   }
+  // MQ: one backend active; nats and pg are alternatives.
   message MQ {
     message NATS {
-      string endpoint = 1;
-      string creds = 2;
-      google.protobuf.Duration max_age = 3;
-      int64 max_bytes = 4;
-      int32 max_retries = 5;
-      google.protobuf.Duration ack_wait = 6;
-      int32 max_ack_pending = 7; // in-flight unacked cap per consumer (0 → backend default)
-      google.protobuf.Duration dlq_max_age = 8; // DLQ stream TTL (0 → backend default)
-      int64 dlq_max_bytes = 9; // DLQ stream size cap (0 → backend default)
-      google.protobuf.Duration nak_backoff_step = 10; // linear Nak redelivery delay step (0 → backend default)
+      string endpoint = 1; // nats://host:port
+      string creds = 2; // user creds file content; empty = no auth
+      google.protobuf.Duration max_age = 3; // stream retention; 0 = backend default
+      int64 max_bytes = 4; // stream size cap; 0 = backend default
+      int32 max_retries = 5; // delivery attempts before dlq; 0 = backend default
+      google.protobuf.Duration ack_wait = 6; // redelivery wait; 0 = backend default
+      int32 max_ack_pending = 7; // per-consumer in-flight cap; 0 = backend default
+      google.protobuf.Duration dlq_max_age = 8; // 0 = backend default
+      int64 dlq_max_bytes = 9; // 0 = backend default
+      google.protobuf.Duration nak_backoff_step = 10; // linear redelivery step; 0 = backend default
     }
     message PG {
-      string dsn = 1; // postgres://... to the standalone `mq` database
-      google.protobuf.Duration poll_interval = 2; // consumer poll interval (0 → backend default)
-      google.protobuf.Duration visibility_timeout = 3; // = NATS ack_wait (0 → backend default)
-      int32 max_retries = 4; // delivery attempts before DLQ (0 → backend default)
-      google.protobuf.Duration retention = 5; // message retention, age-based eviction (0 → backend default)
-      int32 batch_size = 6; // max messages per poll batch (0 → backend default)
+      string dsn = 1; // postgres://… to the standalone mq database
+      google.protobuf.Duration poll_interval = 2; // 0 = backend default
+      google.protobuf.Duration visibility_timeout = 3; // = nats ack_wait; 0 = backend default
+      int32 max_retries = 4; // 0 = backend default
+      google.protobuf.Duration retention = 5; // age-based eviction; 0 = backend default
+      int32 batch_size = 6; // max messages per poll; 0 = backend default
     }
     NATS nats = 1;
     PG pg = 2;
@@ -107,10 +113,11 @@ message Data {
   MQ mq = 4;
 }
 
+// Observability: telemetry sinks share one collector endpoint.
 message Observability {
   message Trace {
     bool enabled = 1;
-    double sampling_ratio = 2;
+    double sampling_ratio = 2; // 0–1
   }
   message Metrics {
     bool enabled = 1;
@@ -123,27 +130,29 @@ message Observability {
       int32 max_age_days = 4;
       bool compress = 5;
     }
-    string level = 1;
+    string level = 1; // debug | info | warn | error
     bool console = 2;
     bool otlp = 3;
-    FileOutput file = 4;
+    FileOutput file = 4; // absent = no file sink
   }
   message SlowQuery {
-    google.protobuf.Duration db = 1; // slow SQL threshold; 0/omit = disabled
-    google.protobuf.Duration cache = 2; // slow redis op threshold; 0/omit = disabled
+    google.protobuf.Duration db = 1; // slow sql threshold; 0/omit = off
+    google.protobuf.Duration cache = 2; // slow redis op threshold; 0/omit = off
   }
-  string endpoint = 1;
-  bool insecure = 2;
+  string endpoint = 1; // otlp http collector
+  bool insecure = 2; // skip tls to the collector
   Trace trace = 3;
   Metrics metrics = 4;
   Log log = 5;
   SlowQuery slow_query = 6;
 }
 
+// Catalog: where the generated service catalogs live for route registration.
 message Catalog {
   string dir = 1;
 }
 
+// Auth: the credential providers; each row is one login channel instance.
 message Auth {
   message Provider {
     message WeChat {
@@ -151,33 +160,33 @@ message Auth {
       string secret = 2;
     }
     message Sms {
-      string access_key_id = 1;     // Aliyun RAM key; a credentialed row selects the dysmsapi backend, otherwise the mock backend
-      string access_key_secret = 2; // deploy-plane fact; empty with a non-empty id is a boot error
-      string sign_name = 3;         // channel-assigned signature
-      string template_code = 4;     // channel-assigned template; its own placeholder vocabulary names the params
-      string endpoint = 5;          // RPC endpoint; empty = the kind's default (tests override here)
-      string backend = 6;           // explicit channel choice: "dysmsapi" (credentials required, else boot fails) | "mock" (record, never dial); empty = pick by credentials
+      string access_key_id = 1; // aliyun ram key (dysmsapi backend)
+      string access_key_secret = 2; // deploy-plane fact; id set with empty secret = boot error
+      string sign_name = 3; // channel-assigned
+      string template_code = 4; // channel-assigned; its placeholders name the params
+      string endpoint = 5; // empty = the kind default
+      string backend = 6; // "dysmsapi" (credential pair required) | "mock" (record, never dial)
     }
-    string key = 1;      // instance registry key
-    string kind = 2;     // code-registered kind; boot fails otherwise
+    string key = 1; // instance registry key; the login request's provider param
+    string kind = 2; // code-registered kind; unknown fails boot
     bool enabled = 3;
-    string endpoint = 4; // exchange base URL; empty = the kind's default (tests override here)
-    bool auto_register = 6;
+    string endpoint = 4; // oauth base url for redirect and exchange; empty = kind defaults
     WeChat wechat = 5;
-    string population = 7; // landing population for this provider's logins (births and bound entries); empty = the default population
+    bool auto_register = 6; // first login creates the account
+    string population = 7; // landing population; empty = default population
     Sms sms = 8;
   }
   repeated Provider providers = 1;
 }
 
+// Seed: what a fresh deployment needs to grant its first operator.
 message Seed {
   message Population {
-    string code = 1;      // join key; declaring the default population is a config error
+    string code = 1; // join key; declaring the default population is a config error
     string name = 2;
-    string plane = 3;     // backend | member
+    string plane = 3; // backend | member
   }
-  // the floor that lets a fresh deployment grant its first user
-  repeated string super_admins = 1;
-  string initial_password = 2;
+  repeated string super_admins = 1; // accounts seeded with full grants
+  string initial_password = 2; // first-login password for the seeded admins
   repeated Population populations = 3;
 }

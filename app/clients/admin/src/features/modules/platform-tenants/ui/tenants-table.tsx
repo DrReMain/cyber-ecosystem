@@ -1,8 +1,8 @@
 import type { Tenant } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/tenant_pb";
 import { DataTable, useColumns } from "@cyber-ecosystem/shared-antd/table";
 import type { TableProps } from "antd";
-import { Avatar, Space, Tag, Typography } from "antd";
-import { Power, PowerOff } from "lucide-react";
+import { Avatar, Button, Space, Tag, Typography } from "antd";
+import { Power, PowerOff, UserPlus } from "lucide-react";
 import { ActionIconButton } from "#/components/action-icon-button";
 import { avatarColor } from "#/libs";
 import { m } from "#/paraglide/messages";
@@ -11,6 +11,8 @@ interface TenantsTableProps {
   tenants: Tenant[];
   loading?: boolean;
   pendingId: string | null;
+  onAddAdmin: (tenant: Tenant) => void;
+  onCreate: () => void;
   onToggle: (tenant: Tenant, next: boolean) => void;
   onRefresh: () => void;
 }
@@ -19,6 +21,8 @@ export function TenantsTable({
   tenants,
   loading,
   pendingId,
+  onAddAdmin,
+  onCreate,
   onToggle,
   onRefresh,
 }: Readonly<TenantsTableProps>) {
@@ -59,6 +63,11 @@ export function TenantsTable({
     fieldAction<Tenant>(
       (_, tenant) => (
         <Space size={0}>
+          <ActionIconButton
+            icon={UserPlus}
+            label={m.platform_tenants_act_add_admin()}
+            onClick={() => onAddAdmin(tenant)}
+          />
           {tenant.enabled ? (
             <ActionIconButton
               confirm={{
@@ -94,11 +103,21 @@ export function TenantsTable({
       }}
       columns={columns}
       dataSource={tenants}
+      emptyAction={
+        <Button color="primary" onClick={onCreate} variant="filled">
+          {m.platform_tenants_create_title()}
+        </Button>
+      }
       emptyDescription={m.platform_tenants_empty()}
       loading={loading}
       rowClassName={(tenant) => (tenant.enabled ? "" : "opacity-60")}
       rowKey="id"
       toolbar={{
+        extra: (
+          <Button color="primary" onClick={onCreate} variant="filled">
+            {m.platform_tenants_create_title()}
+          </Button>
+        ),
         labels: {
           density: m.common_toolbar_density(),
           densityLarge: m.common_toolbar_density_large(),

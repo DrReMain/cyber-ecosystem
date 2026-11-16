@@ -51,6 +51,52 @@ var (
 			},
 		},
 	}
+	// AuditLogColumns holds the columns for the "audit_log" table.
+	AuditLogColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "tenant", Type: field.TypeString, Size: 20, Comment: "subject tenant; empty on denied or subject-less events", Default: ""},
+		{Name: "actor", Type: field.TypeString, Size: 20, Comment: "subject user id; empty on subject-less events", Default: ""},
+		{Name: "principal_type", Type: field.TypeString, Size: 16, Comment: "user; empty together with actor", Default: ""},
+		{Name: "operation", Type: field.TypeString, Size: 255, Comment: "proto operation path, e.g. /cyber.agent.v1.AgentConfigService/UpdateMyAgentConfig"},
+		{Name: "http_method", Type: field.TypeString, Size: 16, Default: ""},
+		{Name: "http_path", Type: field.TypeString, Size: 512, Default: ""},
+		{Name: "status", Type: field.TypeInt, Comment: "HTTP status of the outcome", Default: 0},
+		{Name: "latency_ms", Type: field.TypeInt, Default: 0},
+		{Name: "ip", Type: field.TypeString, Size: 64, Default: ""},
+		{Name: "user_agent", Type: field.TypeString, Size: 512, Default: ""},
+		{Name: "deny_reason", Type: field.TypeString, Size: 64, Comment: "NO_GRANT | ABAC_CONSTRAINT; empty when allowed", Default: ""},
+		{Name: "event_id", Type: field.TypeString, Size: 40, Comment: "publisher-generated dedup key; unique index absorbs redelivery", Default: ""},
+	}
+	// AuditLogTable holds the schema information for the "audit_log" table.
+	AuditLogTable = &schema.Table{
+		Name:       "audit_log",
+		Columns:    AuditLogColumns,
+		PrimaryKey: []*schema.Column{AuditLogColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "auditlog_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{AuditLogColumns[1]},
+			},
+			{
+				Name:    "auditlog_updated_at",
+				Unique:  false,
+				Columns: []*schema.Column{AuditLogColumns[2]},
+			},
+			{
+				Name:    "auditlog_tenant_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{AuditLogColumns[3], AuditLogColumns[1]},
+			},
+			{
+				Name:    "auditlog_event_id",
+				Unique:  true,
+				Columns: []*schema.Column{AuditLogColumns[14]},
+			},
+		},
+	}
 	// ChatMessageColumns holds the columns for the "chat_message" table.
 	ChatMessageColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -127,6 +173,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AgentConfigTable,
+		AuditLogTable,
 		ChatMessageTable,
 		ChatSessionTable,
 	}
@@ -135,6 +182,9 @@ var (
 func init() {
 	AgentConfigTable.Annotation = &entsql.Annotation{
 		Table: "agent_config",
+	}
+	AuditLogTable.Annotation = &entsql.Annotation{
+		Table: "audit_log",
 	}
 	ChatMessageTable.Annotation = &entsql.Annotation{
 		Table: "chat_message",

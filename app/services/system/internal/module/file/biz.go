@@ -74,7 +74,7 @@ type File struct {
 	OwnerID     string
 }
 
-type FileListIn struct {
+type ListIn struct {
 	*commonpb.PageRequest
 	OrderBy     []string
 	Name        *string
@@ -83,7 +83,7 @@ type FileListIn struct {
 	Source      *string
 }
 
-type FileListOut struct {
+type ListOut struct {
 	*commonpb.PageResponse
 	List []*File
 }
@@ -105,7 +105,7 @@ type GenerationSpec struct {
 type FileRP interface {
 	UpdateName(ctx context.Context, id, name string) (*File, error)
 	Delete(ctx context.Context, id string) error
-	List(ctx context.Context, in *FileListIn) (*FileListOut, error)
+	List(ctx context.Context, in *ListIn) (*ListOut, error)
 	FindByID(ctx context.Context, id string) (*File, error)
 	FindRef(ctx context.Context, id string) (*File, error)
 	Limits() storage.Limits
@@ -185,7 +185,7 @@ func (uc *FileUC) Delete(ctx context.Context, id string) error {
 	return uc.fileRP.Delete(ctx, id)
 }
 
-func (uc *FileUC) List(ctx context.Context, in *FileListIn) (*FileListOut, error) {
+func (uc *FileUC) List(ctx context.Context, in *ListIn) (*ListOut, error) {
 	return uc.fileRP.List(ctx, in)
 }
 

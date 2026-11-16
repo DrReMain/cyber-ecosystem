@@ -19,7 +19,10 @@ import (
 // if its attribute shape ever changes upstream, the worst case is falling
 // back to the stock rendering.
 func RenderErrors(logger *slog.Logger) *slog.Logger {
-	return slog.New(&errorViewHandler{next: logger.Handler()})
+	// The mask sits inside the error view: both rewrites are per-record and
+	// stateless, and this is the one logger every service's kratos logging
+	// middleware receives — one wiring point, every protocol covered.
+	return slog.New(&errorViewHandler{next: &secretMaskHandler{next: logger.Handler()}})
 }
 
 // errorViewHandler forwards records to next, rewriting the error projection of

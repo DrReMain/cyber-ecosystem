@@ -14,5 +14,17 @@
   "platform_tenants_act_enable": "启用",
   "platform_tenants_act_disable": "停用",
   "platform_tenants_disable_confirm": "停用该租户？",
-  "platform_tenants_empty": "暂无租户"
+  "platform_tenants_empty": "暂无租户",
+  "platform_tenants_create_title": "新建租户",
+  "platform_tenants_create_code": "租户标识",
+  "platform_tenants_create_code_hint": "小写字母、数字与连字符，创建后不可更换",
+  "platform_tenants_create_name": "租户名称",
+  "platform_tenants_create_admin_account": "管理员账号",
+  "platform_tenants_create_admin_password": "管理员初始密码",
+  "platform_tenants_create_submit": "开通",
+  "platform_tenants_add_admin_title": "新增超级管理员",
+  "platform_tenants_add_admin_account": "账号",
+  "platform_tenants_add_admin_password": "初始密码",
+  "platform_tenants_add_admin_submit": "授予",
+  "platform_tenants_act_add_admin": "新增超管"
 }

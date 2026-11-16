@@ -18,7 +18,6 @@ import (
 
 	"cyber-ecosystem/app/services/agent/internal/conf"
 	"cyber-ecosystem/app/services/agent/internal/module/agentconfig"
-	"cyber-ecosystem/app/services/agent/internal/shared"
 )
 
 // Adapter -------------------------------------------------------------------------------------------------------------
@@ -67,7 +66,7 @@ func (c *systemClient) AuthenticateSession(ctx context.Context, token string) (*
 		Population: utils.Deref(utils.Unwrap[string](resp.Msg.GetPopulation()), ""),
 		Plane:      utils.Deref(utils.Unwrap[string](resp.Msg.GetPlane()), ""),
 		SessionID:  utils.Deref(utils.Unwrap[string](resp.Msg.GetSessionId()), ""),
-		Extra:      map[string]any{shared.ExtraAccount: utils.Deref(utils.Unwrap[string](resp.Msg.GetAccount()), "")},
+		Extra:      map[string]any{security.ExtraAccount: utils.Deref(utils.Unwrap[string](resp.Msg.GetAccount()), "")},
 	}, nil
 }
 

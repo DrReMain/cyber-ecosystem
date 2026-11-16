@@ -19,6 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	TenantService_CreateTenant_FullMethodName       = "/cyber.system.v1.TenantService/CreateTenant"
+	TenantService_AddTenantAdmin_FullMethodName     = "/cyber.system.v1.TenantService/AddTenantAdmin"
 	TenantService_UpdateTenantStatus_FullMethodName = "/cyber.system.v1.TenantService/UpdateTenantStatus"
 	TenantService_ListTenants_FullMethodName        = "/cyber.system.v1.TenantService/ListTenants"
 	TenantService_GetTenant_FullMethodName          = "/cyber.system.v1.TenantService/GetTenant"
@@ -28,6 +30,8 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TenantServiceClient interface {
+	CreateTenant(ctx context.Context, in *CreateTenantRequest, opts ...grpc.CallOption) (*CreateTenantResponse, error)
+	AddTenantAdmin(ctx context.Context, in *AddTenantAdminRequest, opts ...grpc.CallOption) (*AddTenantAdminResponse, error)
 	UpdateTenantStatus(ctx context.Context, in *UpdateTenantStatusRequest, opts ...grpc.CallOption) (*UpdateTenantStatusResponse, error)
 	ListTenants(ctx context.Context, in *ListTenantsRequest, opts ...grpc.CallOption) (*ListTenantsResponse, error)
 	GetTenant(ctx context.Context, in *GetTenantRequest, opts ...grpc.CallOption) (*GetTenantResponse, error)
@@ -39,6 +43,26 @@ type tenantServiceClient struct {
 
 func NewTenantServiceClient(cc grpc.ClientConnInterface) TenantServiceClient {
 	return &tenantServiceClient{cc}
+}
+
+func (c *tenantServiceClient) CreateTenant(ctx context.Context, in *CreateTenantRequest, opts ...grpc.CallOption) (*CreateTenantResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateTenantResponse)
+	err := c.cc.Invoke(ctx, TenantService_CreateTenant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *tenantServiceClient) AddTenantAdmin(ctx context.Context, in *AddTenantAdminRequest, opts ...grpc.CallOption) (*AddTenantAdminResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AddTenantAdminResponse)
+	err := c.cc.Invoke(ctx, TenantService_AddTenantAdmin_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *tenantServiceClient) UpdateTenantStatus(ctx context.Context, in *UpdateTenantStatusRequest, opts ...grpc.CallOption) (*UpdateTenantStatusResponse, error) {
@@ -75,6 +99,8 @@ func (c *tenantServiceClient) GetTenant(ctx context.Context, in *GetTenantReques
 // All implementations must embed UnimplementedTenantServiceServer
 // for forward compatibility.
 type TenantServiceServer interface {
+	CreateTenant(context.Context, *CreateTenantRequest) (*CreateTenantResponse, error)
+	AddTenantAdmin(context.Context, *AddTenantAdminRequest) (*AddTenantAdminResponse, error)
 	UpdateTenantStatus(context.Context, *UpdateTenantStatusRequest) (*UpdateTenantStatusResponse, error)
 	ListTenants(context.Context, *ListTenantsRequest) (*ListTenantsResponse, error)
 	GetTenant(context.Context, *GetTenantRequest) (*GetTenantResponse, error)
@@ -88,6 +114,12 @@ type TenantServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedTenantServiceServer struct{}
 
+func (UnimplementedTenantServiceServer) CreateTenant(context.Context, *CreateTenantRequest) (*CreateTenantResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateTenant not implemented")
+}
+func (UnimplementedTenantServiceServer) AddTenantAdmin(context.Context, *AddTenantAdminRequest) (*AddTenantAdminResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AddTenantAdmin not implemented")
+}
 func (UnimplementedTenantServiceServer) UpdateTenantStatus(context.Context, *UpdateTenantStatusRequest) (*UpdateTenantStatusResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateTenantStatus not implemented")
 }
@@ -116,6 +148,42 @@ func RegisterTenantServiceServer(s grpc.ServiceRegistrar, srv TenantServiceServe
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&TenantService_ServiceDesc, srv)
+}
+
+func _TenantService_CreateTenant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateTenantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TenantServiceServer).CreateTenant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TenantService_CreateTenant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TenantServiceServer).CreateTenant(ctx, req.(*CreateTenantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TenantService_AddTenantAdmin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddTenantAdminRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TenantServiceServer).AddTenantAdmin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TenantService_AddTenantAdmin_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TenantServiceServer).AddTenantAdmin(ctx, req.(*AddTenantAdminRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _TenantService_UpdateTenantStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -179,6 +247,14 @@ var TenantService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "cyber.system.v1.TenantService",
 	HandlerType: (*TenantServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateTenant",
+			Handler:    _TenantService_CreateTenant_Handler,
+		},
+		{
+			MethodName: "AddTenantAdmin",
+			Handler:    _TenantService_AddTenantAdmin_Handler,
+		},
 		{
 			MethodName: "UpdateTenantStatus",
 			Handler:    _TenantService_UpdateTenantStatus_Handler,

@@ -28,7 +28,7 @@ func NewPopulationRP(logger *slog.Logger, p *platform.Platform) PopulationRP {
 
 // Method --------------------------------------------------------------------------------------------------------------
 
-func (rp *populationRP) List(ctx context.Context, in *PopulationListIn) (*PopulationListOut, error) {
+func (rp *populationRP) List(ctx context.Context, in *ListIn) (*ListOut, error) {
 	query := rp.Platform.GetClient(ctx).Population.Query()
 	helper.Where(query, in.Code != nil, func() predicate.Population { return population.CodeContainsFold(*in.Code) })
 	helper.Where(query, in.Name != nil, func() predicate.Population { return population.NameContainsFold(*in.Name) })
@@ -46,7 +46,7 @@ func (rp *populationRP) List(ctx context.Context, in *PopulationListIn) (*Popula
 	if err != nil {
 		return nil, rp.Platform.HandleEntError(err)
 	}
-	return &PopulationListOut{
+	return &ListOut{
 		PageResponse: helper.BuildPageResponse(total, offset, limit),
 		List:         utils.SliceMap(rs, mapPopulation),
 	}, nil

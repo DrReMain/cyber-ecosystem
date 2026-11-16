@@ -13,7 +13,9 @@
     },
     "generate:ent": {
       "executor": "nx:run-commands",
-      "dependsOn": ["proto:generate:go"],
+      "dependsOn": [
+        "proto:generate:go"
+      ],
       "options": {
         "cwd": "{projectRoot}",
         "command": "go generate ./internal/ent/..."
@@ -21,7 +23,9 @@
     },
     "generate:wire": {
       "executor": "nx:run-commands",
-      "dependsOn": ["proto:generate:go"],
+      "dependsOn": [
+        "proto:generate:go"
+      ],
       "options": {
         "cwd": "{projectRoot}",
         "command": "go generate ./cmd/app/..."
@@ -29,10 +33,17 @@
     },
     "generate": {
       "executor": "nx:run-commands",
-      "dependsOn": ["proto:generate", "proto:conf", "generate:ent", "generate:wire"],
+      "dependsOn": [
+        "proto:generate",
+        "proto:conf",
+        "generate:ent",
+        "generate:wire"
+      ],
       "options": {
         "cwd": "{workspaceRoot}",
-        "commands": ["go mod tidy"],
+        "commands": [
+          "go mod tidy"
+        ],
         "parallel": false
       }
     },
@@ -43,12 +54,15 @@
         "command": "go tool kratos run",
         "env": {
           "APP_AGENT_MASTER_KEY": "agent-dev-master-key"
-        }
+        },
+        "description": "The env carries the dev-plane master key: a public dummy, not a secret (min-16-byte boot check only); real values are deploy-plane facts."
       }
     },
     "build": {
       "executor": "nx:run-commands",
-      "outputs": ["{projectRoot}/bin"],
+      "outputs": [
+        "{projectRoot}/bin"
+      ],
       "options": {
         "cwd": "{projectRoot}",
         "command": "go build -o ./bin/ ./..."
@@ -58,7 +72,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{projectRoot}",
-        "command": "go test -race ./..."
+        "command": "go test -race -count=1 ./..."
       }
     },
     "image": {

@@ -12,6 +12,8 @@ import (
 	"cyber-ecosystem/shared-go/kratos/security"
 	"cyber-ecosystem/shared-go/utils"
 
+	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
+
 	"cyber-ecosystem/app/services/system/internal/ent"
 	"cyber-ecosystem/app/services/system/internal/ent/credential"
 	"cyber-ecosystem/app/services/system/internal/ent/membership"
@@ -22,6 +24,11 @@ import (
 	"cyber-ecosystem/app/services/system/internal/ent/user"
 	"cyber-ecosystem/app/services/system/internal/platform"
 	"cyber-ecosystem/app/services/system/internal/shared"
+)
+
+const (
+	rosterKindSMS      = "sms"       // the auth providers' registry values, kept local rather than importing that module's privates
+	rosterKindWechatMP = "wechat_mp" // ditto
 )
 
 // Repo ----------------------------------------------------------------------------------------------------------------
@@ -92,7 +99,7 @@ func (rp *userRP) Delete(ctx context.Context, id string) (string, error) {
 	return id, nil
 }
 
-func (rp *userRP) List(ctx context.Context, in *UserListIn) (*UserListOut, error) {
+func (rp *userRP) List(ctx context.Context, in *ListIn) (*ListOut, error) {
 	query := rp.Platform.GetClient(ctx).User.Query()
 	// The admin face lists the caller's tenant's members — seats, not
 	// birthplace: an identity seated here is visible regardless of where
@@ -122,13 +129,13 @@ func (rp *userRP) List(ctx context.Context, in *UserListIn) (*UserListOut, error
 	if err != nil {
 		return nil, rp.Platform.HandleEntError(err)
 	}
-	return &UserListOut{
+	return &ListOut{
 		PageResponse: helper.BuildPageResponse(total, offset, limit),
 		List:         utils.SliceMap(us, mapUser),
 	}, nil
 }
 
-func (rp *userRP) ListByPopulation(ctx context.Context, in *UserListIn) (*UserListOut, error) {
+func (rp *userRP) ListByPopulation(ctx context.Context, in *ListIn) (*ListOut, error) {
 	query := rp.Platform.GetClient(ctx).User.Query()
 	if subject, ok := security.SubjectFromCtx(ctx); ok {
 		query.Where(populationNarrowing(subject.TenantID, utils.Deref(in.Population, "")))
@@ -149,10 +156,29 @@ func (rp *userRP) ListByPopulation(ctx context.Context, in *UserListIn) (*UserLi
 	if err != nil {
 		return nil, rp.Platform.HandleEntError(err)
 	}
-	return &UserListOut{
+	out := &ListOut{
 		PageResponse: helper.BuildPageResponse(total, offset, limit),
 		List:         utils.SliceMap(us, mapUser),
-	}, nil
+	}
+	rp.hydrateIdentity(ctx, out.List)
+	return out, nil
+}
+
+func (rp *userRP) ListCredentialsByUsers(ctx context.Context, userIDs []string) ([]*Credential, error) {
+	if len(userIDs) == 0 {
+		return nil, nil
+	}
+	rows, err := rp.Platform.GetClient(ctx).Credential.Query().
+		Where(credential.UserIDIn(userIDs...)).
+		All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	out := make([]*Credential, 0, len(rows))
+	for _, row := range rows {
+		out = append(out, &Credential{Kind: row.Kind, Identifier: row.Identifier, UserID: row.UserID})
+	}
+	return out, nil
 }
 
 func (rp *userRP) FindByAccount(ctx context.Context, account string) (*User, error) {
@@ -202,7 +228,15 @@ func (rp *userRP) FindSeatedAnyPlane(ctx context.Context, id string) (*User, err
 }
 
 func (rp *userRP) FindByIDs(ctx context.Context, ids []string) (map[string]*User, error) {
-	rows, err := rp.Platform.GetClient(ctx).User.Query().Where(user.IDIn(ids...)).All(ctx)
+	query := rp.Platform.GetClient(ctx).User.Query().Where(user.IDIn(ids...))
+	if subject, ok := security.SubjectFromCtx(ctx); ok {
+		// The batch face narrows to the caller's tenant like every other
+		// read face; cross-plane briefs stay readable within the tenant
+		// (member seats included — hydration consumers need them), and a
+		// foreign tenant's id answers as a silent miss.
+		query.Where(tenantSeatNarrowing(subject.TenantID))
+	}
+	rows, err := query.All(ctx)
 	if err != nil {
 		return nil, rp.Platform.HandleEntError(err)
 	}
@@ -223,6 +257,28 @@ func (rp *userRP) FindCredential(ctx context.Context, kind, identifier string) (
 	return mapCredential(c), nil
 }
 
+func (rp *userRP) FindCredentialByIdentifier(ctx context.Context, identifier string) (*Credential, error) {
+	// The kind-agnostic twin: an identifier names its account whatever
+	// kind it bound through — the login path resolves, the proof paths
+	// (which know their kind) use the narrow one above. Identifier shapes
+	// across kinds do not collide (a phone is not an email is not an
+	// openid); a same-identifier pair across kinds is a data disease —
+	// logged loudly here, answered as a miss, so the login path keeps its
+	// timing-honest refusal instead of surfacing a 500.
+	c, err := rp.Platform.GetClient(ctx).Credential.Query().
+		Where(credential.Identifier(identifier)).
+		Only(ctx)
+	if err != nil {
+		var nse *ent.NotSingularError
+		if errors.As(err, &nse) {
+			rp.Log.Error("credential identifier collision across kinds", "identifier", identifier)
+			return nil, errorspb.ErrorInfraErrorDbNotFound("")
+		}
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	return mapCredential(c), nil
+}
+
 func (rp *userRP) CreateCredential(ctx context.Context, c *Credential) error {
 	if _, err := rp.Platform.GetClient(ctx).Credential.Create().
 		SetKind(c.Kind).SetIdentifier(c.Identifier).SetUserID(c.UserID).
@@ -230,6 +286,41 @@ func (rp *userRP) CreateCredential(ctx context.Context, c *Credential) error {
 		return rp.Platform.HandleEntError(err)
 	}
 	return nil
+}
+
+func (rp *userRP) MoveCredential(ctx context.Context, kind, identifier, toUserID string) error {
+	// Zero matched rows is a visible miss (the credential vanished between
+	// the caller's read and this write), never a silent no-op.
+	n, err := rp.Platform.GetClient(ctx).Credential.Update().
+		Where(credential.Kind(kind), credential.Identifier(identifier)).
+		SetUserID(toUserID).
+		Save(ctx)
+	if err != nil {
+		return rp.Platform.HandleEntError(err)
+	}
+	if n == 0 {
+		return errorspb.ErrorInfraErrorDbNotFound("")
+	}
+	return nil
+}
+
+func (rp *userRP) ListCredentialsByUser(ctx context.Context, userID string) ([]*Credential, error) {
+	rows, err := rp.Platform.GetClient(ctx).Credential.Query().
+		Where(credential.UserID(userID)).
+		Order(ent.Asc(credential.FieldKind), ent.Asc(credential.FieldIdentifier)).
+		All(ctx)
+	if err != nil {
+		return nil, rp.Platform.HandleEntError(err)
+	}
+	return utils.SliceMap(rows, mapCredential), nil
+}
+
+func (rp *userRP) CountCredentialsByUser(ctx context.Context, userID string) (int, error) {
+	n, err := rp.Platform.GetClient(ctx).Credential.Query().Where(credential.UserID(userID)).Count(ctx)
+	if err != nil {
+		return 0, rp.Platform.HandleEntError(err)
+	}
+	return n, nil
 }
 
 func (rp *userRP) DeleteCredentialsByUser(ctx context.Context, userID string) error {
@@ -279,6 +370,10 @@ func (rp *userRP) FindRoleIDsByCodes(ctx context.Context, codes []string) (map[s
 }
 
 func (rp *userRP) SetUserRoles(ctx context.Context, userID string, wanted []string) error {
+	// Diff-replace convergence: concurrent calls converge to the union of
+	// the two intents — accepted semantics: both writers are authorized
+	// admins, and a role survives removal only as another admin's
+	// explicit concurrent grant.
 	client := rp.Platform.GetClient(ctx)
 	stored, err := client.PrincipalRole.Query().Where(
 		principalrole.PrincipalType(shared.PrincipalTypeUser),
@@ -375,6 +470,43 @@ func (rp *userRP) RevokeUserSessions(ctx context.Context, userID string) error {
 }
 
 // Private -------------------------------------------------------------------------------------------------------------
+
+func (rp *userRP) hydrateIdentity(ctx context.Context, users []*User) {
+	// Folds the credential registry's two operator-facing facts onto a
+	// roster page: the masked phone of the sms credential and whether a
+	// wechat_mp credential exists. Absent credentials stay absent — a
+	// member without a phone bound shows no number, never an error.
+	if len(users) == 0 {
+		return
+	}
+	ids := make([]string, 0, len(users))
+	for _, u := range users {
+		ids = append(ids, u.ID)
+	}
+	creds, err := rp.ListCredentialsByUsers(ctx, ids)
+	if err != nil {
+		// Best-effort by design: the roster row is the truth this face
+		// owes; identity projections failing to load is a degraded read,
+		// not a failed one.
+		rp.Log.Warn("roster identity hydration failed", "err", err)
+		return
+	}
+	byUser := make(map[string][]*Credential, len(users))
+	for _, c := range creds {
+		byUser[c.UserID] = append(byUser[c.UserID], c)
+	}
+	for _, u := range users {
+		for _, c := range byUser[u.ID] {
+			switch c.Kind {
+			case rosterKindSMS:
+				masked := utils.MaskPhone(c.Identifier)
+				u.PhoneMasked = &masked
+			case rosterKindWechatMP:
+				u.WechatBound = true
+			}
+		}
+	}
+}
 
 func seatNarrowing(tenantID string) predicate.User {
 	return predicate.User(func(s *entsql.Selector) {

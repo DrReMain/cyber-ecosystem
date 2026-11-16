@@ -16,6 +16,8 @@ type Tx struct {
 	config
 	// AgentConfig is the client for interacting with the AgentConfig builders.
 	AgentConfig *AgentConfigClient
+	// AuditLog is the client for interacting with the AuditLog builders.
+	AuditLog *AuditLogClient
 	// ChatMessage is the client for interacting with the ChatMessage builders.
 	ChatMessage *ChatMessageClient
 	// ChatSession is the client for interacting with the ChatSession builders.
@@ -152,6 +154,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.AgentConfig = NewAgentConfigClient(tx.config)
+	tx.AuditLog = NewAuditLogClient(tx.config)
 	tx.ChatMessage = NewChatMessageClient(tx.config)
 	tx.ChatSession = NewChatSessionClient(tx.config)
 }

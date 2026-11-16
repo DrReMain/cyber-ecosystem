@@ -7,8 +7,17 @@ import (
 	"cyber-ecosystem/app/services/system/internal/platform"
 )
 
-const ExtraAccount = "account"
 const PrincipalTypeUser = "user"
+
+// The super-administrator provisioning vocabulary, shared by the boot seed
+// and the runtime tenant-opening faces — one copy so every writer shapes
+// the same role (no superuser code path exists; the pattern is a grant like
+// any other).
+const (
+	SuperAdminRoleCode = "superadmin"
+	SuperAdminPattern  = "/*"
+	SuperAdminScope    = "all"
+)
 
 type Transaction interface {
 	InTx(ctx context.Context, fn func(context.Context) error) error

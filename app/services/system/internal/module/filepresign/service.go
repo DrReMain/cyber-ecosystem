@@ -6,9 +6,9 @@ import (
 
 	"github.com/go-kratos/kratos/v3/transport/grpc"
 	"github.com/go-kratos/kratos/v3/transport/http"
-	"google.golang.org/protobuf/types/known/timestamppb"
 
 	connecttransport "cyber-ecosystem/shared-go/kratos/transport/connect"
+	"cyber-ecosystem/shared-go/utils"
 
 	systempb "cyber-ecosystem/gen/go/cyber/system/v1"
 
@@ -57,7 +57,7 @@ func (s *FilePresignService) CreateUpload(ctx context.Context, in *systempb.Crea
 	resp := &systempb.CreateUploadResponse{File: file.ToProtoFile(out.File)}
 	if out.Single != nil {
 		resp.Channel = &systempb.CreateUploadResponse_Single{
-			Single: &systempb.PresignedPut{Url: out.Single.URL, ExpiresAt: timestamppb.New(out.Single.ExpiresAt)},
+			Single: &systempb.PresignedPut{Url: out.Single.URL, ExpiresAt: utils.ToTimestamp(&out.Single.ExpiresAt)},
 		}
 	} else {
 		partURLs := make([]*systempb.UploadPartUrl, 0, len(out.Multipart.PartURLs))
@@ -70,7 +70,7 @@ func (s *FilePresignService) CreateUpload(ctx context.Context, in *systempb.Crea
 				PartSize:  out.Multipart.PartSize,
 				PartCount: out.Multipart.PartCount,
 				PartUrls:  partURLs,
-				ExpiresAt: timestamppb.New(out.Multipart.ExpiresAt),
+				ExpiresAt: utils.ToTimestamp(&out.Multipart.ExpiresAt),
 			},
 		}
 	}
@@ -114,6 +114,6 @@ func (s *FilePresignService) ListUploadedParts(ctx context.Context, in *systempb
 		PartSize:  out.PartSize,
 		Uploaded:  uploaded,
 		Missing:   missing,
-		ExpiresAt: timestamppb.New(out.ExpiresAt),
+		ExpiresAt: utils.ToTimestamp(&out.ExpiresAt),
 	}, nil
 }

@@ -1,5 +1,7 @@
 # Skin Conventions
 
+**Status:** ACTIVE
+
 **Scope:** antd skin presets under `shared-ts/antd/src/skin-presets/` — authoring, tuning, and registering skins. Business-agnostic by design: a skin is a palette-and-geometry fill-in, never a business surface. Prescriptive — `MUST` / `SHOULD` / `MAY`.
 
 ## Read map

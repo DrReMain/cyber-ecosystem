@@ -11,4 +11,4 @@ Each service owns its middleware chain assembly (per-service policy, never share
 
 Procedure: `docs/conventions/kratos/RUNBOOKS.md` §4 "Deriving a new service" — the steps exactly; traps live inside them: the ent two-pass stub dance (entc refuses an empty schema package — the first aggregate's schema lands in the derive slice), wire cold start + interface-bind pruning, the atlas dev-database reset before any squash.
 
-Verify per kratos §7 and the deploy closer: builds green, migration applied on the dev stack, one live probe; counted declaration.
+Verify per kratos §7 and the deploy closer: builds green, migration applied on the dev stack, one live probe; evidence declaration.

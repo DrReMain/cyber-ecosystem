@@ -28,6 +28,7 @@ type fakePolicyRP struct {
 	updates int
 	deletes []string
 	notify  int
+	listOut *ListOut
 }
 
 func (f *fakePolicyRP) FindByID(_ context.Context, id string) (*Policy, error) {
@@ -55,6 +56,8 @@ func (f *fakePolicyRP) Delete(_ context.Context, id string) (string, error) {
 }
 
 func (f *fakePolicyRP) NotifyChanged(context.Context) { f.notify++ }
+
+func (f *fakePolicyRP) List(context.Context, *ListIn) (*ListOut, error) { return f.listOut, nil }
 
 func newPolicyUC(rp *fakePolicyRP) *PolicyUC {
 	return NewPolicyUC(
@@ -238,5 +241,16 @@ func TestValidateCalendar(t *testing.T) {
 func TestValidateParamsUnknownKind(t *testing.T) {
 	if err := validateParams("no-such-kind", nil); !systempb.IsSystemPolicyUnknownKind(err) {
 		t.Fatalf("unknown kind: want POLICY_UNKNOWN_KIND, got %v", err)
+	}
+}
+
+// List is a pure delegation — filters and paging live in the repo.
+func TestListDelegates(t *testing.T) {
+	want := &ListOut{List: []*Policy{{ID: "p1"}}}
+	uc := newPolicyUC(&fakePolicyRP{listOut: want})
+
+	out, err := uc.List(context.Background(), &ListIn{})
+	if err != nil || out != want {
+		t.Fatalf("list: out=%v err=%v", out, err)
 	}
 }

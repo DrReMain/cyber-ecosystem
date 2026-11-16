@@ -25,7 +25,7 @@ const preferencesSchema = z.object({
     .prefault({}),
   watermark: z
     .object({
-      enabled: z.boolean().default(true),
+      enabled: z.boolean().default(false),
     })
     .prefault({}),
 });

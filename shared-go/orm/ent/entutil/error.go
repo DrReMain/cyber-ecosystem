@@ -25,6 +25,11 @@ type DefaultError struct {
 }
 
 func HandleEntError(err error, checker EntErrorChecker, errs *DefaultError) error {
+	// A nil error is a caller bug; answering nil keeps a missed check from
+	// turning the success path into a phantom 500 below.
+	if err == nil {
+		return nil
+	}
 	// An error that already carries a kratos identity passes through: the
 	// mapping below classifies raw ent errors, and re-signing an existing
 	// identity would bury it (a 400 pagination argument surfacing as 500

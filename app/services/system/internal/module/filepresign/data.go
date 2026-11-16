@@ -7,7 +7,6 @@ import (
 
 	"cyber-ecosystem/shared-go/capability/storage"
 
-	"cyber-ecosystem/app/services/system/internal/ent"
 	"cyber-ecosystem/app/services/system/internal/ent/schema/local_mixins"
 	"cyber-ecosystem/app/services/system/internal/module/file"
 	"cyber-ecosystem/app/services/system/internal/platform"
@@ -42,7 +41,7 @@ func (rp *filePresignRP) Create(ctx context.Context, f *file.File) (*file.File, 
 	if err != nil {
 		return nil, rp.Platform.HandleEntError(err)
 	}
-	return mapFile(created), nil
+	return file.MapFile(created), nil
 }
 
 func (rp *filePresignRP) MarkConfirmed(ctx context.Context, id string, size int64, contentType, etag string) (*file.File, error) {
@@ -55,7 +54,7 @@ func (rp *filePresignRP) MarkConfirmed(ctx context.Context, id string, size int6
 	if err != nil {
 		return nil, rp.Platform.HandleEntError(err)
 	}
-	return mapFile(updated), nil
+	return file.MapFile(updated), nil
 }
 
 func (rp *filePresignRP) SetUploadID(ctx context.Context, id, uploadID string) error {
@@ -81,7 +80,7 @@ func (rp *filePresignRP) FindByID(ctx context.Context, id string) (*file.File, e
 	if err != nil {
 		return nil, rp.Platform.HandleEntError(err)
 	}
-	return mapFile(d), nil
+	return file.MapFile(d), nil
 }
 
 func (rp *filePresignRP) Limits() storage.Limits {
@@ -150,21 +149,3 @@ func (rp *filePresignRP) DeleteObject(ctx context.Context, key string) error {
 }
 
 // Private -------------------------------------------------------------------------------------------------------------
-
-func mapFile(d *ent.File) *file.File {
-	return &file.File{
-		ID:          d.ID,
-		CreatedAt:   d.CreatedAt,
-		UpdatedAt:   d.UpdatedAt,
-		TenantID:    d.TenantID,
-		Key:         d.Key,
-		Name:        d.Name,
-		ContentType: d.ContentType,
-		Size:        d.Size,
-		Source:      d.Source,
-		Status:      d.Status,
-		UploadID:    d.UploadID,
-		ETag:        d.Etag,
-		OwnerID:     d.OwnerID,
-	}
-}

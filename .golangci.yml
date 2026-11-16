@@ -31,9 +31,13 @@ linters:
         - name: package-comments
           disabled: true
 
+issues:
+  max-same-issues: 0
+
 formatters:
   enable:
     - gci
+    - gofmt
   settings:
     gci:
       # custom-order keeps the section sequence as declared below;

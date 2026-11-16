@@ -17,6 +17,7 @@ import (
 
 	"cyber-ecosystem/shared-go/capability/cache"
 	"cyber-ecosystem/shared-go/capability/sms"
+	"cyber-ecosystem/shared-go/utils"
 
 	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
 	systempb "cyber-ecosystem/gen/go/cyber/system/v1"
@@ -75,8 +76,21 @@ func testHandleSms() platform.SmsErrorHandler {
 	return func(err error) error { return err }
 }
 
+// fakeKV answers GetTTL for the daily self-heal; the nil-embedded KV makes
+// any other KV call a panic, which these tests never make.
+type fakeKV struct {
+	cache.KV
+	ttl time.Duration
+}
+
+func (f *fakeKV) GetTTL(context.Context, string) (time.Duration, error) { return f.ttl, nil }
+
 func smsTestCache(lim cache.RateLimiter, ctr cache.Counter) *cache.Cache {
-	return &cache.Cache{RateLimiter: lim, Counter: ctr}
+	return smsTestCacheKV(lim, ctr, &fakeKV{})
+}
+
+func smsTestCacheKV(lim cache.RateLimiter, ctr cache.Counter, kv cache.KV) *cache.Cache {
+	return &cache.Cache{RateLimiter: lim, Counter: ctr, KV: kv}
 }
 
 func newSmsProviderForTest(sender *fakeSmsSender, lim *fakeLimiter, ctr *fakeCounter, trp TokenRP) *smsProvider {
@@ -105,7 +119,7 @@ func TestIssueCodeHappyPath(t *testing.T) {
 	sender, lim, ctr, trp := &fakeSmsSender{}, &fakeLimiter{allowed: true}, &fakeCounter{next: 1}, newTokenStore()
 	p := newSmsProviderForTest(sender, lim, ctr, trp)
 
-	state, err := p.IssueCode(context.Background(), smsRow(), "+8613800138000")
+	state, err := p.IssueCode(context.Background(), smsRow(), "+8613800138000", "")
 	if err != nil {
 		t.Fatalf("issue: %v", err)
 	}
@@ -132,8 +146,9 @@ func TestIssueCodeHappyPath(t *testing.T) {
 	if m.To != "13800138000" || m.SignName != "曦光未来" || m.TemplateCode != "SMS_TEST" || m.Params["code"] != string(code) {
 		t.Fatalf("channel message = %+v", m)
 	}
-	if string(trp.vals[identityStatePrefix+state]) != "sms" {
-		t.Fatal("state not bound to the provider key")
+	val, uerr := utils.Unmarshal[identityStateValue](trp.vals[identityStatePrefix+state])
+	if uerr != nil || val.Provider != "sms" || val.BindUser != "" {
+		t.Fatalf("state = %q (%v), want an anonymous sms-provider mint", trp.vals[identityStatePrefix+state], uerr)
 	}
 }
 
@@ -144,7 +159,7 @@ func TestIssueCodeThrottleOrder(t *testing.T) {
 	sender, lim, ctr, trp := &fakeSmsSender{}, &fakeLimiter{allowed: true}, &fakeCounter{next: 1}, newTokenStore()
 	p := newSmsProviderForTest(sender, lim, ctr, trp)
 
-	if _, err := p.IssueCode(context.Background(), smsRow(), "12345"); !errorspb.IsGeneralErrorValidationFailed(err) {
+	if _, err := p.IssueCode(context.Background(), smsRow(), "12345", ""); !errorspb.IsGeneralErrorValidationFailed(err) {
 		t.Fatalf("non-mainland: want validation failed, got %v", err)
 	}
 	if lim.calls != 0 {
@@ -152,7 +167,7 @@ func TestIssueCodeThrottleOrder(t *testing.T) {
 	}
 
 	lim.allowed = false
-	if _, err := p.IssueCode(context.Background(), smsRow(), "13800138000"); !systempb.IsSystemSmsRateLimited(err) {
+	if _, err := p.IssueCode(context.Background(), smsRow(), "13800138000", ""); !systempb.IsSystemSmsRateLimited(err) {
 		t.Fatalf("closed window: want rate limited, got %v", err)
 	}
 	if len(sender.sent) != 0 || len(trp.vals) != 0 {
@@ -161,7 +176,7 @@ func TestIssueCodeThrottleOrder(t *testing.T) {
 
 	lim.allowed = true
 	ctr.next = smsSendPerDay + 1
-	if _, err := p.IssueCode(context.Background(), smsRow(), "13800138000"); !systempb.IsSystemSmsRateLimited(err) {
+	if _, err := p.IssueCode(context.Background(), smsRow(), "13800138000", ""); !systempb.IsSystemSmsRateLimited(err) {
 		t.Fatalf("daily cap: want rate limited, got %v", err)
 	}
 	if len(sender.sent) != 0 {
@@ -177,7 +192,7 @@ func TestIssueCodeNoStateOnFailedSend(t *testing.T) {
 	lim, ctr, trp := &fakeLimiter{allowed: true}, &fakeCounter{next: 1}, newTokenStore()
 	p := newSmsProviderForTest(sender, lim, ctr, trp)
 
-	state, err := p.IssueCode(context.Background(), smsRow(), "13800138000")
+	state, err := p.IssueCode(context.Background(), smsRow(), "13800138000", "")
 	if state != "" || !errors.Is(err, sms.ErrChannelRejected) {
 		t.Fatalf("want empty state + channel rejection, got %q / %v", state, err)
 	}
@@ -264,7 +279,7 @@ func TestBeginIdentityLoginRefusesSmsKind(t *testing.T) {
 	if err != nil {
 		t.Fatalf("uc: %v", err)
 	}
-	if _, err = uc.BeginIdentityLogin(context.Background(), "sms", "https://x.example/cb"); !systempb.IsSystemIdentityProviderUnknown(err) {
+	if _, err = uc.BeginIdentityLogin(context.Background(), "sms", "https://x.example/cb", ""); !systempb.IsSystemIdentityProviderUnknown(err) {
 		t.Fatalf("want provider unknown, got %v", err)
 	}
 }
@@ -281,7 +296,7 @@ func TestSendSmsCodeRefusesNonIssuer(t *testing.T) {
 	if err != nil {
 		t.Fatalf("uc: %v", err)
 	}
-	if _, err = uc.SendSmsCode(context.Background(), "wechat", "13800138000"); !systempb.IsSystemIdentityProviderUnknown(err) {
+	if _, err = uc.SendSmsCode(context.Background(), "wechat", "13800138000", ""); !systempb.IsSystemIdentityProviderUnknown(err) {
 		t.Fatalf("want provider unknown, got %v", err)
 	}
 }
@@ -300,7 +315,7 @@ func TestIssueCodeDailyCapBoundary(t *testing.T) {
 	p := newSmsProviderForTest(sender, lim, ctr, newTokenStore())
 
 	for range smsSendPerDay {
-		if _, err := p.IssueCode(context.Background(), smsRow(), "13800138000"); err != nil {
+		if _, err := p.IssueCode(context.Background(), smsRow(), "13800138000", ""); err != nil {
 			t.Fatalf("send inside the daily budget: %v", err)
 		}
 	}
@@ -308,7 +323,7 @@ func TestIssueCodeDailyCapBoundary(t *testing.T) {
 		t.Fatalf("channel saw %d sends, want %d", len(sender.sent), smsSendPerDay)
 	}
 	ctr.seq, ctr.i = []int64{smsSendPerDay + 1}, 0
-	if _, err := p.IssueCode(context.Background(), smsRow(), "13800138000"); !systempb.IsSystemSmsRateLimited(err) {
+	if _, err := p.IssueCode(context.Background(), smsRow(), "13800138000", ""); !systempb.IsSystemSmsRateLimited(err) {
 		t.Fatalf("send past the daily budget: want rate limited, got %v", err)
 	}
 	if len(sender.sent) != smsSendPerDay {
@@ -326,17 +341,19 @@ func TestFailedSendInvalidatesPriorCode(t *testing.T) {
 	trp := newTokenStore()
 	p := newSmsProviderForTest(sender, lim, &fakeCounter{next: 1}, trp)
 
-	if _, err := p.IssueCode(context.Background(), smsRow(), "13800138000"); err != nil {
+	if _, err := p.IssueCode(context.Background(), smsRow(), "13800138000", ""); err != nil {
 		t.Fatal(err)
 	}
 	first := string(trp.vals[smsCodePrefix+"13800138000"])
 
 	sender.err = &sms.ChannelError{Code: "isv.BUSINESS_LIMIT_CONTROL", Message: "flow control"}
-	if _, err := p.IssueCode(context.Background(), smsRow(), "13800138000"); !errors.Is(err, sms.ErrChannelRejected) {
+	if _, err := p.IssueCode(context.Background(), smsRow(), "13800138000", ""); !errors.Is(err, sms.ErrChannelRejected) {
 		t.Fatalf("failed resend: %v", err)
 	}
-	if cur := string(trp.vals[smsCodePrefix+"13800138000"]); cur == first {
-		t.Fatal("a failed send left the prior code armed")
+	// The burn is total: a refused send leaves neither the prior code
+	// nor the fresh ghost armed.
+	if cur, ok := trp.vals[smsCodePrefix+"13800138000"]; ok {
+		t.Fatalf("a refused send left a code armed: %q", cur)
 	}
 
 	// The overwritten code no longer exchanges — one live code per phone.
@@ -345,7 +362,7 @@ func TestFailedSendInvalidatesPriorCode(t *testing.T) {
 	}
 
 	sender.err = nil
-	if _, err := p.IssueCode(context.Background(), smsRow(), "13800138000"); err != nil {
+	if _, err := p.IssueCode(context.Background(), smsRow(), "13800138000", ""); err != nil {
 		t.Fatal(err)
 	}
 	fresh := string(trp.vals[smsCodePrefix+"13800138000"])
@@ -411,5 +428,65 @@ func TestRandomDigitsShape(t *testing.T) {
 	}
 	if len(seen) != 10 {
 		t.Fatalf("only %d distinct digits drawn", len(seen))
+	}
+}
+
+// TestIssueCodeSourceWindowGatesFirst: the per-source pair runs ahead of
+// the phone pair, so a number-walker hits its own source cap without
+// spending anything on any single phone budget.
+func TestIssueCodeSourceWindowGatesFirst(t *testing.T) {
+	sender, lim, ctr, trp := &fakeSmsSender{}, &fakeLimiter{allowed: false}, &fakeCounter{next: 1}, newTokenStore()
+	p := newSmsProviderForTest(sender, lim, ctr, trp)
+
+	if _, err := p.IssueCode(context.Background(), smsRow(), "13800138000", "203.0.113.7"); !systempb.IsSystemSmsRateLimited(err) {
+		t.Fatalf("want source rate limited, got %v", err)
+	}
+	if lim.calls != 1 {
+		t.Fatalf("source window must gate before the phone pair: calls=%d", lim.calls)
+	}
+}
+
+// TestIssueCodeEmptySourceSkipsSourceDimension: in-process callers pass no
+// source; the phone budgets alone still hold.
+func TestIssueCodeEmptySourceSkipsSourceDimension(t *testing.T) {
+	sender, lim, ctr, trp := &fakeSmsSender{}, &fakeLimiter{allowed: true}, &fakeCounter{next: 1}, newTokenStore()
+	p := newSmsProviderForTest(sender, lim, ctr, trp)
+
+	if _, err := p.IssueCode(context.Background(), smsRow(), "13800138000", ""); err != nil {
+		t.Fatalf("send must pass: %v", err)
+	}
+	if lim.calls != 1 {
+		t.Fatalf("empty source must skip the source dimension: calls=%d", lim.calls)
+	}
+}
+
+// TestIssueCodeDailyTTLSelfHeals: the daily counter's TTL is re-asserted
+// whenever GetTTL reads unset — a lost or failed Expire at the counter's
+// birth heals on a later send instead of leaving an immortal budget key.
+func TestIssueCodeDailyTTLSelfHeals(t *testing.T) {
+	sender, lim, ctr, trp := &fakeSmsSender{}, &fakeLimiter{allowed: true}, &fakeCounter{next: 3}, newTokenStore()
+	p := newSmsProviderForTest(sender, lim, ctr, trp) // default fakeKV: TTL unset
+
+	if _, err := p.IssueCode(context.Background(), smsRow(), "13800138000", ""); err != nil {
+		t.Fatalf("send must pass: %v", err)
+	}
+	if len(ctr.exp) != 1 {
+		t.Fatalf("unset TTL must be re-asserted on a later send: %v", ctr.exp)
+	}
+}
+
+// TestIssueCodeDailyTTLPresentSkipsReexpire: a counter already carrying a
+// TTL is left alone — the heal must not slide the window on every send.
+func TestIssueCodeDailyTTLPresentSkipsReexpire(t *testing.T) {
+	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
+	lim, ctr, trp := &fakeLimiter{allowed: true}, &fakeCounter{next: 1}, newTokenStore()
+	withTTL := &cache.Cache{RateLimiter: lim, Counter: ctr, KV: &fakeKV{ttl: time.Hour}}
+	p := NewSmsProvider(logger, &fakeSmsSender{}, testHandleSms(), func(err error) error { return err }, withTTL, trp)
+
+	if _, err := p.IssueCode(context.Background(), smsRow(), "13800138000", ""); err != nil {
+		t.Fatalf("send must pass: %v", err)
+	}
+	if len(ctr.exp) != 0 {
+		t.Fatalf("a present TTL must not re-expire: %v", ctr.exp)
 	}
 }

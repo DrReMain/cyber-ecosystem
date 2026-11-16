@@ -26,7 +26,10 @@ type fakeTenantRP struct {
 	rows    map[string]*Tenant
 	findErr error
 
-	listOut *TenantListOut
+	listOut *ListOut
+
+	createIn *CreateIn
+	adminIn  *AdminIn
 
 	updatedIDs  []string
 	updatedVals []bool
@@ -54,7 +57,7 @@ func (f *fakeTenantRP) FindByCode(_ context.Context, code string) (*Tenant, erro
 	return nil, errorspb.ErrorInfraErrorDbNotFound("")
 }
 
-func (f *fakeTenantRP) List(context.Context, *TenantListIn) (*TenantListOut, error) {
+func (f *fakeTenantRP) List(context.Context, *ListIn) (*ListOut, error) {
 	return f.listOut, nil
 }
 
@@ -108,10 +111,10 @@ func TestGetFound(t *testing.T) {
 
 // List is a pure delegation — filters and paging live in the repo.
 func TestListDelegates(t *testing.T) {
-	want := &TenantListOut{List: []*Tenant{defaultRow(true)}}
+	want := &ListOut{List: []*Tenant{defaultRow(true)}}
 	uc := newTenantUC(&fakeTenantRP{listOut: want})
 
-	out, err := uc.List(context.Background(), &TenantListIn{})
+	out, err := uc.List(context.Background(), &ListIn{})
 	if err != nil || out != want {
 		t.Fatalf("list: out=%v err=%v", out, err)
 	}
@@ -186,5 +189,52 @@ func TestSetEnabledHappy(t *testing.T) {
 	}
 	if len(rp.updatedIDs) != 1 || rp.updatedVals[0] {
 		t.Fatalf("disable: writes = %v %v", rp.updatedIDs, rp.updatedVals)
+	}
+}
+
+// fakeTenantRP's runtime-opening arms: record the asks, answer fixed ids.
+func (f *fakeTenantRP) Create(_ context.Context, in *CreateIn) (string, error) {
+	f.createIn = in
+	return "t-new", nil
+}
+
+func (f *fakeTenantRP) AddSuperAdmin(_ context.Context, in *AdminIn) (string, error) {
+	f.adminIn = in
+	return "u-new", nil
+}
+
+// AddSuperAdmin refuses a weak administrator password before any write —
+// the same policy every credential flows through.
+func TestAddSuperAdminRejectsWeakPassword(t *testing.T) {
+	uc := newTenantUC(&fakeTenantRP{})
+	if _, err := uc.AddSuperAdmin(context.Background(), &AdminIn{
+		TenantCode: "acme", Account: "admin@acme", Password: "weak",
+	}); err == nil {
+		t.Fatal("weak password: want refusal")
+	}
+}
+
+// Both runtime faces land their whole ask inside the transaction and answer
+// the new row's id.
+func TestRuntimeFacesDelegateInTx(t *testing.T) {
+	rp := &fakeTenantRP{}
+	uc := newTenantUC(rp)
+
+	id, err := uc.Create(context.Background(), &CreateIn{Code: "acme", Name: "ACME"})
+	if err != nil || id != "t-new" {
+		t.Fatalf("create: id=%q err=%v", id, err)
+	}
+	if rp.createIn == nil || rp.createIn.Code != "acme" {
+		t.Fatalf("create ask: %+v", rp.createIn)
+	}
+
+	userID, err := uc.AddSuperAdmin(context.Background(), &AdminIn{
+		TenantCode: "acme", Account: "admin@acme", Password: "Str0ng-Pass!x",
+	})
+	if err != nil || userID != "u-new" {
+		t.Fatalf("add admin: id=%q err=%v", userID, err)
+	}
+	if rp.adminIn == nil || rp.adminIn.Account != "admin@acme" {
+		t.Fatalf("add admin ask: %+v", rp.adminIn)
 	}
 }

@@ -4,13 +4,7 @@ import type { SubmitEvent } from "react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { systemReason } from "#/domains/error";
-import {
-  AuthDivider,
-  ForgotPassword,
-  LoginForm,
-  LoginShell,
-  SsoLogin,
-} from "#/features/login-default";
+import { ForgotPassword, LoginForm, LoginShell, SsoLogin } from "#/features/login-default";
 import { m } from "#/paraglide/messages";
 import { LOGIN_PATH, LOGIN_ROUTE_ID } from "../area";
 import { usePasswordLogin } from "./use-password-login";
@@ -24,6 +18,8 @@ function failureCopy(reason: string | undefined): string | null {
       return m.error_SYSTEM_LOGIN_FAILED();
     case System.LOGIN_SEAT_REQUIRED:
       return m.error_SYSTEM_LOGIN_SEAT_REQUIRED();
+    case System.LOGIN_SEAT_CHOICE_REQUIRED:
+      return m.error_SYSTEM_LOGIN_SEAT_CHOICE_REQUIRED();
     case System.USER_DISABLED:
       return m.error_SYSTEM_USER_DISABLED();
     case System.TENANT_DISABLED:
@@ -89,7 +85,6 @@ export function LoginPage() {
         pending={login.isPending}
       />
       <ForgotPassword />
-      <AuthDivider />
       <SsoLogin />
     </LoginShell>
   );

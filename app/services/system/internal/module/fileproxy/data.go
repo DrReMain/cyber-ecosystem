@@ -7,7 +7,6 @@ import (
 
 	"cyber-ecosystem/shared-go/capability/storage"
 
-	"cyber-ecosystem/app/services/system/internal/ent"
 	"cyber-ecosystem/app/services/system/internal/module/file"
 	"cyber-ecosystem/app/services/system/internal/platform"
 	"cyber-ecosystem/app/services/system/internal/shared"
@@ -42,7 +41,7 @@ func (rp *fileProxyRP) Create(ctx context.Context, f *file.File) (*file.File, er
 	if err != nil {
 		return nil, rp.Platform.HandleEntError(err)
 	}
-	return mapFile(created), nil
+	return file.MapFile(created), nil
 }
 
 func (rp *fileProxyRP) DeleteObject(ctx context.Context, key string) error {
@@ -65,21 +64,3 @@ func (rp *fileProxyRP) PutObject(ctx context.Context, key string, data []byte, c
 }
 
 // Private -------------------------------------------------------------------------------------------------------------
-
-func mapFile(d *ent.File) *file.File {
-	return &file.File{
-		ID:          d.ID,
-		CreatedAt:   d.CreatedAt,
-		UpdatedAt:   d.UpdatedAt,
-		TenantID:    d.TenantID,
-		Key:         d.Key,
-		Name:        d.Name,
-		ContentType: d.ContentType,
-		Size:        d.Size,
-		Source:      d.Source,
-		Status:      d.Status,
-		UploadID:    d.UploadID,
-		ETag:        d.Etag,
-		OwnerID:     d.OwnerID,
-	}
-}

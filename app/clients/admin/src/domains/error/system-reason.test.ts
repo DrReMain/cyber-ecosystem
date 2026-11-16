@@ -9,7 +9,7 @@ describe("systemReason", () => {
   });
 
   it("returns undefined for foreign prefixes and unknown names", () => {
-    expect(systemReason("GENERAL_ERROR_UNSPECIFIED")).toBeUndefined();
+    expect(systemReason("OTHER_SERVICE_MEMBER_NOT_FOUND")).toBeUndefined();
     expect(systemReason("SYSTEM_NO_SUCH_REASON")).toBeUndefined();
     expect(systemReason(undefined)).toBeUndefined();
   });

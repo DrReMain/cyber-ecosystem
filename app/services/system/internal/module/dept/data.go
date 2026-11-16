@@ -74,7 +74,7 @@ func (rp *deptRP) Delete(ctx context.Context, id string) (string, error) {
 	return id, nil
 }
 
-func (rp *deptRP) List(ctx context.Context, in *DeptListIn) (*DeptListOut, error) {
+func (rp *deptRP) List(ctx context.Context, in *ListIn) (*ListOut, error) {
 	query := rp.Platform.GetClient(ctx).Dept.Query()
 	helper.WherePtr(query, utils.FromTimestamp(in.CreatedAtA), dept.CreatedAtGTE)
 	helper.WherePtr(query, utils.FromTimestamp(in.CreatedAtZ), dept.CreatedAtLTE)
@@ -113,7 +113,7 @@ func (rp *deptRP) List(ctx context.Context, in *DeptListIn) (*DeptListOut, error
 	for _, d := range list {
 		d.UserCount = byDept[d.ID]
 	}
-	return &DeptListOut{
+	return &ListOut{
 		PageResponse: helper.BuildPageResponse(total, offset, limit),
 		List:         list,
 	}, nil

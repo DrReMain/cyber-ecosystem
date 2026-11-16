@@ -28,3 +28,16 @@ func SliceMapErr[T any, R any](s []T, f func(T) (R, error)) ([]R, error) {
 	}
 	return result, nil
 }
+
+// SliceAny widens a typed slice to []any — the shape variadic any-takers
+// (sql.In and friends) demand. Returns nil if s is empty.
+func SliceAny[T any](s []T) []any {
+	if len(s) == 0 {
+		return nil
+	}
+	result := make([]any, 0, len(s))
+	for _, v := range s {
+		result = append(result, v)
+	}
+	return result
+}

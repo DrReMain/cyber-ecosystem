@@ -14,5 +14,17 @@
   "platform_tenants_act_enable": "Enable",
   "platform_tenants_act_disable": "Disable",
   "platform_tenants_disable_confirm": "Disable this tenant?",
-  "platform_tenants_empty": "No tenants yet"
+  "platform_tenants_empty": "No tenants yet",
+  "platform_tenants_create_title": "New tenant",
+  "platform_tenants_create_code": "Tenant code",
+  "platform_tenants_create_code_hint": "lowercase letters, digits and dashes; permanent once created",
+  "platform_tenants_create_name": "Tenant name",
+  "platform_tenants_create_admin_account": "Admin account",
+  "platform_tenants_create_admin_password": "Admin initial password",
+  "platform_tenants_create_submit": "Provision",
+  "platform_tenants_add_admin_title": "Add super administrator",
+  "platform_tenants_add_admin_account": "Account",
+  "platform_tenants_add_admin_password": "Initial password",
+  "platform_tenants_add_admin_submit": "Grant",
+  "platform_tenants_act_add_admin": "Add admin"
 }

@@ -9,6 +9,8 @@ import (
 // RegisterTenantServiceConnectServer registers the cyber.system.v1.TenantService service on a
 // Kratos Connect transport server, bridging a gRPC-style implementation.
 func RegisterTenantServiceConnectServer(srv *connect.Server, svc TenantServiceServer) {
+	connect.HandleUnary(srv, "/cyber.system.v1.TenantService/CreateTenant", svc.CreateTenant)
+	connect.HandleUnary(srv, "/cyber.system.v1.TenantService/AddTenantAdmin", svc.AddTenantAdmin)
 	connect.HandleUnary(srv, "/cyber.system.v1.TenantService/UpdateTenantStatus", svc.UpdateTenantStatus)
 	connect.HandleUnary(srv, "/cyber.system.v1.TenantService/ListTenants", svc.ListTenants)
 	connect.HandleUnary(srv, "/cyber.system.v1.TenantService/GetTenant", svc.GetTenant)

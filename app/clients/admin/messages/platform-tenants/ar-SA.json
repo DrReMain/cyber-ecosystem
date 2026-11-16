@@ -14,5 +14,17 @@
   "platform_tenants_act_enable": "تفعيل",
   "platform_tenants_act_disable": "إيقاف",
   "platform_tenants_disable_confirm": "إيقاف هذا المستأجر؟",
-  "platform_tenants_empty": "لا يوجد مستأجرون بعد"
+  "platform_tenants_empty": "لا يوجد مستأجرون بعد",
+  "platform_tenants_create_title": "مستأجر جديد",
+  "platform_tenants_create_code": "رمز المستأجر",
+  "platform_tenants_create_code_hint": "أحرف صغيرة وأرقام وشرطات؛ دائم بعد الإنشاء",
+  "platform_tenants_create_name": "اسم المستأجر",
+  "platform_tenants_create_admin_account": "حساب المسؤول",
+  "platform_tenants_create_admin_password": "كلمة المرور الأولية للمسؤول",
+  "platform_tenants_create_submit": "تأسيس",
+  "platform_tenants_add_admin_title": "إضافة مسؤول متميز",
+  "platform_tenants_add_admin_account": "الحساب",
+  "platform_tenants_add_admin_password": "كلمة المرور الأولية",
+  "platform_tenants_add_admin_submit": "منح",
+  "platform_tenants_act_add_admin": "إضافة مسؤول"
 }

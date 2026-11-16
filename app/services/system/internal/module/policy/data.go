@@ -80,7 +80,7 @@ func (rp *policyRP) Delete(ctx context.Context, id string) (string, error) {
 	return id, nil
 }
 
-func (rp *policyRP) List(ctx context.Context, in *PolicyListIn) (*PolicyListOut, error) {
+func (rp *policyRP) List(ctx context.Context, in *ListIn) (*ListOut, error) {
 	query := rp.Platform.GetClient(ctx).AuthzPolicy.Query()
 	helper.Where(query, in.Kind != nil, func() predicate.AuthzPolicy { return authzpolicy.KindEQ(*in.Kind) })
 	helper.Where(query, in.Name != nil, func() predicate.AuthzPolicy { return authzpolicy.NameContainsFold(*in.Name) })
@@ -103,7 +103,7 @@ func (rp *policyRP) List(ctx context.Context, in *PolicyListIn) (*PolicyListOut,
 	if err := attachBoundCounts(ctx, rp.Platform.GetClient(ctx), out); err != nil {
 		return nil, rp.Platform.HandleEntError(err)
 	}
-	return &PolicyListOut{
+	return &ListOut{
 		PageResponse: helper.BuildPageResponse(total, offset, limit),
 		List:         out,
 	}, nil

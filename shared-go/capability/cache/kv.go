@@ -11,6 +11,7 @@ type KV interface {
 	Get(ctx context.Context, key string) ([]byte, error)
 	GetDel(ctx context.Context, key string) ([]byte, error) // atomic get + delete; miss → ErrCacheMiss
 	Set(ctx context.Context, key string, val []byte, ttl time.Duration) error
+	CompareAndSet(ctx context.Context, key string, expected, val []byte, ttl time.Duration) (bool, error)
 	Del(ctx context.Context, key string) error
 	Expire(ctx context.Context, key string, ttl time.Duration) error
 	Exists(ctx context.Context, key string) (bool, error)

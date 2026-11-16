@@ -14,5 +14,17 @@
   "platform_tenants_act_enable": "활성화",
   "platform_tenants_act_disable": "비활성화",
   "platform_tenants_disable_confirm": "이 테넌트를 비활성화하시겠습니까?",
-  "platform_tenants_empty": "아직 테넌트가 없습니다"
+  "platform_tenants_empty": "아직 테넌트가 없습니다",
+  "platform_tenants_create_title": "새 테넌트",
+  "platform_tenants_create_code": "테넌트 코드",
+  "platform_tenants_create_code_hint": "소문자, 숫자, 하이픈; 생성 후 변경 불가",
+  "platform_tenants_create_name": "테넌트 이름",
+  "platform_tenants_create_admin_account": "관리자 계정",
+  "platform_tenants_create_admin_password": "관리자 초기 비밀번호",
+  "platform_tenants_create_submit": "개설",
+  "platform_tenants_add_admin_title": "슈퍼 관리자 추가",
+  "platform_tenants_add_admin_account": "계정",
+  "platform_tenants_add_admin_password": "초기 비밀번호",
+  "platform_tenants_add_admin_submit": "부여",
+  "platform_tenants_act_add_admin": "관리자 추가"
 }

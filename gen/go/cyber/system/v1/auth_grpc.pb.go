@@ -19,13 +19,19 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AuthService_Login_FullMethodName              = "/cyber.system.v1.AuthService/Login"
-	AuthService_LoginByIdentity_FullMethodName    = "/cyber.system.v1.AuthService/LoginByIdentity"
-	AuthService_BeginIdentityLogin_FullMethodName = "/cyber.system.v1.AuthService/BeginIdentityLogin"
-	AuthService_SendSmsCode_FullMethodName        = "/cyber.system.v1.AuthService/SendSmsCode"
-	AuthService_BindCredential_FullMethodName     = "/cyber.system.v1.AuthService/BindCredential"
-	AuthService_Logout_FullMethodName             = "/cyber.system.v1.AuthService/Logout"
-	AuthService_GetCurrentUser_FullMethodName     = "/cyber.system.v1.AuthService/GetCurrentUser"
+	AuthService_Login_FullMethodName               = "/cyber.system.v1.AuthService/Login"
+	AuthService_LoginByIdentity_FullMethodName     = "/cyber.system.v1.AuthService/LoginByIdentity"
+	AuthService_BeginIdentityLogin_FullMethodName  = "/cyber.system.v1.AuthService/BeginIdentityLogin"
+	AuthService_SendSmsCode_FullMethodName         = "/cyber.system.v1.AuthService/SendSmsCode"
+	AuthService_GetLoginConfig_FullMethodName      = "/cyber.system.v1.AuthService/GetLoginConfig"
+	AuthService_BindCredential_FullMethodName      = "/cyber.system.v1.AuthService/BindCredential"
+	AuthService_BeginBindCredential_FullMethodName = "/cyber.system.v1.AuthService/BeginBindCredential"
+	AuthService_SendBindSmsCode_FullMethodName     = "/cyber.system.v1.AuthService/SendBindSmsCode"
+	AuthService_ResetPassword_FullMethodName       = "/cyber.system.v1.AuthService/ResetPassword"
+	AuthService_GetSecurityStatus_FullMethodName   = "/cyber.system.v1.AuthService/GetSecurityStatus"
+	AuthService_Logout_FullMethodName              = "/cyber.system.v1.AuthService/Logout"
+	AuthService_GetCurrentUser_FullMethodName      = "/cyber.system.v1.AuthService/GetCurrentUser"
+	AuthService_ImportAccounts_FullMethodName      = "/cyber.system.v1.AuthService/ImportAccounts"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -36,9 +42,21 @@ type AuthServiceClient interface {
 	LoginByIdentity(ctx context.Context, in *LoginByIdentityRequest, opts ...grpc.CallOption) (*LoginByIdentityResponse, error)
 	BeginIdentityLogin(ctx context.Context, in *BeginIdentityLoginRequest, opts ...grpc.CallOption) (*BeginIdentityLoginResponse, error)
 	SendSmsCode(ctx context.Context, in *SendSmsCodeRequest, opts ...grpc.CallOption) (*SendSmsCodeResponse, error)
+	GetLoginConfig(ctx context.Context, in *GetLoginConfigRequest, opts ...grpc.CallOption) (*GetLoginConfigResponse, error)
 	BindCredential(ctx context.Context, in *BindCredentialRequest, opts ...grpc.CallOption) (*BindCredentialResponse, error)
+	BeginBindCredential(ctx context.Context, in *BeginBindCredentialRequest, opts ...grpc.CallOption) (*BeginBindCredentialResponse, error)
+	SendBindSmsCode(ctx context.Context, in *SendBindSmsCodeRequest, opts ...grpc.CallOption) (*SendBindSmsCodeResponse, error)
+	ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ResetPasswordResponse, error)
+	GetSecurityStatus(ctx context.Context, in *GetSecurityStatusRequest, opts ...grpc.CallOption) (*GetSecurityStatusResponse, error)
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error)
 	GetCurrentUser(ctx context.Context, in *GetCurrentUserRequest, opts ...grpc.CallOption) (*GetCurrentUserResponse, error)
+	// Bulk registration on the operator's behalf: one file's rows become
+	// accounts with an sms credential each — the exact dance the sms login's
+	// auto-registration runs, minus the proof (the operator collected the
+	// numbers off-line). A phone that already names an account skips — the
+	// credential table's own uniqueness, read ahead of the write — and
+	// nothing rolls back the rows that already landed.
+	ImportAccounts(ctx context.Context, in *ImportAccountsRequest, opts ...grpc.CallOption) (*ImportAccountsResponse, error)
 }
 
 type authServiceClient struct {
@@ -89,10 +107,60 @@ func (c *authServiceClient) SendSmsCode(ctx context.Context, in *SendSmsCodeRequ
 	return out, nil
 }
 
+func (c *authServiceClient) GetLoginConfig(ctx context.Context, in *GetLoginConfigRequest, opts ...grpc.CallOption) (*GetLoginConfigResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetLoginConfigResponse)
+	err := c.cc.Invoke(ctx, AuthService_GetLoginConfig_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *authServiceClient) BindCredential(ctx context.Context, in *BindCredentialRequest, opts ...grpc.CallOption) (*BindCredentialResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(BindCredentialResponse)
 	err := c.cc.Invoke(ctx, AuthService_BindCredential_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) BeginBindCredential(ctx context.Context, in *BeginBindCredentialRequest, opts ...grpc.CallOption) (*BeginBindCredentialResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BeginBindCredentialResponse)
+	err := c.cc.Invoke(ctx, AuthService_BeginBindCredential_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) SendBindSmsCode(ctx context.Context, in *SendBindSmsCodeRequest, opts ...grpc.CallOption) (*SendBindSmsCodeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SendBindSmsCodeResponse)
+	err := c.cc.Invoke(ctx, AuthService_SendBindSmsCode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ResetPasswordResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ResetPasswordResponse)
+	err := c.cc.Invoke(ctx, AuthService_ResetPassword_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) GetSecurityStatus(ctx context.Context, in *GetSecurityStatusRequest, opts ...grpc.CallOption) (*GetSecurityStatusResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetSecurityStatusResponse)
+	err := c.cc.Invoke(ctx, AuthService_GetSecurityStatus_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -119,6 +187,16 @@ func (c *authServiceClient) GetCurrentUser(ctx context.Context, in *GetCurrentUs
 	return out, nil
 }
 
+func (c *authServiceClient) ImportAccounts(ctx context.Context, in *ImportAccountsRequest, opts ...grpc.CallOption) (*ImportAccountsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ImportAccountsResponse)
+	err := c.cc.Invoke(ctx, AuthService_ImportAccounts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
@@ -127,9 +205,21 @@ type AuthServiceServer interface {
 	LoginByIdentity(context.Context, *LoginByIdentityRequest) (*LoginByIdentityResponse, error)
 	BeginIdentityLogin(context.Context, *BeginIdentityLoginRequest) (*BeginIdentityLoginResponse, error)
 	SendSmsCode(context.Context, *SendSmsCodeRequest) (*SendSmsCodeResponse, error)
+	GetLoginConfig(context.Context, *GetLoginConfigRequest) (*GetLoginConfigResponse, error)
 	BindCredential(context.Context, *BindCredentialRequest) (*BindCredentialResponse, error)
+	BeginBindCredential(context.Context, *BeginBindCredentialRequest) (*BeginBindCredentialResponse, error)
+	SendBindSmsCode(context.Context, *SendBindSmsCodeRequest) (*SendBindSmsCodeResponse, error)
+	ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error)
+	GetSecurityStatus(context.Context, *GetSecurityStatusRequest) (*GetSecurityStatusResponse, error)
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
 	GetCurrentUser(context.Context, *GetCurrentUserRequest) (*GetCurrentUserResponse, error)
+	// Bulk registration on the operator's behalf: one file's rows become
+	// accounts with an sms credential each — the exact dance the sms login's
+	// auto-registration runs, minus the proof (the operator collected the
+	// numbers off-line). A phone that already names an account skips — the
+	// credential table's own uniqueness, read ahead of the write — and
+	// nothing rolls back the rows that already landed.
+	ImportAccounts(context.Context, *ImportAccountsRequest) (*ImportAccountsResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -152,14 +242,32 @@ func (UnimplementedAuthServiceServer) BeginIdentityLogin(context.Context, *Begin
 func (UnimplementedAuthServiceServer) SendSmsCode(context.Context, *SendSmsCodeRequest) (*SendSmsCodeResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SendSmsCode not implemented")
 }
+func (UnimplementedAuthServiceServer) GetLoginConfig(context.Context, *GetLoginConfigRequest) (*GetLoginConfigResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetLoginConfig not implemented")
+}
 func (UnimplementedAuthServiceServer) BindCredential(context.Context, *BindCredentialRequest) (*BindCredentialResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method BindCredential not implemented")
+}
+func (UnimplementedAuthServiceServer) BeginBindCredential(context.Context, *BeginBindCredentialRequest) (*BeginBindCredentialResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method BeginBindCredential not implemented")
+}
+func (UnimplementedAuthServiceServer) SendBindSmsCode(context.Context, *SendBindSmsCodeRequest) (*SendBindSmsCodeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SendBindSmsCode not implemented")
+}
+func (UnimplementedAuthServiceServer) ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ResetPassword not implemented")
+}
+func (UnimplementedAuthServiceServer) GetSecurityStatus(context.Context, *GetSecurityStatusRequest) (*GetSecurityStatusResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetSecurityStatus not implemented")
 }
 func (UnimplementedAuthServiceServer) Logout(context.Context, *LogoutRequest) (*LogoutResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Logout not implemented")
 }
 func (UnimplementedAuthServiceServer) GetCurrentUser(context.Context, *GetCurrentUserRequest) (*GetCurrentUserResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetCurrentUser not implemented")
+}
+func (UnimplementedAuthServiceServer) ImportAccounts(context.Context, *ImportAccountsRequest) (*ImportAccountsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ImportAccounts not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
@@ -254,6 +362,24 @@ func _AuthService_SendSmsCode_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_GetLoginConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetLoginConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).GetLoginConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_GetLoginConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).GetLoginConfig(ctx, req.(*GetLoginConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AuthService_BindCredential_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(BindCredentialRequest)
 	if err := dec(in); err != nil {
@@ -268,6 +394,78 @@ func _AuthService_BindCredential_Handler(srv interface{}, ctx context.Context, d
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthServiceServer).BindCredential(ctx, req.(*BindCredentialRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_BeginBindCredential_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BeginBindCredentialRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).BeginBindCredential(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_BeginBindCredential_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).BeginBindCredential(ctx, req.(*BeginBindCredentialRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_SendBindSmsCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendBindSmsCodeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).SendBindSmsCode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_SendBindSmsCode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).SendBindSmsCode(ctx, req.(*SendBindSmsCodeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_ResetPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResetPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).ResetPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_ResetPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).ResetPassword(ctx, req.(*ResetPasswordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_GetSecurityStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSecurityStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).GetSecurityStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_GetSecurityStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).GetSecurityStatus(ctx, req.(*GetSecurityStatusRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -308,6 +506,24 @@ func _AuthService_GetCurrentUser_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_ImportAccounts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ImportAccountsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).ImportAccounts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_ImportAccounts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).ImportAccounts(ctx, req.(*ImportAccountsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -332,8 +548,28 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AuthService_SendSmsCode_Handler,
 		},
 		{
+			MethodName: "GetLoginConfig",
+			Handler:    _AuthService_GetLoginConfig_Handler,
+		},
+		{
 			MethodName: "BindCredential",
 			Handler:    _AuthService_BindCredential_Handler,
+		},
+		{
+			MethodName: "BeginBindCredential",
+			Handler:    _AuthService_BeginBindCredential_Handler,
+		},
+		{
+			MethodName: "SendBindSmsCode",
+			Handler:    _AuthService_SendBindSmsCode_Handler,
+		},
+		{
+			MethodName: "ResetPassword",
+			Handler:    _AuthService_ResetPassword_Handler,
+		},
+		{
+			MethodName: "GetSecurityStatus",
+			Handler:    _AuthService_GetSecurityStatus_Handler,
 		},
 		{
 			MethodName: "Logout",
@@ -342,6 +578,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetCurrentUser",
 			Handler:    _AuthService_GetCurrentUser_Handler,
+		},
+		{
+			MethodName: "ImportAccounts",
+			Handler:    _AuthService_ImportAccounts_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

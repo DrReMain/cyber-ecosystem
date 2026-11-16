@@ -11,6 +11,7 @@ import { userRefView } from "#/features/app/user/user-ref";
 import { m } from "#/paraglide/messages";
 import { getTextDirection } from "#/paraglide/runtime";
 import { DenyTag, StatusTag } from "./event-tags";
+import { dash } from "./format";
 import { Latency } from "./latency";
 
 interface AuditTableProps {
@@ -127,9 +128,7 @@ export function AuditTable({
       title: () => m.system_audit_col_ip(),
       dataIndex: "ip",
       width: 150,
-      render: (_, event) => (
-        <span className="font-mono text-[12px]">{event.ip === "" ? "-" : event.ip}</span>
-      ),
+      render: (_, event) => <span className="font-mono text-[12px]">{dash(event.ip)}</span>,
     },
     fieldAction<AuditLog>(
       (_, event) => (

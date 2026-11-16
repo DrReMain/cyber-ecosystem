@@ -10,10 +10,10 @@ import (
 // fakePopulationRP answers the registry slice: a passthrough list.
 type fakePopulationRP struct {
 	PopulationRP
-	listOut *PopulationListOut
+	listOut *ListOut
 }
 
-func (f *fakePopulationRP) List(context.Context, *PopulationListIn) (*PopulationListOut, error) {
+func (f *fakePopulationRP) List(context.Context, *ListIn) (*ListOut, error) {
 	return f.listOut, nil
 }
 
@@ -26,9 +26,9 @@ func newPopulationUC(rp *fakePopulationRP) *PopulationUC {
 
 // List delegates — the registry carries no list-side law of its own.
 func TestListDelegates(t *testing.T) {
-	want := &PopulationListOut{List: []*Population{{Code: "user"}}}
+	want := &ListOut{List: []*Population{{Code: "user"}}}
 	rp := &fakePopulationRP{listOut: want}
-	got, err := newPopulationUC(rp).List(context.Background(), &PopulationListIn{})
+	got, err := newPopulationUC(rp).List(context.Background(), &ListIn{})
 	if err != nil {
 		t.Fatalf("list: %v", err)
 	}

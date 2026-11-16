@@ -155,6 +155,25 @@ func toInt32(n int) int32 {
 	return int32(n)
 }
 
+// PageWindow resolves a page request onto an in-memory slice: the same
+// defaults and cap query-level pagination applies (absent page = 1, absent
+// size = the default, oversized = capped). The folded-list faces share this
+// one resolver so their in-memory paging can't drift from the query-level
+// answers.
+func PageWindow(req *commonv1.PageRequest) (offset, limit int) {
+	pageNo, pageSize := 1, DefaultPageSize
+	if req.GetPageNo() > 0 {
+		pageNo = int(req.GetPageNo())
+	}
+	if req.GetPageSize() > 0 {
+		pageSize = int(req.GetPageSize())
+	}
+	if pageSize > DefaultPageSizeMax {
+		pageSize = DefaultPageSizeMax
+	}
+	return (pageNo - 1) * pageSize, pageSize
+}
+
 func BuildPageResponse(total, offset, limit int) *commonv1.PageResponse {
 	if limit == 0 {
 		return &commonv1.PageResponse{

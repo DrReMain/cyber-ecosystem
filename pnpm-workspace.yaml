@@ -5,11 +5,15 @@ packages:
   - "app/clients/*"
 
 allowBuilds:
-  esbuild: true
   '@ariga/atlas': true
+  esbuild: true
+  lefthook: true
 
 minimumReleaseAge: 0
+
+verifyDepsBeforeRun: false
 
 onlyBuiltDependencies:
   - esbuild
   - lightningcss
+  - lefthook

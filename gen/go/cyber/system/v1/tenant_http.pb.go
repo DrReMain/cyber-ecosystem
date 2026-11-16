@@ -17,11 +17,15 @@ var _ = new(context.Context)
 
 const _ = http.SupportPackageIsVersion3
 
+const OperationTenantServiceAddTenantAdmin = "/cyber.system.v1.TenantService/AddTenantAdmin"
+const OperationTenantServiceCreateTenant = "/cyber.system.v1.TenantService/CreateTenant"
 const OperationTenantServiceGetTenant = "/cyber.system.v1.TenantService/GetTenant"
 const OperationTenantServiceListTenants = "/cyber.system.v1.TenantService/ListTenants"
 const OperationTenantServiceUpdateTenantStatus = "/cyber.system.v1.TenantService/UpdateTenantStatus"
 
 type TenantServiceHTTPServer interface {
+	AddTenantAdmin(context.Context, *AddTenantAdminRequest) (*AddTenantAdminResponse, error)
+	CreateTenant(context.Context, *CreateTenantRequest) (*CreateTenantResponse, error)
 	GetTenant(context.Context, *GetTenantRequest) (*GetTenantResponse, error)
 	ListTenants(context.Context, *ListTenantsRequest) (*ListTenantsResponse, error)
 	UpdateTenantStatus(context.Context, *UpdateTenantStatusRequest) (*UpdateTenantStatusResponse, error)
@@ -29,9 +33,52 @@ type TenantServiceHTTPServer interface {
 
 func RegisterTenantServiceHTTPServer(s *http.Server, srv TenantServiceHTTPServer) {
 	r := s.Route("/")
+	r.Handle("POST", "/api/v1/system/tenants", _TenantService_CreateTenant0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/system/tenants/{tenant_code}/admins", _TenantService_AddTenantAdmin0_HTTP_Handler(srv))
 	r.Handle("PUT", "/api/v1/system/tenants/{id}/status", _TenantService_UpdateTenantStatus0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/system/tenants", _TenantService_ListTenants0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/system/tenants/{id}", _TenantService_GetTenant0_HTTP_Handler(srv))
+}
+
+func _TenantService_CreateTenant0_HTTP_Handler(srv TenantServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CreateTenantRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTenantServiceCreateTenant)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CreateTenant(ctx, req.(*CreateTenantRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CreateTenantResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _TenantService_AddTenantAdmin0_HTTP_Handler(srv TenantServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AddTenantAdminRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationTenantServiceAddTenantAdmin)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AddTenantAdmin(ctx, req.(*AddTenantAdminRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*AddTenantAdminResponse)
+		return ctx.Result(200, reply)
+	}
 }
 
 func _TenantService_UpdateTenantStatus0_HTTP_Handler(srv TenantServiceHTTPServer) func(ctx http.Context) error {
@@ -98,6 +145,8 @@ func _TenantService_GetTenant0_HTTP_Handler(srv TenantServiceHTTPServer) func(ct
 }
 
 type TenantServiceHTTPClient interface {
+	AddTenantAdmin(ctx context.Context, req *AddTenantAdminRequest, opts ...http.CallOption) (rsp *AddTenantAdminResponse, err error)
+	CreateTenant(ctx context.Context, req *CreateTenantRequest, opts ...http.CallOption) (rsp *CreateTenantResponse, err error)
 	GetTenant(ctx context.Context, req *GetTenantRequest, opts ...http.CallOption) (rsp *GetTenantResponse, err error)
 	ListTenants(ctx context.Context, req *ListTenantsRequest, opts ...http.CallOption) (rsp *ListTenantsResponse, err error)
 	UpdateTenantStatus(ctx context.Context, req *UpdateTenantStatusRequest, opts ...http.CallOption) (rsp *UpdateTenantStatusResponse, err error)
@@ -109,6 +158,40 @@ type TenantServiceHTTPClientImpl struct {
 
 func NewTenantServiceHTTPClient(client *http.Client) TenantServiceHTTPClient {
 	return &TenantServiceHTTPClientImpl{client}
+}
+
+func (c *TenantServiceHTTPClientImpl) AddTenantAdmin(ctx context.Context, in *AddTenantAdminRequest, opts ...http.CallOption) (*AddTenantAdminResponse, error) {
+	var out AddTenantAdminResponse
+	pattern := "/api/v1/system/tenants/{tenant_code}/admins"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationTenantServiceAddTenantAdmin),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *TenantServiceHTTPClientImpl) CreateTenant(ctx context.Context, in *CreateTenantRequest, opts ...http.CallOption) (*CreateTenantResponse, error) {
+	var out CreateTenantResponse
+	pattern := "/api/v1/system/tenants"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationTenantServiceCreateTenant),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 func (c *TenantServiceHTTPClientImpl) GetTenant(ctx context.Context, in *GetTenantRequest, opts ...http.CallOption) (*GetTenantResponse, error) {

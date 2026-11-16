@@ -25,26 +25,39 @@ type Tenant struct {
 	Enabled   bool
 }
 
-type TenantListIn struct {
+type ListIn struct {
 	*commonpb.PageRequest
 	OrderBy []string
 	Code    *string
 	Name    *string
 }
 
-type TenantListOut struct {
+type ListOut struct {
 	*commonpb.PageResponse
 	List []*Tenant
 }
 
 // Port ----------------------------------------------------------------------------------------------------------------
 
+type CreateIn struct {
+	Code string
+	Name string
+}
+
+type AdminIn struct {
+	TenantCode string
+	Account    string
+	Password   string
+}
+
 type TenantRP interface {
 	UpdateStatus(ctx context.Context, id string, enabled bool) (*Tenant, error)
-	List(ctx context.Context, in *TenantListIn) (*TenantListOut, error)
+	List(ctx context.Context, in *ListIn) (*ListOut, error)
 	ListTenantCodes(ctx context.Context) ([]string, error)
 	FindByCode(ctx context.Context, code string) (*Tenant, error)
 	FindByID(ctx context.Context, id string) (*Tenant, error)
+	Create(ctx context.Context, in *CreateIn) (string, error)
+	AddSuperAdmin(ctx context.Context, in *AdminIn) (string, error)
 }
 
 // UC ------------------------------------------------------------------------------------------------------------------
@@ -79,8 +92,37 @@ func (uc *TenantUC) UpdateStatus(ctx context.Context, id string, enabled bool) (
 	return uc.tenantRP.UpdateStatus(ctx, id, enabled)
 }
 
-func (uc *TenantUC) List(ctx context.Context, in *TenantListIn) (*TenantListOut, error) {
+func (uc *TenantUC) List(ctx context.Context, in *ListIn) (*ListOut, error) {
 	return uc.tenantRP.List(ctx, in)
+}
+
+func (uc *TenantUC) Create(ctx context.Context, in *CreateIn) (string, error) {
+	var id string
+	if err := uc.Tm.InTx(ctx, func(tctx context.Context) error {
+		var terr error
+		id, terr = uc.tenantRP.Create(tctx, in)
+		return terr
+	}); err != nil {
+		return "", err
+	}
+	return id, nil
+}
+
+func (uc *TenantUC) AddSuperAdmin(ctx context.Context, in *AdminIn) (string, error) {
+	// The runtime tenant's break-glass face: an account that already
+	// exists joins as-is, a fresh one is created with the offered password.
+	if err := shared.PasswordPolicyError(in.Password); err != nil {
+		return "", err
+	}
+	var userID string
+	if err := uc.Tm.InTx(ctx, func(tctx context.Context) error {
+		var terr error
+		userID, terr = uc.tenantRP.AddSuperAdmin(tctx, in)
+		return terr
+	}); err != nil {
+		return "", err
+	}
+	return userID, nil
 }
 
 func (uc *TenantUC) ListTenantCodes(ctx context.Context) ([]string, error) {

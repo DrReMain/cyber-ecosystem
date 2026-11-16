@@ -14,6 +14,7 @@ import (
 	"log/slog"
 	"os"
 	"testing"
+	"time"
 
 	"cyber-ecosystem/shared-go/kratos/security"
 	"cyber-ecosystem/shared-go/utils"
@@ -189,5 +190,147 @@ func TestSessionLivenessLiveE2E(t *testing.T) {
 	}
 	if _, err = uc.AuthenticateSession(bare, token); err != nil {
 		t.Fatalf("re-enabled identity: session must resurrect, got %v", err)
+	}
+}
+
+// The resurrection window, live: logout deletes the key outright, and an
+// in-flight request's write-back compare-and-set must lose to that
+// deletion — a key that died stays dead. The KV legs pin the Lua swap's
+// own semantics on real redis: a fresh expectation swaps, a stale
+// expectation refuses without writing, a deleted key refuses revival
+// (the window itself), and a negative TTL is rejected up front.
+func TestResurrectionWindowLiveE2E(t *testing.T) {
+	if os.Getenv("ENT_E2E") != "1" {
+		t.Skip("set ENT_E2E=1 with the dev stack (postgres + redis) up to run the resurrection-window end-to-end")
+	}
+	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
+	bare := context.Background()
+
+	db, closeDB, err := platform.NewEntClient(&conf.Data{Database: &conf.Data_Database{
+		Driver: "postgres", Host: tenEnvOr("DB_HOST", "localhost"), Port: 5432,
+		User: "postgres", Password: tenEnvOr("DB_PASS", "postgres"), DbName: tenEnvOr("DB_NAME", "system"),
+		MaxOpenConns: 8,
+	}}, logger)
+	if err != nil {
+		t.Fatalf("ent client: %v", err)
+	}
+	cacheClient, closeCache, err := platform.NewCache(&conf.Data{Redis: &conf.Data_Redis{
+		Addr: tenEnvOr("REDIS_ADDR", "localhost:6379"), Db: 0,
+	}}, logger)
+	if err != nil {
+		t.Fatalf("cache: %v", err)
+	}
+	cacheErrHandler, err := platform.NewCacheErrorHandler()
+	if err != nil {
+		t.Fatalf("cache error handler: %v", err)
+	}
+	pf, err := platform.NewPlatform(cacheClient, cacheErrHandler, db, platform.NewEntErrorHandler(), nil, nil, nil, nil)
+	if err != nil {
+		t.Fatalf("platform: %v", err)
+	}
+	cleanLivenessE2E(t, db)
+	t.Cleanup(func() {
+		cleanLivenessE2E(t, db)
+		closeCache()
+		closeDB()
+	})
+
+	popSeen, err := db.Population.Query().Where(entpopulation.CodeEQ(security.DefaultPopulation)).Exist(bare)
+	if err != nil {
+		t.Fatalf("population exist: %v", err)
+	}
+	if !popSeen {
+		if _, err = db.Population.Create().SetCode(security.DefaultPopulation).SetName("users").SetPlane(security.PlaneBackend).Save(bare); err != nil {
+			t.Fatalf("population: %v", err)
+		}
+	}
+	if _, err = db.Tenant.Create().SetCode(liveTenant).SetName("e2e liveness").Save(bare); err != nil {
+		t.Fatalf("tenant: %v", err)
+	}
+	hash, err := utils.Hash("e2e-liveness-pass")
+	if err != nil {
+		t.Fatalf("hash: %v", err)
+	}
+	u, err := db.User.Create().SetAccount(liveAccount).SetPasswordHash(hash).SetEnabled(true).Save(bare)
+	if err != nil {
+		t.Fatalf("user: %v", err)
+	}
+	if _, err = db.Membership.Create().SetUserID(u.ID).SetTenantID(liveTenant).SetPopulation(security.DefaultPopulation).Save(bare); err != nil {
+		t.Fatalf("membership: %v", err)
+	}
+
+	userRP := usermod.NewUserRP(logger, pf)
+	authzRP, err := authzmod.NewAuthzRP(logger, pf)
+	if err != nil {
+		t.Fatalf("authz rp: %v", err)
+	}
+	tenantRP := tenantmod.NewTenantRP(logger, pf)
+	populationRP := populationmod.NewPopulationRP(logger, pf)
+	tokenRP := authmod.NewTokenRP(logger, pf)
+	providers, _ := e2eProviders(t, logger, cacheClient, tokenRP)
+	uc, err := authmod.NewAuthUC(logger, pf, nil, providers, userRP, authzRP, tenantRP, populationRP, tokenRP)
+	if err != nil {
+		t.Fatalf("auth uc: %v", err)
+	}
+
+	token, _, _, err := uc.Login(bare, liveAccount, "e2e-liveness-pass", "")
+	if err != nil {
+		t.Fatalf("login: %v", err)
+	}
+	subject, err := uc.AuthenticateSession(bare, token)
+	if err != nil {
+		t.Fatalf("verify: %v", err)
+	}
+
+	// Logout kills the key outright (the handler shape: the session's own
+	// subject carries the deletion handle); the next verification dies,
+	// and the store confirms the key is gone — the write-back has nothing
+	// to resurrect against.
+	if err = uc.Logout(security.WithSubject(bare, subject)); err != nil {
+		t.Fatalf("logout: %v", err)
+	}
+	if _, err = uc.AuthenticateSession(bare, token); !errorspb.IsGeneralErrorUnauthenticated(err) {
+		t.Fatalf("post-logout verify: want unauthenticated, got %v", err)
+	}
+	if _, gerr := tokenRP.Get(bare, "auth:web:session:"+token); !errorspb.IsInfraErrorCacheMiss(gerr) {
+		t.Fatalf("post-logout key: want cache miss, got %v", gerr)
+	}
+
+	// The KV legs — the write-back's own primitive, on real redis with
+	// the real Lua swap.
+	k := "auth:web:e2e:cas-probe"
+	t.Cleanup(func() { _ = tokenRP.Del(bare, k) })
+	if err = tokenRP.Set(bare, k, []byte("v1"), time.Minute); err != nil {
+		t.Fatalf("probe set: %v", err)
+	}
+	swapped, err := tokenRP.CompareAndSet(bare, k, []byte("v1"), []byte("v2"), time.Minute)
+	if err != nil || !swapped {
+		t.Fatalf("fresh swap: swapped=%v err=%v", swapped, err)
+	}
+	if got, gerr := tokenRP.Get(bare, k); gerr != nil || string(got) != "v2" {
+		t.Fatalf("after swap: %q (%v)", got, gerr)
+	}
+	swapped, err = tokenRP.CompareAndSet(bare, k, []byte("stale"), []byte("v3"), time.Minute)
+	if err != nil || swapped {
+		t.Fatalf("stale expectation must lose: swapped=%v err=%v", swapped, err)
+	}
+	if got, gerr := tokenRP.Get(bare, k); gerr != nil || string(got) != "v2" {
+		t.Fatalf("after stale refusal: %q (%v)", got, gerr)
+	}
+
+	// The window itself: the key deleted (logout's shape), the write-back
+	// with the last-read bytes must refuse to revive it.
+	if err = tokenRP.Del(bare, k); err != nil {
+		t.Fatalf("probe del: %v", err)
+	}
+	swapped, err = tokenRP.CompareAndSet(bare, k, []byte("v2"), []byte("v4"), time.Minute)
+	if err != nil || swapped {
+		t.Fatalf("deleted key must not resurrect: swapped=%v err=%v", swapped, err)
+	}
+	if _, gerr := tokenRP.Get(bare, k); !errorspb.IsInfraErrorCacheMiss(gerr) {
+		t.Fatalf("window left dead: want cache miss, got %v", gerr)
+	}
+	if _, err = tokenRP.CompareAndSet(bare, k, []byte("v2"), []byte("v5"), -time.Second); err == nil {
+		t.Fatal("negative TTL must be refused")
 	}
 }

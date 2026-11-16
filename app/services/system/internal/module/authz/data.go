@@ -59,8 +59,8 @@ func NewAuthzRP(logger *slog.Logger, p *platform.Platform) (AuthzRP, error) {
 
 // Method --------------------------------------------------------------------------------------------------------------
 
-func (r *authzRP) ImplicitGrants(ctx context.Context, userID, tenant string) ([]GrantView, error) {
-	snap := r.snap.Load()
+func (rp *authzRP) ImplicitGrants(ctx context.Context, userID, tenant string) ([]GrantView, error) {
+	snap := rp.snap.Load()
 	if snap == nil {
 		return nil, fmt.Errorf("authz rp: snapshot not compiled")
 	}
@@ -88,11 +88,11 @@ func (r *authzRP) ImplicitGrants(ctx context.Context, userID, tenant string) ([]
 			Policies:    policyViews(meta.policies),
 		})
 	}
-	return r.hydrateScopes(ctx, userID, views)
+	return rp.hydrateScopes(ctx, userID, views)
 }
 
-func (r *authzRP) EffectiveGrants(ctx context.Context, subject *security.Subject) ([]GrantView, error) {
-	member, err := r.MemberSubject(subject)
+func (rp *authzRP) EffectiveGrants(ctx context.Context, subject *security.Subject) ([]GrantView, error) {
+	member, err := rp.MemberSubject(subject)
 	if err != nil {
 		return nil, err
 	}
@@ -101,13 +101,13 @@ func (r *authzRP) EffectiveGrants(ctx context.Context, subject *security.Subject
 		// are never read.
 		return []GrantView{}, nil
 	}
-	views, err := r.ImplicitGrants(ctx, subject.UserID, subject.TenantID)
+	views, err := rp.ImplicitGrants(ctx, subject.UserID, subject.TenantID)
 	if err != nil {
 		return nil, err
 	}
-	return survivingGrants(ctx, r.Log, subject, views), nil
+	return survivingGrants(ctx, rp.Log, subject, views), nil
 }
-func (r *authzRP) MemberSubject(subject *security.Subject) (bool, error) {
+func (rp *authzRP) MemberSubject(subject *security.Subject) (bool, error) {
 	// Member means the seat is structurally denied every gated face — the
 	// grant tables are never read. An empty population is the backend
 	// default. A population absent from the snapshot is a broken registry
@@ -115,37 +115,37 @@ func (r *authzRP) MemberSubject(subject *security.Subject) (bool, error) {
 	if subject.Population == "" {
 		return false, nil
 	}
-	plane, ok := r.snap.Load().populations[subject.Population]
+	plane, ok := rp.snap.Load().populations[subject.Population]
 	if !ok {
 		return false, errorspb.ErrorGeneralErrorInternal("").WithCause(fmt.Errorf("population %q missing from the compiled registry", subject.Population))
 	}
 	return plane == security.PlaneMember, nil
 }
 
-func (r *authzRP) PlaneOf(population string) (string, error) {
+func (rp *authzRP) PlaneOf(population string) (string, error) {
 	// An empty population resolves as backend.
 	if population == "" {
 		return security.PlaneBackend, nil
 	}
-	plane, ok := r.snap.Load().populations[population]
+	plane, ok := rp.snap.Load().populations[population]
 	if !ok {
 		return "", errorspb.ErrorGeneralErrorInternal("").WithCause(fmt.Errorf("population %q missing from the compiled registry", population))
 	}
 	return plane, nil
 }
 
-func (r *authzRP) ExplainGrants(ctx context.Context, principalType, principalID, tenant, operation string) (*ExplainResult, error) {
-	snap := r.snap.Load()
+func (rp *authzRP) ExplainGrants(ctx context.Context, principalType, principalID, tenant, operation string) (*ExplainResult, error) {
+	snap := rp.snap.Load()
 	if snap == nil {
 		return nil, fmt.Errorf("authz rp: snapshot not compiled")
 	}
 	out := &ExplainResult{}
 	if principalType == shared.PrincipalTypeUser {
-		population, err := r.seatPopulation(ctx, principalID, tenant)
+		population, err := rp.seatPopulation(ctx, principalID, tenant)
 		if err != nil {
 			return nil, err
 		}
-		member, err := r.MemberSubject(&security.Subject{UserID: principalID, TenantID: tenant, Population: population})
+		member, err := rp.MemberSubject(&security.Subject{UserID: principalID, TenantID: tenant, Population: population})
 		if err != nil {
 			return nil, err
 		}
@@ -193,7 +193,7 @@ func (r *authzRP) ExplainGrants(ctx context.Context, principalType, principalID,
 		if attrs, err = resolveAttributes(ctx, subject, neededAttrKeys(views)); err != nil {
 			// Decide's posture: unresolvable attributes fail every constraint
 			// closed; nil attrs make each plugin fail below, states show it.
-			r.Log.Error("authz: attribute resolution failed; constraints fail closed", "error", err)
+			rp.Log.Error("authz: attribute resolution failed; constraints fail closed", "error", err)
 			attrs = nil
 		}
 	}
@@ -202,7 +202,7 @@ func (r *authzRP) ExplainGrants(ctx context.Context, principalType, principalID,
 		passed := true
 		var states []PolicyState
 		if len(v.Policies) > 0 {
-			passed, states = evalGrantPolicies(ctx, r.Log, attrs, v.Policies)
+			passed, states = evalGrantPolicies(ctx, rp.Log, attrs, v.Policies)
 		}
 		survivedAny = survivedAny || passed
 		out.Hits = append(out.Hits, GrantHit{
@@ -216,8 +216,8 @@ func (r *authzRP) ExplainGrants(ctx context.Context, principalType, principalID,
 	return out, nil
 }
 
-func (r *authzRP) PreviewGrants(ctx context.Context, tenant string, roleCodes []string) ([]string, error) {
-	snap := r.snap.Load()
+func (rp *authzRP) PreviewGrants(ctx context.Context, tenant string, roleCodes []string) ([]string, error) {
+	snap := rp.snap.Load()
 	if snap == nil {
 		return nil, fmt.Errorf("authz rp: snapshot not compiled")
 	}
@@ -242,22 +242,22 @@ func (r *authzRP) PreviewGrants(ctx context.Context, tenant string, roleCodes []
 	return ops, nil
 }
 
-func (r *authzRP) StartWatch(context.Context) error {
-	if s, err := r.Platform.GetCache().PubSub.Subscribe(context.Background(), shared.PolicyChangedChannel); err != nil {
-		r.Log.Warn("authz: pubsub subscribe failed; periodic reconcile only", "error", err)
+func (rp *authzRP) StartWatch(context.Context) error {
+	if s, err := rp.Platform.GetCache().PubSub.Subscribe(context.Background(), shared.PolicyChangedChannel); err != nil {
+		rp.Log.Warn("authz: pubsub subscribe failed; periodic reconcile only", "error", err)
 	} else {
-		r.watchSub = s
+		rp.watchSub = s
 		// Pubsub has no backlog: a change published between the constructor's
 		// compile and this subscription is otherwise invisible until the tick.
-		r.reconcile()
+		rp.reconcile()
 	}
-	r.watchDone = make(chan struct{})
+	rp.watchDone = make(chan struct{})
 	go func() {
-		if r.watchSub == nil {
+		if rp.watchSub == nil {
 			return
 		}
-		for range r.watchSub.Channel() {
-			r.reconcile()
+		for range rp.watchSub.Channel() {
+			rp.reconcile()
 		}
 	}()
 	go func() {
@@ -265,36 +265,36 @@ func (r *authzRP) StartWatch(context.Context) error {
 		defer ticker.Stop()
 		for {
 			select {
-			case <-r.watchDone:
+			case <-rp.watchDone:
 				return
 			case <-ticker.C:
-				r.reconcile()
+				rp.reconcile()
 			}
 		}
 	}()
 	return nil
 }
 
-func (r *authzRP) StopWatch(context.Context) error {
-	if r.watchDone == nil {
+func (rp *authzRP) StopWatch(context.Context) error {
+	if rp.watchDone == nil {
 		return nil
 	}
-	close(r.watchDone)
-	if r.watchSub != nil {
-		_ = r.watchSub.Close()
+	close(rp.watchDone)
+	if rp.watchSub != nil {
+		_ = rp.watchSub.Close()
 	}
 	return nil
 }
 
 // Private -------------------------------------------------------------------------------------------------------------
 
-func (r *authzRP) reconcile() {
-	r.mu.Lock()
-	defer r.mu.Unlock()
+func (rp *authzRP) reconcile() {
+	rp.mu.Lock()
+	defer rp.mu.Unlock()
 	ctx := context.Background()
-	ver, err := r.stampVersion(ctx)
+	ver, err := rp.stampVersion(ctx)
 	if err != nil {
-		r.Log.Warn("authz: stamp read failed; keeping snapshot", "version", r.version(), "error", err)
+		rp.Log.Warn("authz: stamp read failed; keeping snapshot", "version", rp.version(), "error", err)
 		return
 	}
 	// != : any divergence from the stamp rebuilds. The stamp is the DB
@@ -302,55 +302,55 @@ func (r *authzRP) reconcile() {
 	// ever diverges — forwards, backwards, from a restored backup — heals
 	// on this pass; the old >= comparison pinned stale replicas forever
 	// whenever the stamp moved backwards (counter loss, a restore).
-	if r.version() == ver && !forcedDue(r.lastForced.Load(), time.Now()) {
+	if rp.version() == ver && !forcedDue(rp.lastForced.Load(), time.Now()) {
 		return
 	}
-	if err := r.rebuild(ctx, ver); err != nil {
-		r.Log.Warn("authz: rebuild failed; keeping snapshot", "version", r.version(), "error", err)
+	if err := rp.rebuild(ctx, ver); err != nil {
+		rp.Log.Warn("authz: rebuild failed; keeping snapshot", "version", rp.version(), "error", err)
 		return
 	}
-	r.lastForced.Store(time.Now().UnixNano())
+	rp.lastForced.Store(time.Now().UnixNano())
 }
 
-func (r *authzRP) version() int64 {
-	if s := r.snap.Load(); s != nil {
+func (rp *authzRP) version() int64 {
+	if s := rp.snap.Load(); s != nil {
 		return s.version
 	}
 	return -1
 }
 
-func (r *authzRP) StampVersion(ctx context.Context) (int64, error) {
-	return r.stampVersion(ctx)
+func (rp *authzRP) StampVersion(ctx context.Context) (int64, error) {
+	return rp.stampVersion(ctx)
 }
 
-func (r *authzRP) stampVersion(ctx context.Context) (int64, error) {
-	row, err := r.Platform.GetClient(ctx).AuthzStamp.Get(ctx, local_mixins.StampRowKey)
+func (rp *authzRP) stampVersion(ctx context.Context) (int64, error) {
+	row, err := rp.Platform.GetClient(ctx).AuthzStamp.Get(ctx, local_mixins.StampRowKey)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return 0, nil // no bump yet: version zero
 		}
-		return 0, r.Platform.HandleEntError(err)
+		return 0, rp.Platform.HandleEntError(err)
 	}
 	return row.Version, nil
 }
 
-func (r *authzRP) stampVersionSafe(ctx context.Context) int64 {
-	ver, err := r.stampVersion(ctx)
+func (rp *authzRP) stampVersionSafe(ctx context.Context) int64 {
+	ver, err := rp.stampVersion(ctx)
 	if err != nil {
 		// A stamp-read failure must not block startup; the first reconcile
 		// after recovery realigns the version.
-		r.Log.Warn("authz: initial stamp read failed; starting unversioned", "error", err)
+		rp.Log.Warn("authz: initial stamp read failed; starting unversioned", "error", err)
 		return -1
 	}
 	return ver
 }
 
-func (r *authzRP) seatPopulation(ctx context.Context, userID, tenant string) (string, error) {
-	rows, err := r.Platform.GetClient(ctx).Membership.Query().
+func (rp *authzRP) seatPopulation(ctx context.Context, userID, tenant string) (string, error) {
+	rows, err := rp.Platform.GetClient(ctx).Membership.Query().
 		Where(membership.UserID(userID), membership.TenantID(tenant)).
 		All(ctx)
 	if err != nil {
-		return "", r.Platform.HandleEntError(err)
+		return "", rp.Platform.HandleEntError(err)
 	}
 	single := ""
 	for _, row := range rows {
@@ -362,45 +362,45 @@ func (r *authzRP) seatPopulation(ctx context.Context, userID, tenant string) (st
 	return single, nil
 }
 
-func (r *authzRP) rebuild(ctx context.Context, version int64) error {
-	snap, err := r.compileFromDB(ctx, version)
+func (rp *authzRP) rebuild(ctx context.Context, version int64) error {
+	snap, err := rp.compileFromDB(ctx, version)
 	if err != nil {
 		return err
 	}
-	r.snap.Store(snap)
-	r.Log.Info("authz: snapshot rebuilt", "version", version)
+	rp.snap.Store(snap)
+	rp.Log.Info("authz: snapshot rebuilt", "version", version)
 	return nil
 }
 
-func (r *authzRP) compileFromDB(ctx context.Context, version int64) (*snapshot, error) {
+func (rp *authzRP) compileFromDB(ctx context.Context, version int64) (*snapshot, error) {
 	// Reload is version-gated and full-table: idempotent, multi-replica
 	// safe, no delta ordering; frequency is policy-edit rate. The first
 	// pressure point under load is hydrateScopes' per-request dept scan,
 	// not this compile.
-	client := r.Platform.GetClient(ctx)
+	client := rp.Platform.GetClient(ctx)
 	roles, err := client.Role.Query().All(ctx)
 	if err != nil {
-		return nil, r.Platform.HandleEntError(fmt.Errorf("authz compile: load roles: %w", err))
+		return nil, rp.Platform.HandleEntError(fmt.Errorf("authz compile: load roles: %w", err))
 	}
 	perms, err := client.Permission.Query().All(ctx)
 	if err != nil {
-		return nil, r.Platform.HandleEntError(fmt.Errorf("authz compile: load permissions: %w", err))
+		return nil, rp.Platform.HandleEntError(fmt.Errorf("authz compile: load permissions: %w", err))
 	}
 	polRows, err := client.AuthzPolicy.Query().Where(authzpolicy.EnabledEQ(true)).All(ctx)
 	if err != nil {
-		return nil, r.Platform.HandleEntError(fmt.Errorf("authz compile: load policies: %w", err))
+		return nil, rp.Platform.HandleEntError(fmt.Errorf("authz compile: load policies: %w", err))
 	}
 	linkRows, err := client.PermissionPolicy.Query().All(ctx)
 	if err != nil {
-		return nil, r.Platform.HandleEntError(fmt.Errorf("authz compile: load policy links: %w", err))
+		return nil, rp.Platform.HandleEntError(fmt.Errorf("authz compile: load policy links: %w", err))
 	}
 	bindings, err := client.PrincipalRole.Query().All(ctx)
 	if err != nil {
-		return nil, r.Platform.HandleEntError(fmt.Errorf("authz compile: load bindings: %w", err))
+		return nil, rp.Platform.HandleEntError(fmt.Errorf("authz compile: load bindings: %w", err))
 	}
 	popRows, err := client.Population.Query().All(ctx)
 	if err != nil {
-		return nil, r.Platform.HandleEntError(fmt.Errorf("authz compile: load populations: %w", err))
+		return nil, rp.Platform.HandleEntError(fmt.Errorf("authz compile: load populations: %w", err))
 	}
 	populations := make(map[string]string, len(popRows))
 	for _, po := range popRows {
@@ -408,7 +408,7 @@ func (r *authzRP) compileFromDB(ctx context.Context, version int64) (*snapshot, 
 	}
 	disabledUsers, err := client.User.Query().Where(user.EnabledEQ(false)).All(ctx)
 	if err != nil {
-		return nil, r.Platform.HandleEntError(fmt.Errorf("authz compile: load disabled users: %w", err))
+		return nil, rp.Platform.HandleEntError(fmt.Errorf("authz compile: load disabled users: %w", err))
 	}
 	disabled := make(map[string]struct{}, len(disabledUsers))
 	for _, du := range disabledUsers {

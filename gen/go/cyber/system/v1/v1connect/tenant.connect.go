@@ -33,6 +33,12 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
+	// TenantServiceCreateTenantProcedure is the fully-qualified name of the TenantService's
+	// CreateTenant RPC.
+	TenantServiceCreateTenantProcedure = "/cyber.system.v1.TenantService/CreateTenant"
+	// TenantServiceAddTenantAdminProcedure is the fully-qualified name of the TenantService's
+	// AddTenantAdmin RPC.
+	TenantServiceAddTenantAdminProcedure = "/cyber.system.v1.TenantService/AddTenantAdmin"
 	// TenantServiceUpdateTenantStatusProcedure is the fully-qualified name of the TenantService's
 	// UpdateTenantStatus RPC.
 	TenantServiceUpdateTenantStatusProcedure = "/cyber.system.v1.TenantService/UpdateTenantStatus"
@@ -45,6 +51,8 @@ const (
 
 // TenantServiceClient is a client for the cyber.system.v1.TenantService service.
 type TenantServiceClient interface {
+	CreateTenant(context.Context, *connect.Request[v1.CreateTenantRequest]) (*connect.Response[v1.CreateTenantResponse], error)
+	AddTenantAdmin(context.Context, *connect.Request[v1.AddTenantAdminRequest]) (*connect.Response[v1.AddTenantAdminResponse], error)
 	UpdateTenantStatus(context.Context, *connect.Request[v1.UpdateTenantStatusRequest]) (*connect.Response[v1.UpdateTenantStatusResponse], error)
 	ListTenants(context.Context, *connect.Request[v1.ListTenantsRequest]) (*connect.Response[v1.ListTenantsResponse], error)
 	GetTenant(context.Context, *connect.Request[v1.GetTenantRequest]) (*connect.Response[v1.GetTenantResponse], error)
@@ -61,6 +69,18 @@ func NewTenantServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 	baseURL = strings.TrimRight(baseURL, "/")
 	tenantServiceMethods := v1.File_cyber_system_v1_tenant_proto.Services().ByName("TenantService").Methods()
 	return &tenantServiceClient{
+		createTenant: connect.NewClient[v1.CreateTenantRequest, v1.CreateTenantResponse](
+			httpClient,
+			baseURL+TenantServiceCreateTenantProcedure,
+			connect.WithSchema(tenantServiceMethods.ByName("CreateTenant")),
+			connect.WithClientOptions(opts...),
+		),
+		addTenantAdmin: connect.NewClient[v1.AddTenantAdminRequest, v1.AddTenantAdminResponse](
+			httpClient,
+			baseURL+TenantServiceAddTenantAdminProcedure,
+			connect.WithSchema(tenantServiceMethods.ByName("AddTenantAdmin")),
+			connect.WithClientOptions(opts...),
+		),
 		updateTenantStatus: connect.NewClient[v1.UpdateTenantStatusRequest, v1.UpdateTenantStatusResponse](
 			httpClient,
 			baseURL+TenantServiceUpdateTenantStatusProcedure,
@@ -84,9 +104,21 @@ func NewTenantServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 
 // tenantServiceClient implements TenantServiceClient.
 type tenantServiceClient struct {
+	createTenant       *connect.Client[v1.CreateTenantRequest, v1.CreateTenantResponse]
+	addTenantAdmin     *connect.Client[v1.AddTenantAdminRequest, v1.AddTenantAdminResponse]
 	updateTenantStatus *connect.Client[v1.UpdateTenantStatusRequest, v1.UpdateTenantStatusResponse]
 	listTenants        *connect.Client[v1.ListTenantsRequest, v1.ListTenantsResponse]
 	getTenant          *connect.Client[v1.GetTenantRequest, v1.GetTenantResponse]
+}
+
+// CreateTenant calls cyber.system.v1.TenantService.CreateTenant.
+func (c *tenantServiceClient) CreateTenant(ctx context.Context, req *connect.Request[v1.CreateTenantRequest]) (*connect.Response[v1.CreateTenantResponse], error) {
+	return c.createTenant.CallUnary(ctx, req)
+}
+
+// AddTenantAdmin calls cyber.system.v1.TenantService.AddTenantAdmin.
+func (c *tenantServiceClient) AddTenantAdmin(ctx context.Context, req *connect.Request[v1.AddTenantAdminRequest]) (*connect.Response[v1.AddTenantAdminResponse], error) {
+	return c.addTenantAdmin.CallUnary(ctx, req)
 }
 
 // UpdateTenantStatus calls cyber.system.v1.TenantService.UpdateTenantStatus.
@@ -106,6 +138,8 @@ func (c *tenantServiceClient) GetTenant(ctx context.Context, req *connect.Reques
 
 // TenantServiceHandler is an implementation of the cyber.system.v1.TenantService service.
 type TenantServiceHandler interface {
+	CreateTenant(context.Context, *connect.Request[v1.CreateTenantRequest]) (*connect.Response[v1.CreateTenantResponse], error)
+	AddTenantAdmin(context.Context, *connect.Request[v1.AddTenantAdminRequest]) (*connect.Response[v1.AddTenantAdminResponse], error)
 	UpdateTenantStatus(context.Context, *connect.Request[v1.UpdateTenantStatusRequest]) (*connect.Response[v1.UpdateTenantStatusResponse], error)
 	ListTenants(context.Context, *connect.Request[v1.ListTenantsRequest]) (*connect.Response[v1.ListTenantsResponse], error)
 	GetTenant(context.Context, *connect.Request[v1.GetTenantRequest]) (*connect.Response[v1.GetTenantResponse], error)
@@ -118,6 +152,18 @@ type TenantServiceHandler interface {
 // and JSON codecs. They also support gzip compression.
 func NewTenantServiceHandler(svc TenantServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
 	tenantServiceMethods := v1.File_cyber_system_v1_tenant_proto.Services().ByName("TenantService").Methods()
+	tenantServiceCreateTenantHandler := connect.NewUnaryHandler(
+		TenantServiceCreateTenantProcedure,
+		svc.CreateTenant,
+		connect.WithSchema(tenantServiceMethods.ByName("CreateTenant")),
+		connect.WithHandlerOptions(opts...),
+	)
+	tenantServiceAddTenantAdminHandler := connect.NewUnaryHandler(
+		TenantServiceAddTenantAdminProcedure,
+		svc.AddTenantAdmin,
+		connect.WithSchema(tenantServiceMethods.ByName("AddTenantAdmin")),
+		connect.WithHandlerOptions(opts...),
+	)
 	tenantServiceUpdateTenantStatusHandler := connect.NewUnaryHandler(
 		TenantServiceUpdateTenantStatusProcedure,
 		svc.UpdateTenantStatus,
@@ -138,6 +184,10 @@ func NewTenantServiceHandler(svc TenantServiceHandler, opts ...connect.HandlerOp
 	)
 	return "/cyber.system.v1.TenantService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
+		case TenantServiceCreateTenantProcedure:
+			tenantServiceCreateTenantHandler.ServeHTTP(w, r)
+		case TenantServiceAddTenantAdminProcedure:
+			tenantServiceAddTenantAdminHandler.ServeHTTP(w, r)
 		case TenantServiceUpdateTenantStatusProcedure:
 			tenantServiceUpdateTenantStatusHandler.ServeHTTP(w, r)
 		case TenantServiceListTenantsProcedure:
@@ -152,6 +202,14 @@ func NewTenantServiceHandler(svc TenantServiceHandler, opts ...connect.HandlerOp
 
 // UnimplementedTenantServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedTenantServiceHandler struct{}
+
+func (UnimplementedTenantServiceHandler) CreateTenant(context.Context, *connect.Request[v1.CreateTenantRequest]) (*connect.Response[v1.CreateTenantResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.TenantService.CreateTenant is not implemented"))
+}
+
+func (UnimplementedTenantServiceHandler) AddTenantAdmin(context.Context, *connect.Request[v1.AddTenantAdminRequest]) (*connect.Response[v1.AddTenantAdminResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.TenantService.AddTenantAdmin is not implemented"))
+}
 
 func (UnimplementedTenantServiceHandler) UpdateTenantStatus(context.Context, *connect.Request[v1.UpdateTenantStatusRequest]) (*connect.Response[v1.UpdateTenantStatusResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.TenantService.UpdateTenantStatus is not implemented"))

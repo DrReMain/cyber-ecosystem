@@ -1,5 +1,7 @@
 # Proto Conventions
 
+**Status:** ACTIVE
+
 **Scope:** Protobuf contracts under `proto/`. These are the **source of truth**; `gen/` is derived (never hand-edit). Prescriptive — `MUST` / `SHOULD` / `MAY`.
 
 For Go-side consumption (mapping, error handling, import aliases) see `docs/conventions/kratos/CONVENTIONS.md`.
@@ -76,7 +78,7 @@ Requests don't need this (input is presence-based), so they use the lighter `opt
 Two layers of error enums, both using the kratos `errors.proto` option (`errors.code` = HTTP status):
 
 - **Shared generic** (`cyber.shared.errors.v1`): `GeneralError` (enum values mirror HTTP status: 4xx client / 5xx server), `InfraError` (3xxx db/cache/storage/mq/network), `FlowError`. Reused by every service — do not redefine generic codes per service.
-- **Service business** (`cyber.<service>/v1/error_reason.proto`): a service-semantic enum — `System` for system, e.g. `SYSTEM_INVALID_STATUS_TRANSITION` (6xxx range as **disjoint per-service blocks**: system 60xx, esports 61xx; a new service takes the next free block and records it in the enum's header comment). **The enum name carries the service identity**: buf's `ENUM_VALUE_PREFIX` then forces every value to start with the service prefix, so the wire reason is unique across services by construction. Do not name this enum `ErrorReason` (generic prefix collides the moment a second service copies the template).
+- **Service business** (`cyber.<service>/v1/error_reason.proto`): a service-semantic enum — `System` for system, e.g. `SYSTEM_SMS_RATE_LIMITED` (6xxx range as **disjoint per-service blocks**: a service occupies decades and continues when one fills — system holds 600x–610x today, recorded in its enum header; a new service takes the next free block (62xx) and records its holdings the same way). **The enum name carries the service identity**: buf's `ENUM_VALUE_PREFIX` then forces every value to start with the service prefix, so the wire reason is unique across services by construction. Do not name this enum `ErrorReason` (generic prefix collides the moment a second service copies the template).
 
 **Wire reason shape & i18n.** The wire reason is the bare proto value name (e.g. `SYSTEM_INVALID_STATUS_TRANSITION`) — protobuf APIv2's `String()` emits no Go type prefix. `ENUM_VALUE_PREFIX` makes the value name unique across services, so it doubles as the client-side error identity: i18n catalogs key error copy as `error_<ValueName>` and the frontend looks it up directly, no transformation.
 
@@ -125,7 +127,7 @@ The `(errors.code)` option comes from the vendored `proto/errors/errors.proto` (
 6. `./nx run proto:breaking` before merging (FILE rules vs `HEAD`). Blind spot: it cannot see protovalidate rule removals/weakenings — review validation rules explicitly (§9).
 7. Build the affected service (`./nx run <service>:build`); if the client surface changed, run the client verification chain (`docs/conventions/tanstack/CONVENTIONS.md §11`).
 
-Done = every command's exit code checked; breaking green (or weakenings consciously reviewed); gen diff clean; error copy present in every registered locale. Close with the counted-evidence declaration line (what ran, what was observed); gates = this checklist's chain plus `proto:check-drift` at close; runtime verification = a counterexample live probe on the producer and one consumer.
+Done = every command's exit code checked; breaking green (or weakenings consciously reviewed); gen diff clean; error copy present in every registered locale. Close with an evidence declaration line (what ran, what was observed); gates = this checklist's chain plus `proto:check-drift` at close; runtime verification = a counterexample live probe on the producer and one consumer.
 
 ---
 

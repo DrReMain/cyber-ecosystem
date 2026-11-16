@@ -49,6 +49,34 @@ func (k *kv) Set(ctx context.Context, key string, val []byte, ttl time.Duration)
 	return mapErr(k.client.Set(ctx, key, val, ttl).Err())
 }
 
+// casScript swaps val in only while the key still holds the expected
+// bytes. PX 0 is invalid in redis, so a zero TTL branches to the
+// no-expiry form, matching Set's contract.
+var casScript = redis.NewScript(`
+if redis.call("get", KEYS[1]) == ARGV[1] then
+	if ARGV[3] == "0" then
+		redis.call("set", KEYS[1], ARGV[2])
+	else
+		redis.call("set", KEYS[1], ARGV[2], "PX", ARGV[3])
+	end
+	return 1
+end
+return 0`)
+
+func (k *kv) CompareAndSet(ctx context.Context, key string, expected, val []byte, ttl time.Duration) (bool, error) {
+	if err := cache.ValidateKey(key); err != nil {
+		return false, err
+	}
+	if ttl < 0 {
+		return false, cache.ErrInvalidArgument
+	}
+	res, err := casScript.Run(ctx, k.client, []string{key}, expected, val, ttl.Milliseconds()).Int()
+	if err != nil {
+		return false, mapErr(err)
+	}
+	return res == 1, nil
+}
+
 func (k *kv) Del(ctx context.Context, key string) error {
 	if err := cache.ValidateKey(key); err != nil {
 		return err

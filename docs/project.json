@@ -1,0 +1,14 @@
+{
+  "$schema": "../.nx/installation/node_modules/nx/schemas/project-schema.json",
+  "name": "docs",
+  "root": "docs",
+  "targets": {
+    "check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "{workspaceRoot}",
+        "command": "node docs/scripts/check.cjs"
+      }
+    }
+  }
+}

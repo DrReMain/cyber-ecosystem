@@ -12,6 +12,7 @@ import (
 	"cyber-ecosystem/app/services/agent/internal/conf"
 	"cyber-ecosystem/app/services/agent/internal/module/agentconfig"
 	"cyber-ecosystem/app/services/agent/internal/module/agentconfigadmin"
+	"cyber-ecosystem/app/services/agent/internal/module/audit"
 	"cyber-ecosystem/app/services/agent/internal/module/authz"
 	"cyber-ecosystem/app/services/agent/internal/module/chat"
 	"cyber-ecosystem/app/services/agent/internal/platform"
@@ -57,13 +58,16 @@ func wireApp(confServer *conf.Server, data *conf.Data, remote *conf.Remote, cryp
 	}
 	chatService := chat.NewChatService(logger, chatUC)
 	v := server.NewRegistrarList(agentConfigService, agentConfigAdminService, chatService)
+	auditRP, cleanup3 := audit.NewAuditRP(logger, platformPlatform)
+	auditUC := audit.NewAuditUC(logger, platformPlatform, auditRP)
 	authzUC := authz.NewAuthzUC(logger, platformPlatform, systemClient)
-	grpcServer := server.NewGRPCServer(confServer, logger, v, systemClient, authzUC)
-	httpServer := server.NewHTTPServer(confServer, logger, v, systemClient, authzUC)
-	connectServer := server.NewConnectServer(confServer, logger, v, systemClient, authzUC)
+	grpcServer := server.NewGRPCServer(confServer, logger, v, systemClient, auditUC, authzUC)
+	httpServer := server.NewHTTPServer(confServer, logger, v, systemClient, auditUC, authzUC)
+	connectServer := server.NewConnectServer(confServer, logger, v, systemClient, auditUC, authzUC)
 	lifecycle := bootstrap.NewLifecycle()
 	app := newApp(logger, grpcServer, httpServer, connectServer, lifecycle)
 	return app, func() {
+		cleanup3()
 		cleanup2()
 		cleanup()
 	}, nil

@@ -18,6 +18,7 @@ import (
 
 	smsmock "cyber-ecosystem/shared-go/capability/sms/mock"
 	"cyber-ecosystem/shared-go/kratos/security"
+	"cyber-ecosystem/shared-go/utils"
 
 	systempb "cyber-ecosystem/gen/go/cyber/system/v1"
 
@@ -26,6 +27,8 @@ import (
 	entcredential "cyber-ecosystem/app/services/system/internal/ent/credential"
 	entmembership "cyber-ecosystem/app/services/system/internal/ent/membership"
 	entpopulation "cyber-ecosystem/app/services/system/internal/ent/population"
+	"cyber-ecosystem/app/services/system/internal/ent/schema/local_mixins"
+	enttenant "cyber-ecosystem/app/services/system/internal/ent/tenant"
 	entuser "cyber-ecosystem/app/services/system/internal/ent/user"
 	authmod "cyber-ecosystem/app/services/system/internal/module/auth"
 	authzmod "cyber-ecosystem/app/services/system/internal/module/authz"
@@ -47,22 +50,7 @@ func smsClean(t *testing.T, db *ent.Client, trp authmod.TokenRP) {
 	t.Helper()
 	ctx := context.Background()
 	for _, phone := range []string{e2eSmsPhoneA, e2eSmsPhoneB} {
-		cs, err := db.Credential.Query().Where(
-			entcredential.KindEQ("sms"), entcredential.IdentifierEQ(phone)).All(ctx)
-		if err != nil {
-			t.Fatalf("clean credential query: %v", err)
-		}
-		for _, c := range cs {
-			if _, err := db.Membership.Delete().Where(entmembership.UserIDEQ(c.UserID)).Exec(ctx); err != nil {
-				t.Fatalf("clean membership: %v", err)
-			}
-			if _, err := db.User.Delete().Where(entuser.IDEQ(c.UserID)).Exec(ctx); err != nil {
-				t.Fatalf("clean user: %v", err)
-			}
-			if _, err := db.Credential.Delete().Where(entcredential.IDEQ(c.ID)).Exec(ctx); err != nil {
-				t.Fatalf("clean credential: %v", err)
-			}
-		}
+		sweepBornUsers(t, db, "sms", phone)
 		// The code and throttle keys reset so the next run starts from
 		// zero; orphaned states die on their own TTL. The send-window key
 		// carries redis_rate's own "rate:" storage prefix — the one place
@@ -197,7 +185,7 @@ func TestSmsLoginLiveE2E(t *testing.T) {
 	if subject.Population != "member" {
 		t.Fatalf("session population = %q, want member", subject.Population)
 	}
-	smsAssertMemberChain(t, db)
+	assertBornMemberChain(t, db, "sms", e2eSmsPhoneB)
 }
 
 // lastSmsCode reads the newest recorded send's code — the harness's window
@@ -220,14 +208,14 @@ func lastSmsCode(t *testing.T, ctrl *smsmock.Controller, phone string) string {
 	return last.Params["code"]
 }
 
-// smsAssertMemberChain lands the auto-registration contract on real rows:
+// assertBornMemberChain lands the auto-registration contract on real rows:
 // the credential keys a born user (xid account, empty-hash password plane,
 // enabled) holding exactly the member seat.
-func smsAssertMemberChain(t *testing.T, db *ent.Client) {
+func assertBornMemberChain(t *testing.T, db *ent.Client, kind, identifier string) {
 	t.Helper()
 	ctx := context.Background()
 	c, err := db.Credential.Query().Where(
-		entcredential.KindEQ("sms"), entcredential.IdentifierEQ(e2eSmsPhoneB)).Only(ctx)
+		entcredential.KindEQ(kind), entcredential.IdentifierEQ(identifier)).Only(ctx)
 	if err != nil {
 		t.Fatalf("credential row: %v", err)
 	}
@@ -249,11 +237,222 @@ func smsAssertMemberChain(t *testing.T, db *ent.Client) {
 
 func sp(s string) *string { return &s }
 
+// sweepBornUsers erases a born member's full row family — user, seats, and
+// the credential that keyed it — so a re-run starts from zero rows.
+func sweepBornUsers(t *testing.T, db *ent.Client, kind, identifier string) {
+	t.Helper()
+	ctx := context.Background()
+	cs, err := db.Credential.Query().Where(
+		entcredential.KindEQ(kind), entcredential.IdentifierEQ(identifier)).All(ctx)
+	if err != nil {
+		t.Fatalf("clean credential query: %v", err)
+	}
+	for _, c := range cs {
+		if _, err := db.Membership.Delete().Where(entmembership.UserIDEQ(c.UserID)).Exec(ctx); err != nil {
+			t.Fatalf("clean membership: %v", err)
+		}
+		if _, err := db.User.Delete().Where(entuser.IDEQ(c.UserID)).Exec(ctx); err != nil {
+			t.Fatalf("clean user: %v", err)
+		}
+		if _, err := db.Credential.Delete().Where(entcredential.IDEQ(c.ID)).Exec(ctx); err != nil {
+			t.Fatalf("clean credential: %v", err)
+		}
+	}
+}
+
 func smsIdentityReq(state, phone, code string) *systempb.LoginByIdentityRequest {
 	p, c, s, prov := phone, code, state, "sms"
 	return &systempb.LoginByIdentityRequest{
 		Provider: &prov,
 		State:    &s,
 		Payload:  &systempb.LoginByIdentityRequest_Sms{Sms: &systempb.SmsIdentityPayload{Phone: &p, Code: &c}},
+	}
+}
+
+const (
+	e2eSmsPhoneBind = "13900003333"
+	e2eSmsPhoneAnon = "13900004444"
+	e2eBindAccount  = "e2e-bind@e2e"
+	e2eBindTenant   = "e2e-bind-tenant"
+)
+
+func bindClean(t *testing.T, db *ent.Client, trp authmod.TokenRP) {
+	t.Helper()
+	ctx := local_mixins.SkipSoftDelete(context.Background())
+	sweepBornUsers(t, db, "sms", e2eSmsPhoneBind)
+	sweepBornUsers(t, db, "sms", e2eSmsPhoneAnon)
+	if us, err := db.User.Query().Where(entuser.AccountEQ(e2eBindAccount)).All(ctx); err != nil {
+		t.Fatalf("bind clean user query: %v", err)
+	} else {
+		for _, u := range us {
+			if _, err := db.Membership.Delete().Where(entmembership.UserIDEQ(u.ID)).Exec(ctx); err != nil {
+				t.Fatalf("bind clean seat: %v", err)
+			}
+			if _, err := db.User.Delete().Where(entuser.IDEQ(u.ID)).Exec(ctx); err != nil {
+				t.Fatalf("bind clean user: %v", err)
+			}
+		}
+	}
+	if _, err := db.Tenant.Delete().Where(enttenant.CodeEQ(e2eBindTenant)).Exec(ctx); err != nil {
+		t.Fatalf("bind clean tenant: %v", err)
+	}
+	bare := context.Background()
+	for _, phone := range []string{e2eSmsPhoneBind, e2eSmsPhoneAnon} {
+		for _, k := range []string{
+			"auth:web:sms-code:" + phone,
+			"auth:sms:send-daily:" + phone,
+			"rate:auth:sms:send-window:" + phone,
+		} {
+			if err := trp.Del(bare, k); err != nil {
+				t.Fatalf("bind clean key %s: %v", k, err)
+			}
+		}
+	}
+}
+
+// The bind twin of the sms chain, live: an authenticated session asks
+// for a code, and the mint carries that session (the rung is the whole
+// difference — the same send on the public login rung stays anonymous).
+// Binding cashes the state back to the same session, lands the sms
+// credential on the password user, and the burn leaves the state
+// single-use. An anonymous mint must refuse on the bind face before any
+// provider call. Gated: ENT_E2E=1 with the dev stack up.
+func TestBindSmsLiveE2E(t *testing.T) {
+	if os.Getenv("ENT_E2E") != "1" {
+		t.Skip("set ENT_E2E=1 with the dev stack (postgres + redis) up to run the bind-sms end-to-end")
+	}
+	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
+	bare := context.Background()
+
+	db, closeDB, err := platform.NewEntClient(&conf.Data{Database: &conf.Data_Database{
+		Driver: "postgres", Host: tenEnvOr("DB_HOST", "localhost"), Port: 5432,
+		User: "postgres", Password: tenEnvOr("DB_PASS", "postgres"), DbName: tenEnvOr("DB_NAME", "system"),
+		MaxOpenConns: 8,
+	}}, logger)
+	if err != nil {
+		t.Fatalf("ent client: %v", err)
+	}
+	cacheClient, closeCache, err := platform.NewCache(&conf.Data{Redis: &conf.Data_Redis{
+		Addr: tenEnvOr("REDIS_ADDR", "localhost:6379"), Db: 0,
+	}}, logger)
+	if err != nil {
+		t.Fatalf("cache: %v", err)
+	}
+	cacheErrHandler, err := platform.NewCacheErrorHandler()
+	if err != nil {
+		t.Fatalf("cache error handler: %v", err)
+	}
+	pf, err := platform.NewPlatform(cacheClient, cacheErrHandler, db, platform.NewEntErrorHandler(), nil, nil, nil, nil)
+	if err != nil {
+		t.Fatalf("platform: %v", err)
+	}
+
+	memberSeen, err := db.Population.Query().Where(entpopulation.CodeEQ("member")).Exist(bare)
+	if err != nil {
+		t.Fatalf("population exist: %v", err)
+	}
+	if !memberSeen {
+		if _, err = db.Population.Create().SetCode("member").SetName("Member").SetPlane(security.PlaneMember).Save(bare); err != nil {
+			t.Fatalf("population: %v", err)
+		}
+	}
+
+	userRP := usermod.NewUserRP(logger, pf)
+	authzRP, err := authzmod.NewAuthzRP(logger, pf)
+	if err != nil {
+		t.Fatalf("authz rp: %v", err)
+	}
+	tenantRP := tenantmod.NewTenantRP(logger, pf)
+	populationRP := populationmod.NewPopulationRP(logger, pf)
+	tokenRP := authmod.NewTokenRP(logger, pf)
+	providers, ctrl := e2eProviders(t, logger, cacheClient, tokenRP)
+	authConf := &conf.Auth{Providers: []*conf.Auth_Provider{{
+		Key: "sms", Kind: "sms", Enabled: true, AutoRegister: true, Population: "member",
+		Sms: &conf.Auth_Provider_Sms{SignName: "曦光未来", TemplateCode: "SMS_E2E"},
+	}}}
+	uc, err := authmod.NewAuthUC(logger, pf, authConf, providers, userRP, authzRP, tenantRP, populationRP, tokenRP)
+	if err != nil {
+		t.Fatalf("auth uc: %v", err)
+	}
+	t.Cleanup(func() {
+		bindClean(t, db, tokenRP)
+		closeCache()
+		closeDB()
+	})
+	bindClean(t, db, tokenRP)
+
+	svc := authmod.NewAuthService(logger, uc)
+
+	// A password user to bind onto: its own tenant, its own seat, the
+	// population the login default resolves.
+	if _, err = db.Tenant.Create().SetCode(e2eBindTenant).SetName("e2e bind").Save(bare); err != nil {
+		t.Fatalf("bind tenant: %v", err)
+	}
+	hash, err := utils.Hash("e2e-bind-pass")
+	if err != nil {
+		t.Fatalf("hash: %v", err)
+	}
+	pu, err := db.User.Create().SetAccount(e2eBindAccount).SetPasswordHash(hash).SetEnabled(true).Save(bare)
+	if err != nil {
+		t.Fatalf("password user: %v", err)
+	}
+	if _, err = db.Membership.Create().SetUserID(pu.ID).SetTenantID(e2eBindTenant).SetPopulation(security.DefaultPopulation).Save(bare); err != nil {
+		t.Fatalf("password seat: %v", err)
+	}
+
+	token, _, _, err := uc.Login(bare, e2eBindAccount, "e2e-bind-pass", "")
+	if err != nil {
+		t.Fatalf("password login: %v", err)
+	}
+	subject, err := uc.AuthenticateSession(bare, token)
+	if err != nil {
+		t.Fatalf("verify session: %v", err)
+	}
+	if subject.UserID != pu.ID {
+		t.Fatalf("session user %s != password user %s", subject.UserID, pu.ID)
+	}
+	ctxBind := security.WithSubject(bare, subject)
+
+	// The authenticated rung mints a state carrying this session.
+	sent, err := svc.SendSmsCode(ctxBind, &systempb.SendSmsCodeRequest{Provider: sp("sms"), Phone: sp(e2eSmsPhoneBind)})
+	if err != nil {
+		t.Fatalf("bind send: %v", err)
+	}
+	code := lastSmsCode(t, ctrl, e2eSmsPhoneBind)
+	bindReq := func(state, phone, c string) *systempb.BindCredentialRequest {
+		p, cc, prov, st := phone, c, "sms", state
+		return &systempb.BindCredentialRequest{
+			Provider: &prov,
+			State:    &st,
+			Payload:  &systempb.BindCredentialRequest_Sms{Sms: &systempb.SmsIdentityPayload{Phone: &p, Code: &cc}},
+		}
+	}
+	if _, err = svc.BindCredential(ctxBind, bindReq(sent.State, e2eSmsPhoneBind, code)); err != nil {
+		t.Fatalf("bind: %v", err)
+	}
+	cred, err := db.Credential.Query().Where(
+		entcredential.KindEQ("sms"), entcredential.IdentifierEQ(e2eSmsPhoneBind)).Only(bare)
+	if err != nil {
+		t.Fatalf("credential row: %v", err)
+	}
+	if cred.UserID != subject.UserID {
+		t.Fatalf("bind joined %s, want the session user %s", cred.UserID, subject.UserID)
+	}
+
+	// The state burned on the cash: a replay answers the exchange refusal.
+	if _, err = svc.BindCredential(ctxBind, bindReq(sent.State, e2eSmsPhoneBind, code)); !systempb.IsSystemIdentityExchangeFailed(err) {
+		t.Fatalf("replay: want EXCHANGE_FAILED, got %v", err)
+	}
+
+	// The rung is the whole difference: a mint from the public login rung
+	// (anonymous) never binds — the bind face refuses it as a failed
+	// exchange, before any provider call.
+	anon, err := svc.SendSmsCode(bare, &systempb.SendSmsCodeRequest{Provider: sp("sms"), Phone: sp(e2eSmsPhoneAnon)})
+	if err != nil {
+		t.Fatalf("anon send: %v", err)
+	}
+	anonCode := lastSmsCode(t, ctrl, e2eSmsPhoneAnon)
+	if _, err = svc.BindCredential(ctxBind, bindReq(anon.State, e2eSmsPhoneAnon, anonCode)); !systempb.IsSystemIdentityExchangeFailed(err) {
+		t.Fatalf("anonymous mint: want EXCHANGE_FAILED, got %v", err)
 	}
 }

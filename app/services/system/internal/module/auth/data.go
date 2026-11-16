@@ -46,6 +46,14 @@ func (r *tokenRP) Set(ctx context.Context, key string, val []byte, ttl time.Dura
 	return nil
 }
 
+func (r *tokenRP) CompareAndSet(ctx context.Context, key string, expected, val []byte, ttl time.Duration) (bool, error) {
+	swapped, err := r.Platform.GetCache().KV.CompareAndSet(ctx, key, expected, val, ttl)
+	if err != nil {
+		return false, r.Platform.HandleCacheError(err)
+	}
+	return swapped, nil
+}
+
 func (r *tokenRP) Del(ctx context.Context, key string) error {
 	if err := r.Platform.GetCache().KV.Del(ctx, key); err != nil {
 		return r.Platform.HandleCacheError(err)

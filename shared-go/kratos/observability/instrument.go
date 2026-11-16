@@ -18,9 +18,9 @@ import (
 
 	"github.com/XSAM/otelsql"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/smithy-go/tracing/smithyoteltracing"
 	redisotel "github.com/redis/go-redis/extra/redisotel/v9"
 	"github.com/redis/go-redis/v9"
-	"go.opentelemetry.io/contrib/instrumentation/github.com/aws/aws-sdk-go-v2/otelaws"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
@@ -49,13 +49,14 @@ func InstrumentRedis(c *redis.Client) error {
 	return nil
 }
 
-// S3Options returns an s3.Options mutator that appends the aws-sdk-go-v2 OTel
-// middlewares (trace + metrics) to the client's APIOptions. Pass it to
-// storage/s3.NewClient via its variadic opts; storage/s3 stays unaware of
-// observability. otelaws.AppendMiddlewares reads the global providers.
+// S3Options returns an s3.Options mutator that wires the client's Smithy
+// tracing onto the global OTel tracer provider. Pass it to storage/s3.NewClient
+// via its variadic opts; storage/s3 stays unaware of observability. This is the
+// AWS-sanctioned instrumentation path — the contrib otelaws module it replaces
+// was deprecated upstream with no named successor.
 func S3Options() func(*s3.Options) {
 	return func(o *s3.Options) {
-		otelaws.AppendMiddlewares(&o.APIOptions)
+		o.TracerProvider = smithyoteltracing.Adapt(otel.GetTracerProvider())
 	}
 }
 

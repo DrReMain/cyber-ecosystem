@@ -97,6 +97,10 @@ type fakeRoleRP struct {
 	membersOut   *MemberListOut
 	membersCalls int
 	findErr      error
+
+	listOut     *ListOut
+	byPrincipal []*Role
+	principalOf string
 }
 
 func (f *fakeRoleRP) FindByID(_ context.Context, id string) (*Role, error) {
@@ -153,6 +157,13 @@ func (f *fakeRoleRP) RemoveMember(context.Context, string, string, string) error
 func (f *fakeRoleRP) ListMembers(_ context.Context, _ *MemberListIn) (*MemberListOut, error) {
 	f.membersCalls++
 	return f.membersOut, nil
+}
+
+func (f *fakeRoleRP) List(context.Context, *ListIn) (*ListOut, error) { return f.listOut, nil }
+
+func (f *fakeRoleRP) ListByPrincipal(_ context.Context, principalType, principalID string) ([]*Role, error) {
+	f.principalOf = principalType + "|" + principalID
+	return f.byPrincipal, nil
 }
 
 // fakePolicyRP answers the policy reference check with a controllable found
@@ -454,5 +465,34 @@ func TestPreviewScopedToCallerTenant(t *testing.T) {
 	}
 	if len(ops) != 1 || arp.captureScope[0] != "t9" {
 		t.Fatalf("preview: ops=%v scope=%v", ops, arp.captureScope)
+	}
+}
+
+// List ------------------------------------------------------------------------------------------------------------------
+
+// List is a pure delegation — filters and paging live in the repo.
+func TestListDelegates(t *testing.T) {
+	want := &ListOut{List: []*Role{{ID: "r1"}}}
+	uc := newRoleUCFull(&fakeRoleRP{listOut: want}, &fakePolicyRP{}, &fakeAuthzRP{}, nil)
+
+	out, err := uc.List(context.Background(), &ListIn{})
+	if err != nil || out != want {
+		t.Fatalf("list: out=%v err=%v", out, err)
+	}
+}
+
+// ListByPrincipal is a pure delegation — the binding join and its code
+// ordering live in the repo.
+func TestListByPrincipalDelegates(t *testing.T) {
+	want := []*Role{{ID: "r1"}}
+	rp := &fakeRoleRP{byPrincipal: want}
+	uc := newRoleUCFull(rp, &fakePolicyRP{}, &fakeAuthzRP{}, nil)
+
+	out, err := uc.ListByPrincipal(context.Background(), "user", "u1")
+	if err != nil || len(out) != 1 || out[0] != want[0] {
+		t.Fatalf("by principal: out=%v err=%v", out, err)
+	}
+	if rp.principalOf != "user|u1" {
+		t.Fatalf("by principal: args=%s", rp.principalOf)
 	}
 }

@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"go.opentelemetry.io/contrib/bridges/otelslog"
+	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp"
-	otellogglobal "go.opentelemetry.io/otel/log/global"
 	sdklog "go.opentelemetry.io/otel/sdk/log"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/trace"
@@ -72,7 +72,7 @@ func buildLogger(cfg Config, name, version, instanceID string, res *resource.Res
 				sdklog.WithResource(res),
 				sdklog.WithProcessor(sdklog.NewBatchProcessor(exp)),
 			)
-			otellogglobal.SetLoggerProvider(lp)
+			otel.SetLoggerProvider(lp)
 			// otelslog pulls service identity from the provider's resource and fills
 			// trace correlation from the record's context — no manual injection.
 			handlers = append(handlers, otelslog.NewHandler(name, otelslog.WithLoggerProvider(lp)))

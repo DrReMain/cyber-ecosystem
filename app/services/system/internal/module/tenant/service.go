@@ -44,6 +44,29 @@ func (s *TenantService) RegisterConnect(srv *connecttransport.Server) {
 
 // Handler -------------------------------------------------------------------------------------------------------------
 
+func (s *TenantService) CreateTenant(ctx context.Context, in *systempb.CreateTenantRequest) (*systempb.CreateTenantResponse, error) {
+	id, err := s.tenantUC.Create(ctx, &CreateIn{
+		Code: in.GetCode(),
+		Name: in.GetName(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &systempb.CreateTenantResponse{Id: id}, nil
+}
+
+func (s *TenantService) AddTenantAdmin(ctx context.Context, in *systempb.AddTenantAdminRequest) (*systempb.AddTenantAdminResponse, error) {
+	userID, err := s.tenantUC.AddSuperAdmin(ctx, &AdminIn{
+		TenantCode: in.GetTenantCode(),
+		Account:    in.GetAccount(),
+		Password:   in.GetPassword(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &systempb.AddTenantAdminResponse{UserId: userID}, nil
+}
+
 func (s *TenantService) UpdateTenantStatus(ctx context.Context, in *systempb.UpdateTenantStatusRequest) (*systempb.UpdateTenantStatusResponse, error) {
 	if _, err := s.tenantUC.UpdateStatus(ctx, in.Id, in.GetEnabled()); err != nil {
 		return nil, err
@@ -52,7 +75,7 @@ func (s *TenantService) UpdateTenantStatus(ctx context.Context, in *systempb.Upd
 }
 
 func (s *TenantService) ListTenants(ctx context.Context, in *systempb.ListTenantsRequest) (*systempb.ListTenantsResponse, error) {
-	out, err := s.tenantUC.List(ctx, &TenantListIn{
+	out, err := s.tenantUC.List(ctx, &ListIn{
 		PageRequest: helper.EnsurePageRequest(in.Page),
 		OrderBy:     in.OrderBy,
 		Code:        in.Code,

@@ -1,14 +1,6 @@
-# Container-mode bootstrap config (baked by the Dockerfile; configs/ holds
-# only the bare-metal dev config). Endpoints are network discovery aliases
-# (<service>.<domain> — the same names k8s Service DNS resolves), so one file
-# serves every container shape. Deployment-sensitive values are
-# ${VAR:default} placeholders overridden by APP_-prefixed env vars (e.g.
-# APP_DB_HOST=prod-db reconfigures without a rebuild); booleans included —
-# main.go wires WithResolveActualTypes for the string→bool conversion.
-# Placeholder coverage is field-aligned with configs/config.yaml — a key
-# that carries one here carries the same one there (defaults differ per
-# environment); a key stays literal in both when neither flips. When a key
-# changes in configs/config.yaml, mirror it here.
+# Container config (baked by the Dockerfile; configs/config.yaml holds the
+# dev shape). Key set and order mirror the dev file; defaults point at the
+# compose network aliases. Overrides come ONLY from APP_-prefixed env vars.
 server:
   http: {addr: 0.0.0.0:11001, timeout: 1s}
   grpc: {addr: 0.0.0.0:12001, timeout: 1s}
@@ -21,68 +13,58 @@ data:
     user: ${DB_USER:postgres}
     password: ${DB_PASS:postgres}
     db_name: ${DB_NAME:system}
-    max_open_conns: 100        # connections (max)
-    max_idle_conns: 50         # connections (max idle)
-    conn_max_lifetime: 3600s   # duration (max connection lifetime)
+    max_open_conns: 100
+    max_idle_conns: 50
+    conn_max_lifetime: 3600s
   redis:
     network: tcp
     addr: ${REDIS_ADDR:redis.db:6379}
     password: ${REDIS_PASS:}
-    db: 0                      # index (Redis database 0–15)
-    pool_size: 50              # connections (pool size)
-    min_idle_conns: 5          # connections (min idle)
-    conn_max_lifetime: 1800s   # duration (max connection lifetime)
-    read_timeout: 0.2s         # duration (read timeout)
-    write_timeout: 0.2s        # duration (write timeout)
-    dial_timeout: 5s           # duration (dial timeout)
-    pool_timeout: 1.2s         # duration (pool wait timeout)
+    db: 0
+    pool_size: 50
+    min_idle_conns: 5
+    conn_max_lifetime: 1800s
+    read_timeout: 0.2s
+    write_timeout: 0.2s
+    dial_timeout: 5s
+    pool_timeout: 1.2s
   storage:
     s3:
       endpoint: ${S3_ENDPOINT:http://s3.cyber.test}
-      public_endpoint: ${S3_PUBLIC_ENDPOINT:http://s3.cyber.test}
       access_key: ${S3_ACCESS_KEY:admin@cyber-ecosystem.com}
       secret_key: ${S3_SECRET_KEY:Cyber-Ecosystem123}
       bucket: ${S3_BUCKET:core}
       region: ${S3_REGION:us-east-1}
       use_path_style: true
-      multipart_threshold: 8388608 # bytes (8 MiB)
-      part_size: 5242880           # bytes (5 MiB)
-      presign_ttl: 900s            # duration (presign validity)
+      multipart_threshold: 8388608
+      part_size: 5242880
+      presign_ttl: 900s
       max_file_size: 2147483648
+      public_endpoint: ${S3_PUBLIC_ENDPOINT:http://s3.cyber.test}
   mq:
     pg:
       dsn: ${MQ_DSN:postgres://postgres:postgres@postgresql.db:5432/mq?sslmode=disable}
       poll_interval: 0.5s
       visibility_timeout: 30s
-      max_retries: 5              # attempts (delivery ceiling)
-      retention: 604800s          # duration (7 days)
+      max_retries: 5
+      retention: 604800s
       batch_size: 16
 observability:
-  endpoint: ${OTLP_ENDPOINT:signoz-otel-collector.observability:4318} # SigNoz OTLP HTTP
+  endpoint: ${OTLP_ENDPOINT:signoz-otel-collector.observability:4318}
   insecure: true
   trace:
     enabled: ${TRACE_ENABLED:false}
   metrics:
     enabled: ${METRICS_ENABLED:false}
-  slow_query:
-    db: 0.2s
-    cache: 0.05s
   log:
     level: info
     console: true
     otlp: false
-
+  slow_query:
+    db: 0.2s
+    cache: 0.05s
 catalog:
   dir: ${CATALOG_DIR:/etc/cyber/catalog}
-
-seed:
-  super_admins:
-    - admin
-  initial_password: ${SEED_INITIAL_PASSWORD:admin123456}
-  populations:
-    - code: member # C-end member plane (composition-face enumeration)
-      name: Member
-      plane: member
 auth:
   providers:
     - key: wechat
@@ -90,7 +72,7 @@ auth:
       enabled: ${WECHAT_ENABLED:false}
       auto_register: ${WECHAT_AUTO_REGISTER:false}
       endpoint: ${WECHAT_ENDPOINT:}
-      population: ${WECHAT_POPULATION:member} # landing population (member plane)
+      population: ${WECHAT_POPULATION:member}
       wechat:
         appid: ${WECHAT_APPID:}
         secret: ${WECHAT_SECRET:}
@@ -98,11 +80,19 @@ auth:
       kind: sms
       enabled: ${SMS_ENABLED:false}
       auto_register: ${SMS_AUTO_REGISTER:false}
-      population: ${SMS_POPULATION:member} # landing population (member plane)
+      population: ${SMS_POPULATION:member}
       sms:
-        backend: ${SMS_BACKEND:} # empty = auto by credentials; dysmsapi | mock
+        backend: ${SMS_BACKEND:mock}
         access_key_id: ${SMS_ACCESS_KEY_ID:}
         access_key_secret: ${SMS_ACCESS_KEY_SECRET:}
         sign_name: ${SMS_SIGN_NAME:}
-        template_code: ${SMS_TEMPLATE_CODE:}
-        endpoint: ${SMS_ENDPOINT:} # empty = official default
+        template_code: ${SMS_TEMPLATE_CODE:SMS_460000000}
+        endpoint: ${SMS_ENDPOINT:}
+seed:
+  super_admins:
+    - admin
+  initial_password: ${SEED_INITIAL_PASSWORD:admin123456}
+  populations:
+    - code: member
+      name: Member
+      plane: member

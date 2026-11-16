@@ -24,20 +24,30 @@ const (
 
 // business errors (service-level): domain-specific failures the
 // service layer returns actively, distinct from the generic codes in
-// cyber/shared/errors (General/Flow/Infra). The 6xxx range is reserved for service-level business reasons.
+// cyber/shared/errors (General/Flow/Infra). The 6xxx range is reserved
+// for service-level business reasons; system holds 600x-610x, and the
+// next free block for a new service starts at 62xx.
 type System int32
 
 const (
 	System_SYSTEM_UNSPECIFIED System = 0
 	// 600x: auth
-	System_SYSTEM_LOGIN_FAILED              System = 6000
-	System_SYSTEM_PASSWORD_MISMATCH         System = 6001
-	System_SYSTEM_LOGIN_SEAT_REQUIRED       System = 6002
-	System_SYSTEM_IDENTITY_PROVIDER_UNKNOWN System = 6003
-	System_SYSTEM_IDENTITY_EXCHANGE_FAILED  System = 6004
-	System_SYSTEM_IDENTITY_ALREADY_BOUND    System = 6005
-	System_SYSTEM_SMS_RATE_LIMITED          System = 6006
-	System_SYSTEM_SMS_CODE_INVALID          System = 6007
+	System_SYSTEM_LOGIN_FAILED System = 6000
+	// No seat in the target population: a true refusal — this identity has
+	// no standing here, a different account is the answer.
+	System_SYSTEM_LOGIN_SEAT_REQUIRED System = 6002
+	// Multiple seats, none chosen: guidance, not refusal — the client
+	// should offer the seat choice, not an error dead-end.
+	System_SYSTEM_LOGIN_SEAT_CHOICE_REQUIRED System = 6008
+	System_SYSTEM_IDENTITY_PROVIDER_UNKNOWN  System = 6003
+	System_SYSTEM_IDENTITY_EXCHANGE_FAILED   System = 6004
+	System_SYSTEM_IDENTITY_ALREADY_BOUND     System = 6005
+	// One code for every send-budget dimension (window, per-phone daily,
+	// per-source): the refusal deliberately names no dimension, because the
+	// copy a client renders is a budget-structure oracle otherwise.
+	System_SYSTEM_SMS_RATE_LIMITED  System = 6006
+	System_SYSTEM_SMS_CODE_INVALID  System = 6007
+	System_SYSTEM_PASSWORD_MISMATCH System = 6001
 	// 601x: dept
 	System_SYSTEM_DEPT_SELF_PARENT      System = 6010
 	System_SYSTEM_DEPT_CYCLE            System = 6011
@@ -54,6 +64,8 @@ const (
 	System_SYSTEM_POLICY_UNKNOWN_KIND   System = 6040
 	System_SYSTEM_POLICY_INVALID_PARAMS System = 6041
 	System_SYSTEM_POLICY_NOT_FOUND      System = 6042
+	// 605x: password
+	System_SYSTEM_PASSWORD_POLICY System = 6050
 	// 606x: authz runtime
 	System_SYSTEM_AUTHZ_POLICY_DENIED System = 6060
 	// 607x: user
@@ -70,6 +82,9 @@ const (
 	System_SYSTEM_TENANT_DISABLED  System = 6090
 	System_SYSTEM_TENANT_NOT_FOUND System = 6091
 	System_SYSTEM_TENANT_PROTECTED System = 6092
+	// A taken code is burned forever — reuse would graft the new tenant onto
+	// the old one's seats and history.
+	System_SYSTEM_TENANT_CODE_TAKEN System = 6093
 	// 610x: population registry
 	System_SYSTEM_POPULATION_NOT_FOUND System = 6101
 )
@@ -79,13 +94,14 @@ var (
 	System_name = map[int32]string{
 		0:    "SYSTEM_UNSPECIFIED",
 		6000: "SYSTEM_LOGIN_FAILED",
-		6001: "SYSTEM_PASSWORD_MISMATCH",
 		6002: "SYSTEM_LOGIN_SEAT_REQUIRED",
+		6008: "SYSTEM_LOGIN_SEAT_CHOICE_REQUIRED",
 		6003: "SYSTEM_IDENTITY_PROVIDER_UNKNOWN",
 		6004: "SYSTEM_IDENTITY_EXCHANGE_FAILED",
 		6005: "SYSTEM_IDENTITY_ALREADY_BOUND",
 		6006: "SYSTEM_SMS_RATE_LIMITED",
 		6007: "SYSTEM_SMS_CODE_INVALID",
+		6001: "SYSTEM_PASSWORD_MISMATCH",
 		6010: "SYSTEM_DEPT_SELF_PARENT",
 		6011: "SYSTEM_DEPT_CYCLE",
 		6012: "SYSTEM_DEPT_HAS_CHILDREN",
@@ -98,6 +114,7 @@ var (
 		6040: "SYSTEM_POLICY_UNKNOWN_KIND",
 		6041: "SYSTEM_POLICY_INVALID_PARAMS",
 		6042: "SYSTEM_POLICY_NOT_FOUND",
+		6050: "SYSTEM_PASSWORD_POLICY",
 		6060: "SYSTEM_AUTHZ_POLICY_DENIED",
 		6070: "SYSTEM_USER_SELF_DELETE",
 		6071: "SYSTEM_USER_SELF_DISABLE",
@@ -110,18 +127,20 @@ var (
 		6090: "SYSTEM_TENANT_DISABLED",
 		6091: "SYSTEM_TENANT_NOT_FOUND",
 		6092: "SYSTEM_TENANT_PROTECTED",
+		6093: "SYSTEM_TENANT_CODE_TAKEN",
 		6101: "SYSTEM_POPULATION_NOT_FOUND",
 	}
 	System_value = map[string]int32{
 		"SYSTEM_UNSPECIFIED":                  0,
 		"SYSTEM_LOGIN_FAILED":                 6000,
-		"SYSTEM_PASSWORD_MISMATCH":            6001,
 		"SYSTEM_LOGIN_SEAT_REQUIRED":          6002,
+		"SYSTEM_LOGIN_SEAT_CHOICE_REQUIRED":   6008,
 		"SYSTEM_IDENTITY_PROVIDER_UNKNOWN":    6003,
 		"SYSTEM_IDENTITY_EXCHANGE_FAILED":     6004,
 		"SYSTEM_IDENTITY_ALREADY_BOUND":       6005,
 		"SYSTEM_SMS_RATE_LIMITED":             6006,
 		"SYSTEM_SMS_CODE_INVALID":             6007,
+		"SYSTEM_PASSWORD_MISMATCH":            6001,
 		"SYSTEM_DEPT_SELF_PARENT":             6010,
 		"SYSTEM_DEPT_CYCLE":                   6011,
 		"SYSTEM_DEPT_HAS_CHILDREN":            6012,
@@ -134,6 +153,7 @@ var (
 		"SYSTEM_POLICY_UNKNOWN_KIND":          6040,
 		"SYSTEM_POLICY_INVALID_PARAMS":        6041,
 		"SYSTEM_POLICY_NOT_FOUND":             6042,
+		"SYSTEM_PASSWORD_POLICY":              6050,
 		"SYSTEM_AUTHZ_POLICY_DENIED":          6060,
 		"SYSTEM_USER_SELF_DELETE":             6070,
 		"SYSTEM_USER_SELF_DISABLE":            6071,
@@ -146,6 +166,7 @@ var (
 		"SYSTEM_TENANT_DISABLED":              6090,
 		"SYSTEM_TENANT_NOT_FOUND":             6091,
 		"SYSTEM_TENANT_PROTECTED":             6092,
+		"SYSTEM_TENANT_CODE_TAKEN":            6093,
 		"SYSTEM_POPULATION_NOT_FOUND":         6101,
 	}
 )
@@ -181,17 +202,19 @@ var File_cyber_system_v1_error_reason_proto protoreflect.FileDescriptor
 
 const file_cyber_system_v1_error_reason_proto_rawDesc = "" +
 	"\n" +
-	"\"cyber/system/v1/error_reason.proto\x12\x0fcyber.system.v1\x1a\x13errors/errors.proto*\xf8\t\n" +
+	"\"cyber/system/v1/error_reason.proto\x12\x0fcyber.system.v1\x1a\x13errors/errors.proto*\xf6\n" +
+	"\n" +
 	"\x06System\x12\x1c\n" +
 	"\x12SYSTEM_UNSPECIFIED\x10\x00\x1a\x04\xa8E\xf4\x03\x12\x1e\n" +
-	"\x13SYSTEM_LOGIN_FAILED\x10\xf0.\x1a\x04\xa8E\x90\x03\x12#\n" +
-	"\x18SYSTEM_PASSWORD_MISMATCH\x10\xf1.\x1a\x04\xa8E\x90\x03\x12%\n" +
-	"\x1aSYSTEM_LOGIN_SEAT_REQUIRED\x10\xf2.\x1a\x04\xa8E\x90\x03\x12+\n" +
+	"\x13SYSTEM_LOGIN_FAILED\x10\xf0.\x1a\x04\xa8E\x90\x03\x12%\n" +
+	"\x1aSYSTEM_LOGIN_SEAT_REQUIRED\x10\xf2.\x1a\x04\xa8E\x90\x03\x12,\n" +
+	"!SYSTEM_LOGIN_SEAT_CHOICE_REQUIRED\x10\xf8.\x1a\x04\xa8E\x90\x03\x12+\n" +
 	" SYSTEM_IDENTITY_PROVIDER_UNKNOWN\x10\xf3.\x1a\x04\xa8E\x90\x03\x12*\n" +
 	"\x1fSYSTEM_IDENTITY_EXCHANGE_FAILED\x10\xf4.\x1a\x04\xa8E\x91\x03\x12(\n" +
 	"\x1dSYSTEM_IDENTITY_ALREADY_BOUND\x10\xf5.\x1a\x04\xa8E\x99\x03\x12\"\n" +
 	"\x17SYSTEM_SMS_RATE_LIMITED\x10\xf6.\x1a\x04\xa8E\xad\x03\x12\"\n" +
-	"\x17SYSTEM_SMS_CODE_INVALID\x10\xf7.\x1a\x04\xa8E\x91\x03\x12\"\n" +
+	"\x17SYSTEM_SMS_CODE_INVALID\x10\xf7.\x1a\x04\xa8E\x91\x03\x12#\n" +
+	"\x18SYSTEM_PASSWORD_MISMATCH\x10\xf1.\x1a\x04\xa8E\x90\x03\x12\"\n" +
 	"\x17SYSTEM_DEPT_SELF_PARENT\x10\xfa.\x1a\x04\xa8E\x90\x03\x12\x1c\n" +
 	"\x11SYSTEM_DEPT_CYCLE\x10\xfb.\x1a\x04\xa8E\x90\x03\x12#\n" +
 	"\x18SYSTEM_DEPT_HAS_CHILDREN\x10\xfc.\x1a\x04\xa8E\x90\x03\x12 \n" +
@@ -203,7 +226,8 @@ const file_cyber_system_v1_error_reason_proto_rawDesc = "" +
 	"#SYSTEM_PERMISSION_INVALID_OPERATION\x10\x8e/\x1a\x04\xa8E\x90\x03\x12%\n" +
 	"\x1aSYSTEM_POLICY_UNKNOWN_KIND\x10\x98/\x1a\x04\xa8E\x90\x03\x12'\n" +
 	"\x1cSYSTEM_POLICY_INVALID_PARAMS\x10\x99/\x1a\x04\xa8E\x90\x03\x12\"\n" +
-	"\x17SYSTEM_POLICY_NOT_FOUND\x10\x9a/\x1a\x04\xa8E\x94\x03\x12%\n" +
+	"\x17SYSTEM_POLICY_NOT_FOUND\x10\x9a/\x1a\x04\xa8E\x94\x03\x12!\n" +
+	"\x16SYSTEM_PASSWORD_POLICY\x10\xa2/\x1a\x04\xa8E\x90\x03\x12%\n" +
 	"\x1aSYSTEM_AUTHZ_POLICY_DENIED\x10\xac/\x1a\x04\xa8E\x93\x03\x12\"\n" +
 	"\x17SYSTEM_USER_SELF_DELETE\x10\xb6/\x1a\x04\xa8E\x90\x03\x12#\n" +
 	"\x18SYSTEM_USER_SELF_DISABLE\x10\xb7/\x1a\x04\xa8E\x90\x03\x12\x1f\n" +
@@ -215,8 +239,9 @@ const file_cyber_system_v1_error_reason_proto_rawDesc = "" +
 	"\x19SYSTEM_FILE_INVALID_STATE\x10\xc3/\x1a\x04\xa8E\x90\x03\x12!\n" +
 	"\x16SYSTEM_TENANT_DISABLED\x10\xca/\x1a\x04\xa8E\x93\x03\x12\"\n" +
 	"\x17SYSTEM_TENANT_NOT_FOUND\x10\xcb/\x1a\x04\xa8E\x94\x03\x12\"\n" +
-	"\x17SYSTEM_TENANT_PROTECTED\x10\xcc/\x1a\x04\xa8E\x90\x03\x12&\n" +
-	"\x1bSYSTEM_POPULATION_NOT_FOUND\x10\xd5/\x1a\x04\xa8E\x94\x03\x1a\x04\xa0E\x90\x03B(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
+	"\x17SYSTEM_TENANT_PROTECTED\x10\xcc/\x1a\x04\xa8E\x90\x03\x12#\n" +
+	"\x18SYSTEM_TENANT_CODE_TAKEN\x10\xcd/\x1a\x04\xa8E\x99\x03\x12&\n" +
+	"\x1bSYSTEM_POPULATION_NOT_FOUND\x10\xd5/\x1a\x04\xa8E\x94\x03\x1a\x04\xa0E\x90\x03\"\x06\b\x8f/\x10\x8f/B(Z&cyber-ecosystem/gen/go/cyber/system/v1b\x06proto3"
 
 var (
 	file_cyber_system_v1_error_reason_proto_rawDescOnce sync.Once

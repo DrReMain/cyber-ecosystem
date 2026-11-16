@@ -37,18 +37,8 @@ func ErrorSystemLoginFailed(format string, args ...interface{}) *errors.Error {
 	return errors.New(400, System_SYSTEM_LOGIN_FAILED.String(), fmt.Sprintf(format, args...))
 }
 
-func IsSystemPasswordMismatch(err error) bool {
-	if err == nil {
-		return false
-	}
-	e := errors.FromError(err)
-	return e.Reason == System_SYSTEM_PASSWORD_MISMATCH.String() && e.Code == 400
-}
-
-func ErrorSystemPasswordMismatch(format string, args ...interface{}) *errors.Error {
-	return errors.New(400, System_SYSTEM_PASSWORD_MISMATCH.String(), fmt.Sprintf(format, args...))
-}
-
+// No seat in the target population: a true refusal — this identity has
+// no standing here, a different account is the answer.
 func IsSystemLoginSeatRequired(err error) bool {
 	if err == nil {
 		return false
@@ -57,8 +47,26 @@ func IsSystemLoginSeatRequired(err error) bool {
 	return e.Reason == System_SYSTEM_LOGIN_SEAT_REQUIRED.String() && e.Code == 400
 }
 
+// No seat in the target population: a true refusal — this identity has
+// no standing here, a different account is the answer.
 func ErrorSystemLoginSeatRequired(format string, args ...interface{}) *errors.Error {
 	return errors.New(400, System_SYSTEM_LOGIN_SEAT_REQUIRED.String(), fmt.Sprintf(format, args...))
+}
+
+// Multiple seats, none chosen: guidance, not refusal — the client
+// should offer the seat choice, not an error dead-end.
+func IsSystemLoginSeatChoiceRequired(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_LOGIN_SEAT_CHOICE_REQUIRED.String() && e.Code == 400
+}
+
+// Multiple seats, none chosen: guidance, not refusal — the client
+// should offer the seat choice, not an error dead-end.
+func ErrorSystemLoginSeatChoiceRequired(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, System_SYSTEM_LOGIN_SEAT_CHOICE_REQUIRED.String(), fmt.Sprintf(format, args...))
 }
 
 func IsSystemIdentityProviderUnknown(err error) bool {
@@ -97,6 +105,9 @@ func ErrorSystemIdentityAlreadyBound(format string, args ...interface{}) *errors
 	return errors.New(409, System_SYSTEM_IDENTITY_ALREADY_BOUND.String(), fmt.Sprintf(format, args...))
 }
 
+// One code for every send-budget dimension (window, per-phone daily,
+// per-source): the refusal deliberately names no dimension, because the
+// copy a client renders is a budget-structure oracle otherwise.
 func IsSystemSmsRateLimited(err error) bool {
 	if err == nil {
 		return false
@@ -105,6 +116,9 @@ func IsSystemSmsRateLimited(err error) bool {
 	return e.Reason == System_SYSTEM_SMS_RATE_LIMITED.String() && e.Code == 429
 }
 
+// One code for every send-budget dimension (window, per-phone daily,
+// per-source): the refusal deliberately names no dimension, because the
+// copy a client renders is a budget-structure oracle otherwise.
 func ErrorSystemSmsRateLimited(format string, args ...interface{}) *errors.Error {
 	return errors.New(429, System_SYSTEM_SMS_RATE_LIMITED.String(), fmt.Sprintf(format, args...))
 }
@@ -119,6 +133,18 @@ func IsSystemSmsCodeInvalid(err error) bool {
 
 func ErrorSystemSmsCodeInvalid(format string, args ...interface{}) *errors.Error {
 	return errors.New(401, System_SYSTEM_SMS_CODE_INVALID.String(), fmt.Sprintf(format, args...))
+}
+
+func IsSystemPasswordMismatch(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_PASSWORD_MISMATCH.String() && e.Code == 400
+}
+
+func ErrorSystemPasswordMismatch(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, System_SYSTEM_PASSWORD_MISMATCH.String(), fmt.Sprintf(format, args...))
 }
 
 // 601x: dept
@@ -273,6 +299,20 @@ func ErrorSystemPolicyNotFound(format string, args ...interface{}) *errors.Error
 	return errors.New(404, System_SYSTEM_POLICY_NOT_FOUND.String(), fmt.Sprintf(format, args...))
 }
 
+// 605x: password
+func IsSystemPasswordPolicy(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_PASSWORD_POLICY.String() && e.Code == 400
+}
+
+// 605x: password
+func ErrorSystemPasswordPolicy(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, System_SYSTEM_PASSWORD_POLICY.String(), fmt.Sprintf(format, args...))
+}
+
 // 606x: authz runtime
 func IsSystemAuthzPolicyDenied(err error) bool {
 	if err == nil {
@@ -423,6 +463,22 @@ func IsSystemTenantProtected(err error) bool {
 
 func ErrorSystemTenantProtected(format string, args ...interface{}) *errors.Error {
 	return errors.New(400, System_SYSTEM_TENANT_PROTECTED.String(), fmt.Sprintf(format, args...))
+}
+
+// A taken code is burned forever — reuse would graft the new tenant onto
+// the old one's seats and history.
+func IsSystemTenantCodeTaken(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_TENANT_CODE_TAKEN.String() && e.Code == 409
+}
+
+// A taken code is burned forever — reuse would graft the new tenant onto
+// the old one's seats and history.
+func ErrorSystemTenantCodeTaken(format string, args ...interface{}) *errors.Error {
+	return errors.New(409, System_SYSTEM_TENANT_CODE_TAKEN.String(), fmt.Sprintf(format, args...))
 }
 
 // 610x: population registry

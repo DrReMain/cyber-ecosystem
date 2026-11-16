@@ -32,8 +32,6 @@
   "system_users_form_account_required": "请输入账号",
   "system_users_form_account_hint": "账号为登录标识，不可修改",
   "system_users_form_password": "初始密码",
-  "system_users_form_population": "用户类型",
-  "system_users_ph_population": "可留空；留空为默认",
   "system_users_form_dept": "部门",
   "system_users_form_avatar": "头像",
   "system_users_form_avatar_upload": "上传头像",

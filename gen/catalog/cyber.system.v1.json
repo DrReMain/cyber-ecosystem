@@ -55,6 +55,19 @@
     "comment": "认证与会话",
     "methods": [
       {
+        "name": "BeginBindCredential",
+        "full_name": "cyber.system.v1.AuthService.BeginBindCredential",
+        "request_name": "BeginBindCredentialRequest",
+        "request_full_name": "cyber.system.v1.BeginBindCredentialRequest",
+        "response_name": "BeginBindCredentialResponse",
+        "response_full_name": "cyber.system.v1.BeginBindCredentialResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/system/auth/begin-bind-credential",
+        "comment": "发起凭证绑定：为已登录会话铸造绑定态授权跳转",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
         "name": "BeginIdentityLogin",
         "full_name": "cyber.system.v1.AuthService.BeginIdentityLogin",
         "request_name": "BeginIdentityLoginRequest",
@@ -94,6 +107,45 @@
         "datascope": false
       },
       {
+        "name": "GetLoginConfig",
+        "full_name": "cyber.system.v1.AuthService.GetLoginConfig",
+        "request_name": "GetLoginConfigRequest",
+        "request_full_name": "cyber.system.v1.GetLoginConfigRequest",
+        "response_name": "GetLoginConfigResponse",
+        "response_full_name": "cyber.system.v1.GetLoginConfigResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/system/auth/login-config",
+        "comment": "登录页配置发现：列出启用的身份提供方，匿名可达",
+        "access": "PUBLIC",
+        "datascope": false
+      },
+      {
+        "name": "GetSecurityStatus",
+        "full_name": "cyber.system.v1.AuthService.GetSecurityStatus",
+        "request_name": "GetSecurityStatusRequest",
+        "request_full_name": "cyber.system.v1.GetSecurityStatusRequest",
+        "response_name": "GetSecurityStatusResponse",
+        "response_full_name": "cyber.system.v1.GetSecurityStatusResponse",
+        "http_method": "GET",
+        "http_path": "/api/v1/system/me/security",
+        "comment": "获取当前账号绑定面",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "ImportAccounts",
+        "full_name": "cyber.system.v1.AuthService.ImportAccounts",
+        "request_name": "ImportAccountsRequest",
+        "request_full_name": "cyber.system.v1.ImportAccountsRequest",
+        "response_name": "ImportAccountsResponse",
+        "response_full_name": "cyber.system.v1.ImportAccountsResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/system/auth/import-accounts",
+        "comment": "批量建号(sms 凭据)",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
         "name": "Login",
         "full_name": "cyber.system.v1.AuthService.Login",
         "request_name": "LoginRequest",
@@ -129,6 +181,32 @@
         "http_method": "POST",
         "http_path": "/api/v1/system/auth/logout",
         "comment": "登出",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
+        "name": "ResetPassword",
+        "full_name": "cyber.system.v1.AuthService.ResetPassword",
+        "request_name": "ResetPasswordRequest",
+        "request_full_name": "cyber.system.v1.ResetPasswordRequest",
+        "response_name": "ResetPasswordResponse",
+        "response_full_name": "cyber.system.v1.ResetPasswordResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/system/auth/reset-password",
+        "comment": "重置登录密码：短信码证明手机号归属",
+        "access": "PUBLIC",
+        "datascope": false
+      },
+      {
+        "name": "SendBindSmsCode",
+        "full_name": "cyber.system.v1.AuthService.SendBindSmsCode",
+        "request_name": "SendBindSmsCodeRequest",
+        "request_full_name": "cyber.system.v1.SendBindSmsCodeRequest",
+        "response_name": "SendBindSmsCodeResponse",
+        "response_full_name": "cyber.system.v1.SendBindSmsCodeResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/system/auth/send-bind-sms-code",
+        "comment": "发送绑定用短信验证码：铸造绑定当前会话的一次性 state",
         "access": "BUILTIN",
         "datascope": false
       },
@@ -716,6 +794,32 @@
     "source_file": "cyber/system/v1/tenant.proto",
     "comment": "租户管理",
     "methods": [
+      {
+        "name": "AddTenantAdmin",
+        "full_name": "cyber.system.v1.TenantService.AddTenantAdmin",
+        "request_name": "AddTenantAdminRequest",
+        "request_full_name": "cyber.system.v1.AddTenantAdminRequest",
+        "response_name": "AddTenantAdminResponse",
+        "response_full_name": "cyber.system.v1.AddTenantAdminResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/system/tenants/{tenant_code}/admins",
+        "comment": "给租户新增超级管理员：账号已有则加座授权，无则随密码创建",
+        "access": "PLATFORM",
+        "datascope": false
+      },
+      {
+        "name": "CreateTenant",
+        "full_name": "cyber.system.v1.TenantService.CreateTenant",
+        "request_name": "CreateTenantRequest",
+        "request_full_name": "cyber.system.v1.CreateTenantRequest",
+        "response_name": "CreateTenantResponse",
+        "response_full_name": "cyber.system.v1.CreateTenantResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/system/tenants",
+        "comment": "运行时开通租户：建租户与其超管角色（不带账号）",
+        "access": "PLATFORM",
+        "datascope": false
+      },
       {
         "name": "GetTenant",
         "full_name": "cyber.system.v1.TenantService.GetTenant",

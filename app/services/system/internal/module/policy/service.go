@@ -92,7 +92,7 @@ func (s *PolicyService) DeletePolicy(ctx context.Context, in *systempb.DeletePol
 }
 
 func (s *PolicyService) ListPolicies(ctx context.Context, in *systempb.ListPoliciesRequest) (*systempb.ListPoliciesResponse, error) {
-	out, err := s.policyUC.List(ctx, &PolicyListIn{
+	out, err := s.policyUC.List(ctx, &ListIn{
 		PageRequest: helper.EnsurePageRequest(in.Page),
 		OrderBy:     in.OrderBy,
 		Kind:        in.Kind,

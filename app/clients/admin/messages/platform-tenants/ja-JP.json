@@ -14,5 +14,17 @@
   "platform_tenants_act_enable": "有効化",
   "platform_tenants_act_disable": "無効化",
   "platform_tenants_disable_confirm": "このテナントを無効化しますか？",
-  "platform_tenants_empty": "テナントはまだありません"
+  "platform_tenants_empty": "テナントはまだありません",
+  "platform_tenants_create_title": "テナント作成",
+  "platform_tenants_create_code": "テナントコード",
+  "platform_tenants_create_code_hint": "小文字・数字・ハイフン。作成後は変更できません",
+  "platform_tenants_create_name": "テナント名",
+  "platform_tenants_create_admin_account": "管理者アカウント",
+  "platform_tenants_create_admin_password": "管理者初期パスワード",
+  "platform_tenants_create_submit": "開設",
+  "platform_tenants_add_admin_title": "スーパー管理者を追加",
+  "platform_tenants_add_admin_account": "アカウント",
+  "platform_tenants_add_admin_password": "初期パスワード",
+  "platform_tenants_add_admin_submit": "付与",
+  "platform_tenants_act_add_admin": "管理者追加"
 }

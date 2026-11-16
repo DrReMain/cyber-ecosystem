@@ -25,13 +25,13 @@ type Dept struct {
 	UserCount int64
 }
 
-type DeptListIn struct {
+type ListIn struct {
 	*commonpb.PageRequest
 	OrderBy []string
 	Name    *string
 }
 
-type DeptListOut struct {
+type ListOut struct {
 	*commonpb.PageResponse
 	List []*Dept
 }
@@ -58,7 +58,7 @@ type DeptRP interface {
 	Create(ctx context.Context, d *Dept) (*Dept, error)
 	Update(ctx context.Context, fieldsMask []string, d *Dept) (*Dept, error)
 	Delete(ctx context.Context, id string) (string, error)
-	List(ctx context.Context, in *DeptListIn) (*DeptListOut, error)
+	List(ctx context.Context, in *ListIn) (*ListOut, error)
 	Get(ctx context.Context, id string) (*Dept, error)
 	HasChildren(ctx context.Context, id string) (bool, error)
 	HasUsers(ctx context.Context, id string) (bool, error)
@@ -153,7 +153,7 @@ func (uc *DeptUC) Delete(ctx context.Context, id string) (out string, err error)
 	return
 }
 
-func (uc *DeptUC) List(ctx context.Context, in *DeptListIn) (*DeptListOut, error) {
+func (uc *DeptUC) List(ctx context.Context, in *ListIn) (*ListOut, error) {
 	return uc.deptRP.List(ctx, in)
 }
 

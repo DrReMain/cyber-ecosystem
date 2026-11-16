@@ -14,6 +14,28 @@ option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
 
 service TenantService {
   option (cyber.ext.v1.service_comment) = "租户管理";
+  rpc CreateTenant(CreateTenantRequest) returns (CreateTenantResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "运行时开通租户：建租户与其超管角色（不带账号）"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_PLATFORM;
+    option (google.api.http) = {
+      post: "/api/v1/system/tenants"
+      body: "*"
+    };
+  }
+  rpc AddTenantAdmin(AddTenantAdminRequest) returns (AddTenantAdminResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "给租户新增超级管理员：账号已有则加座授权，无则随密码创建"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_PLATFORM;
+    option (google.api.http) = {
+      post: "/api/v1/system/tenants/{tenant_code}/admins"
+      body: "*"
+    };
+  }
   rpc UpdateTenantStatus(UpdateTenantStatusRequest) returns (UpdateTenantStatusResponse) {
     option (cyber.ext.v1.method) = {
       comment: "启停租户"
@@ -91,3 +113,62 @@ message UpdateTenantStatusRequest {
 }
 
 message UpdateTenantStatusResponse {}
+
+// create
+message CreateTenantRequest {
+  // The tenant's reference key — memberships and sessions name tenants by
+  // this code, and a code is never reused (a hard-deleted tenant's code
+  // stays burned). "default" is unreachable here in practice: the protected
+  // default row always exists and its code answers 409 like any taken code.
+  optional string code = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 2,
+    (buf.validate.field).string.max_len = 64,
+    (buf.validate.field).string.pattern = "^[a-z0-9][a-z0-9-]*$"
+  ];
+  optional string name = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+}
+
+message CreateTenantResponse {
+  // The provisioned tenant's id, so the caller can jump to it without a
+  // second read.
+  string id = 1;
+}
+
+// add-admin
+message AddTenantAdminRequest {
+  // The tenant the administrator joins — the code CreateTenant took.
+  optional string tenant_code = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 2,
+    (buf.validate.field).string.max_len = 64,
+    (buf.validate.field).string.pattern = "^[a-z0-9][a-z0-9-]*$"
+  ];
+  // An existing account is seated and bound as-is (identity is global,
+  // passwords belong to admin flows); an account that does not exist yet
+  // is created with this password. This is the runtime tenant's break-glass
+  // face — a tenant whose administrators all lost their passwords is never
+  // locked out, the platform admin adds a fresh one from here.
+  optional string account = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 3,
+    (buf.validate.field).string.max_len = 64
+  ];
+  // Plain on the wire (TLS), strength-enforced server-side by the same
+  // password policy every credential flows through; ignored when the
+  // account already exists.
+  optional string password = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 8,
+    (buf.validate.field).string.max_len = 64
+  ];
+}
+
+message AddTenantAdminResponse {
+  // The administrator's user id — created or reused.
+  string user_id = 1;
+}

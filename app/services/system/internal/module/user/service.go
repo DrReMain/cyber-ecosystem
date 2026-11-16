@@ -45,7 +45,7 @@ func (s *UserService) RegisterConnect(srv *connecttransport.Server) {
 // Handler -------------------------------------------------------------------------------------------------------------
 
 func (s *UserService) CreateUser(ctx context.Context, in *systempb.CreateUserRequest) (*systempb.CreateUserResponse, error) {
-	created, err := s.userUC.Create(ctx, in.Account, in.Password, in.DeptId, in.Avatar, in.GetPopulation(), in.Roles)
+	created, err := s.userUC.Create(ctx, in.Account, in.Password, in.DeptId, in.Avatar, in.Roles)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (s *UserService) DeleteUser(ctx context.Context, in *systempb.DeleteUserReq
 }
 
 func (s *UserService) ListUsers(ctx context.Context, in *systempb.ListUsersRequest) (*systempb.ListUsersResponse, error) {
-	out, err := s.userUC.List(ctx, &UserListIn{
+	out, err := s.userUC.List(ctx, &ListIn{
 		PageRequest: helper.EnsurePageRequest(in.Page),
 		OrderBy:     in.OrderBy,
 		Account:     in.Account,
@@ -104,7 +104,7 @@ func (s *UserService) ListUsers(ctx context.Context, in *systempb.ListUsersReque
 }
 
 func (s *UserService) ListUsersByPopulation(ctx context.Context, in *systempb.ListUsersByPopulationRequest) (*systempb.ListUsersByPopulationResponse, error) {
-	out, err := s.userUC.ListByPopulation(ctx, &UserListIn{
+	out, err := s.userUC.ListByPopulation(ctx, &ListIn{
 		PageRequest: helper.EnsurePageRequest(in.Page),
 		OrderBy:     in.OrderBy,
 		Population:  in.Population,
@@ -150,13 +150,15 @@ func (s *UserService) BatchGetUsers(ctx context.Context, in *systempb.BatchGetUs
 
 func toProtoUser(a *User) *systempb.User {
 	return &systempb.User{
-		Id:        utils.StringW(a.ID),
-		CreatedAt: utils.ToTimestamp(&a.CreatedAt),
-		UpdatedAt: utils.ToTimestamp(&a.UpdatedAt),
-		Account:   utils.Wrap(a.Account, utils.StringW),
-		DeptId:    utils.Wrap(a.DeptID, utils.StringW),
-		Avatar:    utils.Wrap(a.Avatar, utils.StringW),
-		Roles:     a.Roles,
-		Enabled:   utils.BoolW(a.Enabled),
+		Id:          utils.StringW(a.ID),
+		CreatedAt:   utils.ToTimestamp(&a.CreatedAt),
+		UpdatedAt:   utils.ToTimestamp(&a.UpdatedAt),
+		Account:     utils.Wrap(a.Account, utils.StringW),
+		DeptId:      utils.Wrap(a.DeptID, utils.StringW),
+		Avatar:      utils.Wrap(a.Avatar, utils.StringW),
+		Roles:       a.Roles,
+		Enabled:     utils.BoolW(a.Enabled),
+		PhoneMasked: utils.Wrap(a.PhoneMasked, utils.StringW),
+		WechatBound: utils.BoolW(a.WechatBound),
 	}
 }

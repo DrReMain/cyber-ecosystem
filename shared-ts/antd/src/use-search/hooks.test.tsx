@@ -4,7 +4,6 @@ import { z } from "zod";
 import { pageNoField, pageSizeField, sortField } from "./schema";
 import type { SearchStore } from "./types";
 import { useFilter } from "./use-filter";
-import { useSort } from "./use-sort";
 import { useUrlSearchStore } from "./use-url-search-store";
 
 const schema = z.object({
@@ -72,23 +71,5 @@ describe("useFilter", () => {
     const { result } = renderHook(() => useFilter(store, schema));
     act(() => result.current.onReset());
     expect(patches[0]).toEqual({ keyword: undefined, status: undefined });
-  });
-});
-
-describe("useSort", () => {
-  it("toggles asc→desc per field, tracks several fields, and resets page", () => {
-    const { store, patches } = makeStore({ pageNo: 4, sort: "name:asc" });
-    const { result } = renderHook(() => useSort(store, schema));
-    act(() => result.current.onSortToggle("name"));
-    expect(patches[0]).toEqual({ sort: "name:desc", pageNo: 1 });
-    act(() => result.current.onSortToggle("code"));
-    expect(patches[1]).toEqual({ sort: "name:desc,code:asc", pageNo: 1 });
-  });
-
-  it("clear removes the sort key", () => {
-    const { store, patches } = makeStore({ sort: "name:asc" });
-    const { result } = renderHook(() => useSort(store, schema));
-    act(() => result.current.onSortClear());
-    expect(patches[0]).toEqual({ sort: undefined, pageNo: 1 });
   });
 });

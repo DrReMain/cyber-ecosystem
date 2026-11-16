@@ -12,5 +12,3 @@ export {
   type TransportFactory,
 } from "./transport";
 export { type StreamStatus, useServerStream } from "./use-server-stream";
-export { useStreamSession } from "./use-stream-session";
-export { wsStreamCall } from "./ws-stream";

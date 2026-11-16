@@ -8,6 +8,7 @@ import "ext/v1/access.proto";
 import "ext/v1/desc.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 
 option go_package = "cyber-ecosystem/gen/go/cyber/system/v1";
 
@@ -57,6 +58,14 @@ service AuthService {
       body: "*"
     };
   }
+  rpc GetLoginConfig(GetLoginConfigRequest) returns (GetLoginConfigResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "登录页配置发现：列出启用的身份提供方，匿名可达"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_PUBLIC;
+    option (google.api.http) = {get: "/api/v1/system/auth/login-config"};
+  }
   rpc BindCredential(BindCredentialRequest) returns (BindCredentialResponse) {
     option (cyber.ext.v1.method) = {
       comment: "绑定第三方身份凭证"
@@ -67,6 +76,47 @@ service AuthService {
       post: "/api/v1/system/auth/bind-credential"
       body: "*"
     };
+  }
+  rpc BeginBindCredential(BeginBindCredentialRequest) returns (BeginBindCredentialResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "发起凭证绑定：为已登录会话铸造绑定态授权跳转"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {
+      post: "/api/v1/system/auth/begin-bind-credential"
+      body: "*"
+    };
+  }
+  rpc SendBindSmsCode(SendBindSmsCodeRequest) returns (SendBindSmsCodeResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "发送绑定用短信验证码：铸造绑定当前会话的一次性 state"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {
+      post: "/api/v1/system/auth/send-bind-sms-code"
+      body: "*"
+    };
+  }
+  rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "重置登录密码：短信码证明手机号归属"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_PUBLIC;
+    option (google.api.http) = {
+      post: "/api/v1/system/auth/reset-password"
+      body: "*"
+    };
+  }
+  rpc GetSecurityStatus(GetSecurityStatusRequest) returns (GetSecurityStatusResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "获取当前账号绑定面"
+      action: ACTION_READ
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {get: "/api/v1/system/me/security"};
   }
   rpc Logout(LogoutRequest) returns (LogoutResponse) {
     option (cyber.ext.v1.method) = {
@@ -86,6 +136,23 @@ service AuthService {
     };
     option (cyber.ext.v1.access) = ACCESS_BUILTIN;
     option (google.api.http) = {get: "/api/v1/system/me"};
+  }
+  // Bulk registration on the operator's behalf: one file's rows become
+  // accounts with an sms credential each — the exact dance the sms login's
+  // auto-registration runs, minus the proof (the operator collected the
+  // numbers off-line). A phone that already names an account skips — the
+  // credential table's own uniqueness, read ahead of the write — and
+  // nothing rolls back the rows that already landed.
+  rpc ImportAccounts(ImportAccountsRequest) returns (ImportAccountsResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "批量建号(sms 凭据)"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_ADMIN;
+    option (google.api.http) = {
+      post: "/api/v1/system/auth/import-accounts"
+      body: "*"
+    };
   }
 }
 
@@ -152,10 +219,27 @@ message SmsIdentityPayload {
   ];
 }
 
+// What the wechat oauth leg learned about the person behind the openid:
+// the raw nickname and avatar URL as wechat reports them, present only when
+// the authorize scope was snsapi_userinfo and the userinfo fetch survived
+// (a failed fetch degrades to absent, never to a failed login). Values are
+// wechat's own — sanitising to the nickname rules is the consumer's side of
+// the wire.
+message WeChatProfile {
+  google.protobuf.StringValue nickname = 1;
+  google.protobuf.StringValue avatar_url = 2;
+}
+
 message LoginByIdentityResponse {
+  // Plain, not a wrapper: the call succeeding is the token's presence —
+  // no "succeeded but empty session" shape exists.
   string session_token = 1;
   google.protobuf.Timestamp issued_at = 2;
   google.protobuf.Timestamp expires_at = 3;
+  // The wechat profile when the logged-in identity is wechat and userinfo
+  // came back; the wizard prefills nickname/avatar from it. Absent for every
+  // other identity and for a degraded userinfo fetch alike.
+  optional WeChatProfile wechat_profile = 4;
 }
 
 message BeginIdentityLoginRequest {
@@ -169,9 +253,23 @@ message BeginIdentityLoginRequest {
     (buf.validate.field).string.min_len = 1,
     (buf.validate.field).string.max_len = 512
   ];
+  // Same-origin post-login target relayed through the authorize hop: the
+  // redirect_uri itself may carry no query (wechat rejects it), so Begin
+  // folds this into the one-shot state it mints. The pattern is the
+  // open-redirect law — a leading slash, never a protocol-relative "//".
+  // The state caps at 128 chars (wechat's own limit), leaving ~45 bytes
+  // for the path once the token takes its share; a next that does not fit
+  // is dropped at mint, never refused — the login then lands on its
+  // completeness branch instead.
+  optional string next = 3 [
+    (buf.validate.field).string.max_len = 128,
+    (buf.validate.field).string.pattern = "^/[^/].*$"
+  ];
 }
 
 message BeginIdentityLoginResponse {
+  // Plain, not a wrapper: a successful begin always mints the redirect —
+  // success implies presence.
   string authorize_url = 1;
 }
 
@@ -189,8 +287,26 @@ message SendSmsCodeRequest {
 
 message SendSmsCodeResponse {
   // The one-shot state the caller presents at LoginByIdentity — the same
-  // shape Begin mints for redirect flows.
+  // shape Begin mints for redirect flows. Plain, not a wrapper: a
+  // successful send always mints it — success implies presence.
   string state = 1;
+}
+
+message GetLoginConfigRequest {}
+
+message GetLoginConfigResponse {
+  // The identity providers the login page may offer, exactly as configured:
+  // an empty list is a wired-but-closed deployment, and the page renders the
+  // account form only — never a dead button.
+  repeated LoginProvider providers = 1;
+}
+
+message LoginProvider {
+  // The configured provider row's key — the value LoginByIdentity expects.
+  string key = 1;
+  // The channel kind (wechat_mp, sms): the login page picks its UI shape
+  // per kind.
+  string kind = 2;
 }
 
 message BindCredentialRequest {
@@ -202,12 +318,13 @@ message BindCredentialRequest {
   oneof payload {
     option (buf.validate.oneof).required = true;
     WeChatIdentityPayload wechat = 2;
+    SmsIdentityPayload sms = 4;
   }
-  // The state is one-shot (consumed on exchange) but binds only the
-  // provider key, not the initiating browser: this RPC trusts whoever
-  // presents the code. Dormant while no client offers a bind entry; the
-  // first GET-triggered bind flow must tie the state to the initiating
-  // session before shipping — do not copy this shape without that.
+  // The state must be one minted on an authenticated rung (SendBindSmsCode
+  // or BeginBindCredential) and carries the minting session: the exchange
+  // refuses a state born in another session or anonymous, so a phished code
+  // cannot be injected into a foreign bind flow. Login faces accept any
+  // live state of their provider — the code itself is the login proof.
   optional string state = 3 [
     (buf.validate.field).required = true,
     (buf.validate.field).string.min_len = 1,
@@ -215,7 +332,115 @@ message BindCredentialRequest {
   ];
 }
 
-message BindCredentialResponse {}
+message BindCredentialResponse {
+  // Same shape as the login response's: binding a wechat identity is the
+  // wizard pill's moment — the openid binds and the nickname/avatar arrive
+  // in the same exchange, so the caller fills the form without a second hop.
+  optional WeChatProfile wechat_profile = 1;
+}
+
+message BeginBindCredentialRequest {
+  optional string provider = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+  optional string redirect_uri = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 512
+  ];
+}
+
+message BeginBindCredentialResponse {
+  // Plain, not a wrapper: a successful begin always mints the redirect —
+  // success implies presence.
+  string authorize_url = 1;
+}
+
+message SendBindSmsCodeRequest {
+  optional string provider = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+  optional string phone = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[0-9+]{5,20}$"
+  ];
+}
+
+message SendBindSmsCodeResponse {
+  // The one-shot state bound to the calling session; present it at
+  // BindCredential together with the code the phone received. Plain, not a
+  // wrapper: a successful send always mints it — success implies presence.
+  string state = 1;
+}
+
+// The owner facts an offer needs. Masked identifiers only: the raw values
+// never leave the service. The mergeable verdict is the system-side hard
+// gate (no password, exactly the resolved credential, no operator seats);
+// the richer both-sides-have-data judgment over business records stays in
+// the consuming service.
+message CredentialOwner {
+  string user_id = 1;
+  bool enabled = 2;
+  bool mergeable = 3;
+  repeated SecurityCredential credentials = 4;
+}
+
+// resetPassword ----------------------------------------------------------------------
+
+// The proof-carrying password setter for accounts whose only reach is their
+// phone: the forgot-password leg on the login page and the first-password
+// leg in account security both land here. The sms code to the account's own
+// phone is the anti-takeover gate; the state is the one SendSmsCode minted.
+// The account owning the sms credential is the one rehashed; sessions stay
+// standing (a rotation is not a revocation).
+message ResetPasswordRequest {
+  optional string provider = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 64
+  ];
+  oneof payload {
+    option (buf.validate.oneof).required = true;
+    SmsIdentityPayload sms = 2;
+  }
+  optional string state = 3 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1,
+    (buf.validate.field).string.max_len = 128
+  ];
+  optional string new_password = 4 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 6
+      max_len: 128
+    }
+  ];
+}
+
+message ResetPasswordResponse {}
+
+// getSecurityStatus ------------------------------------------------------------------
+
+message GetSecurityStatusRequest {}
+
+// The caller's own binding surface: password set or not, and each
+// credential with a display-masked identifier. The mask is server policy
+// with one home; clients render what they receive and never re-derive it.
+message GetSecurityStatusResponse {
+  bool has_password = 1;
+  repeated SecurityCredential credentials = 2;
+}
+
+// One binding row of the security surface; kind is the credential family
+// (sms, wechat_mp).
+message SecurityCredential {
+  string kind = 1;
+  string masked_identifier = 2;
+}
 
 message LogoutRequest {}
 
@@ -235,4 +460,78 @@ message GetCurrentUserResponse {
 message Membership {
   string tenant = 1;
   string population = 2;
+}
+
+// importAccounts ---------------------------------------------------------------
+
+// One file of phones. The contract checks shape only (the sms payload's own
+// law); which market a number belongs to is the channel's knowledge and
+// answers per-row invalid below, never a whole-file refusal.
+message ImportAccountsRequest {
+  repeated ImportAccountRow rows = 1 [(buf.validate.field).repeated = {
+    min_items: 1
+    max_items: 500
+  }];
+}
+
+message ImportAccountRow {
+  optional string phone = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.pattern = "^[0-9+]{5,20}$"
+  ];
+}
+
+message ImportAccountsResponse {
+  // created plus skipped plus invalid is the request's row count — the
+  // ledger closes on every row.
+  int32 created = 1;
+  int32 skipped = 2;
+  int32 invalid = 3;
+  repeated AccountImportResult results = 4;
+}
+
+// One row's verdict; the index is the request's own row, 1-based — the
+// caller maps it back to its file line.
+message AccountImportResult {
+  int32 row_index = 1;
+  // The row's phone as submitted — the operator's own list echoes back, so
+  // the masked form would only blur the line-by-line check.
+  string phone = 2;
+  // Present on created and skipped-duplicate — the account's id, the
+  // hydration join key (a skipped row's caller still has a pre-fill to
+  // land against it).
+  string user_id = 3 [(buf.validate.field).string.max_len = 20];
+  AccountImportStatus status = 4 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
+  // Why the row landed where it did — operator-facing, only read on
+  // SKIPPED_DUPLICATE and INVALID; the caller maps every value to its own
+  // locale copy, so a new value is a caller-copy change, never a copy
+  // change on the wire.
+  AccountImportReason reason = 5 [(buf.validate.field).enum.defined_only = true];
+}
+
+enum AccountImportReason {
+  ACCOUNT_IMPORT_REASON_UNSPECIFIED = 0;
+  // The mainland rule is the channel's own law — the same refusal
+  // IssueCode gives.
+  ACCOUNT_IMPORT_REASON_NOT_MAINLAND_MOBILE = 1;
+  // The same phone twice within the file.
+  ACCOUNT_IMPORT_REASON_DUPLICATE_IN_FILE = 2;
+  // The skip's own word: an existing account owns the phone.
+  ACCOUNT_IMPORT_REASON_PHONE_TAKEN = 3;
+}
+
+enum AccountImportStatus {
+  ACCOUNT_IMPORT_STATUS_UNSPECIFIED = 0;
+  // The account landed: xid handle, empty password hash (the password
+  // plane stays closed — the phone is the only way in), sms credential,
+  // member seat.
+  ACCOUNT_IMPORT_STATUS_CREATED = 1;
+  // A credential row already names the phone — an existing account keeps
+  // its own history, the row never touches it.
+  ACCOUNT_IMPORT_STATUS_SKIPPED_DUPLICATE = 2;
+  // Not a mainland mobile, or the same phone twice within the file.
+  ACCOUNT_IMPORT_STATUS_INVALID = 3;
 }

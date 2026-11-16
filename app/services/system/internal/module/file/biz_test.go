@@ -32,7 +32,7 @@ type fakeFileRP struct {
 
 	updateNames []string
 	deletes     []string
-	listOut     *FileListOut
+	listOut     *ListOut
 
 	limits     storage.Limits
 	presigned  []string
@@ -78,7 +78,7 @@ func (f *fakeFileRP) Delete(_ context.Context, id string) error {
 	return nil
 }
 
-func (f *fakeFileRP) List(context.Context, *FileListIn) (*FileListOut, error) {
+func (f *fakeFileRP) List(context.Context, *ListIn) (*ListOut, error) {
 	return f.listOut, nil
 }
 
@@ -542,7 +542,7 @@ func securityWithSubject(userID string) context.Context {
 
 // Rename on a live row delegates; an unknown id never reaches the write.
 func TestUpdateHappyAndList(t *testing.T) {
-	rp := &fakeFileRP{rows: map[string]*File{"f1": {ID: "f1"}}, listOut: &FileListOut{}}
+	rp := &fakeFileRP{rows: map[string]*File{"f1": {ID: "f1"}}, listOut: &ListOut{}}
 	uc := newFileUC(rp)
 
 	if _, err := uc.Update(context.Background(), "f1", "new-name"); err != nil {
@@ -551,7 +551,7 @@ func TestUpdateHappyAndList(t *testing.T) {
 	if len(rp.updateNames) != 1 {
 		t.Fatal("rename: the write must land")
 	}
-	if _, err := uc.List(context.Background(), &FileListIn{}); err != nil {
+	if _, err := uc.List(context.Background(), &ListIn{}); err != nil {
 		t.Fatalf("list: %v", err)
 	}
 }

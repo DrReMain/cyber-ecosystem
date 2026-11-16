@@ -47,7 +47,7 @@ func (s *AuditService) RegisterConnect(srv *connecttransport.Server) {
 // Handler -------------------------------------------------------------------------------------------------------------
 
 func (s *AuditService) ListAuditLogs(ctx context.Context, in *systempb.ListAuditLogsRequest) (*systempb.ListAuditLogsResponse, error) {
-	out, err := s.auditUC.List(ctx, &AuditListIn{
+	out, err := s.auditUC.List(ctx, &ListIn{
 		PageRequest: helper.EnsurePageRequest(in.Page),
 		OrderBy:     in.OrderBy,
 		Actor:       in.Actor,

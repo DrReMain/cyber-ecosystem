@@ -22,7 +22,7 @@ import (
 	"cyber-ecosystem/app/services/agent/internal/conf"
 	"cyber-ecosystem/app/services/agent/internal/ent"
 	entagentconfig "cyber-ecosystem/app/services/agent/internal/ent/agentconfig"
-	local_mixins "cyber-ecosystem/app/services/agent/internal/ent/schema/local_mixins"
+	"cyber-ecosystem/app/services/agent/internal/ent/schema/local_mixins"
 	"cyber-ecosystem/app/services/agent/internal/platform"
 )
 

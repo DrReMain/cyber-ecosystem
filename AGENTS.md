@@ -14,7 +14,7 @@ Monorepo for the Cyber Ecosystem platform — a **generic development skeleton**
 
 ## Hard laws
 
-1. **Workflows run through Nx** — `./nx run <project>:<target>`; every valid target is declared in the project's `project.json`. Package-local binaries go through `pnpm exec <bin>`. A workflow with no target gets one added, never an ad-hoc command.
+1. **Workflows run through Nx** — `./nx run <project>:<target>`; every valid target is declared in the project's `project.json`. A workflow with no target gets one added, never an ad-hoc command.
 2. **pnpm is the only package manager.** A `package-lock.json` or `yarn.lock` anywhere means a command bypassed pnpm — delete the artifact, fix the command.
 3. **Never hand-edit `gen/`.** Fix the source or generator and regenerate (proto conventions §7).
 4. **No cross-service code dependencies.** Cross-service reads go through the owning service's RPCs, behind a `<Remote>RP` ACL adapter (kratos conventions §5); capability packages stay self-contained (kratos conventions §1).
@@ -25,7 +25,11 @@ Monorepo for the Cyber Ecosystem platform — a **generic development skeleton**
 - **Read before write.** Each convention opens with a read map: the artifact you are about to touch names the sections that are its law. Read those sections — the text itself, not your memory of it.
 - **Structural actions verify first.** Branch, commit, mirror, delete: check the standing law (branch discipline, face separation) before acting, not after.
 - **Gaps are questions.** Where no law speaks, or the call is an author's rather than a mechanic's, stop and ask. A choice you cannot trace to a law line is a question, not a decision.
-- **Close with the counted declaration.** One line stating what ran and what was observed: chain green, probes counted, residues zero.
+- **Decisions carry a checkable source.** A decision that shapes user-visible behavior names where it comes from — a ruling id, a spec line, a prototype frame, a legacy anchor. "The spec says" without a line the reader can open is a derivation awaiting a ruling, not a decision.
+
+## Documentation economy
+
+These docs are read by coding agents whose context is finite and billed: every line costs every future session. Write for injection cost — shortest text that loses no information; structure that finds the law in one lookup (readable section names, stable anchors); splits when a file serves more than one reading occasion (a rule nobody reads on this occasion does not belong here). File names and section titles are the index agents navigate by — they state the artifact, not the history.
 
 ## Conventions
 

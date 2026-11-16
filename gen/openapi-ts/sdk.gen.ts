@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { AgentConfigAdminServiceListAgentConfigsData, AgentConfigAdminServiceListAgentConfigsResponses, AgentConfigServiceDeleteMyAgentConfigData, AgentConfigServiceDeleteMyAgentConfigResponses, AgentConfigServiceGetMyAgentConfigData, AgentConfigServiceGetMyAgentConfigResponses, AgentConfigServiceUpdateMyAgentConfigData, AgentConfigServiceUpdateMyAgentConfigResponses, AuditServiceExportAuditLogsData, AuditServiceExportAuditLogsResponses, AuditServiceListAuditExportsData, AuditServiceListAuditExportsResponses, AuditServiceListAuditLogsData, AuditServiceListAuditLogsResponses, AuthServiceBeginIdentityLoginData, AuthServiceBeginIdentityLoginResponses, AuthServiceBindCredentialData, AuthServiceBindCredentialResponses, AuthServiceGetCurrentUserData, AuthServiceGetCurrentUserResponses, AuthServiceLoginByIdentityData, AuthServiceLoginByIdentityResponses, AuthServiceLoginData, AuthServiceLoginResponses, AuthServiceLogoutData, AuthServiceLogoutResponses, AuthServiceSendSmsCodeData, AuthServiceSendSmsCodeResponses, ChatServiceChatData, ChatServiceChatResponses, ChatServiceDeleteSessionData, ChatServiceDeleteSessionResponses, ChatServiceGetSessionMessagesData, ChatServiceGetSessionMessagesResponses, ChatServiceListModelsData, ChatServiceListModelsResponses, ChatServiceListSessionsData, ChatServiceListSessionsResponses, ChatServiceUpdateSessionData, ChatServiceUpdateSessionResponses, DeptServiceCreateDeptData, DeptServiceCreateDeptResponses, DeptServiceDeleteDeptData, DeptServiceDeleteDeptResponses, DeptServiceGetDeptData, DeptServiceGetDeptResponses, DeptServiceListDeptMembersData, DeptServiceListDeptMembersResponses, DeptServiceListDeptsData, DeptServiceListDeptsResponses, DeptServiceRemoveDeptMemberData, DeptServiceRemoveDeptMemberResponses, DeptServiceUpdateDeptData, DeptServiceUpdateDeptResponses, FilePresignServiceAbortUploadData, FilePresignServiceAbortUploadResponses, FilePresignServiceConfirmUploadData, FilePresignServiceConfirmUploadResponses, FilePresignServiceCreateUploadData, FilePresignServiceCreateUploadResponses, FilePresignServiceListUploadedPartsData, FilePresignServiceListUploadedPartsResponses, FileProxyServiceUploadFileData, FileProxyServiceUploadFileResponses, FileServiceDeleteFileData, FileServiceDeleteFileResponses, FileServiceGetFileData, FileServiceGetFileResponses, FileServiceGetFileUrlsData, FileServiceGetFileUrlsResponses, FileServiceListFilesData, FileServiceListFilesResponses, FileServiceRenameFileData, FileServiceRenameFileResponses, IntrospectServiceCheckOperationData, IntrospectServiceCheckOperationResponses, IntrospectServiceVerifySessionData, IntrospectServiceVerifySessionResponses, PolicyServiceCreatePolicyData, PolicyServiceCreatePolicyResponses, PolicyServiceDeletePolicyData, PolicyServiceDeletePolicyResponses, PolicyServiceGetPolicyData, PolicyServiceGetPolicyResponses, PolicyServiceListPoliciesData, PolicyServiceListPoliciesResponses, PolicyServiceUpdatePolicyData, PolicyServiceUpdatePolicyResponses, PopulationServiceListPopulationsData, PopulationServiceListPopulationsResponses, ResourceServiceListResourceData, ResourceServiceListResourceResponses, RoleServiceCreateRoleData, RoleServiceCreateRoleResponses, RoleServiceDeleteRoleData, RoleServiceDeleteRoleResponses, RoleServiceExplainOperationData, RoleServiceExplainOperationResponses, RoleServiceGetRoleData, RoleServiceGetRoleResponses, RoleServiceListRoleMembersData, RoleServiceListRoleMembersResponses, RoleServiceListRolesByPrincipalData, RoleServiceListRolesByPrincipalResponses, RoleServiceListRolesData, RoleServiceListRolesResponses, RoleServicePreviewGrantsData, RoleServicePreviewGrantsResponses, RoleServiceRemoveRoleMemberData, RoleServiceRemoveRoleMemberResponses, RoleServiceUpdateRoleData, RoleServiceUpdateRoleResponses, RoleServiceUpdateRoleStatusData, RoleServiceUpdateRoleStatusResponses, TenantServiceGetTenantData, TenantServiceGetTenantResponses, TenantServiceListTenantsData, TenantServiceListTenantsResponses, TenantServiceUpdateTenantStatusData, TenantServiceUpdateTenantStatusResponses, TransferServiceEchoData, TransferServiceEchoResponses, TransferServicePipeData, TransferServicePipeResponses, TransferServiceRawData, TransferServiceRawResponses, TransferServiceSubscribeData, TransferServiceSubscribeResponses, UserServiceBatchGetUsersData, UserServiceBatchGetUsersResponses, UserServiceChangePasswordData, UserServiceChangePasswordResponses, UserServiceCreateUserData, UserServiceCreateUserResponses, UserServiceDeleteUserData, UserServiceDeleteUserResponses, UserServiceGetUserData, UserServiceGetUserResponses, UserServiceListUsersByPopulationData, UserServiceListUsersByPopulationResponses, UserServiceListUsersData, UserServiceListUsersResponses, UserServiceUpdateUserData, UserServiceUpdateUserResponses, UserServiceUpdateUserStatusData, UserServiceUpdateUserStatusResponses } from './types.gen';
+import type { AgentConfigAdminServiceListAgentConfigsData, AgentConfigAdminServiceListAgentConfigsResponses, AgentConfigServiceDeleteMyAgentConfigData, AgentConfigServiceDeleteMyAgentConfigResponses, AgentConfigServiceGetMyAgentConfigData, AgentConfigServiceGetMyAgentConfigResponses, AgentConfigServiceUpdateMyAgentConfigData, AgentConfigServiceUpdateMyAgentConfigResponses, AuditServiceExportAuditLogsData, AuditServiceExportAuditLogsResponses, AuditServiceListAuditExportsData, AuditServiceListAuditExportsResponses, AuditServiceListAuditLogsData, AuditServiceListAuditLogsResponses, AuthServiceBeginBindCredentialData, AuthServiceBeginBindCredentialResponses, AuthServiceBeginIdentityLoginData, AuthServiceBeginIdentityLoginResponses, AuthServiceBindCredentialData, AuthServiceBindCredentialResponses, AuthServiceGetCurrentUserData, AuthServiceGetCurrentUserResponses, AuthServiceGetLoginConfigData, AuthServiceGetLoginConfigResponses, AuthServiceGetSecurityStatusData, AuthServiceGetSecurityStatusResponses, AuthServiceImportAccountsData, AuthServiceImportAccountsResponses, AuthServiceLoginByIdentityData, AuthServiceLoginByIdentityResponses, AuthServiceLoginData, AuthServiceLoginResponses, AuthServiceLogoutData, AuthServiceLogoutResponses, AuthServiceResetPasswordData, AuthServiceResetPasswordResponses, AuthServiceSendBindSmsCodeData, AuthServiceSendBindSmsCodeResponses, AuthServiceSendSmsCodeData, AuthServiceSendSmsCodeResponses, ChatServiceChatData, ChatServiceChatResponses, ChatServiceDeleteSessionData, ChatServiceDeleteSessionResponses, ChatServiceGetSessionMessagesData, ChatServiceGetSessionMessagesResponses, ChatServiceListModelsData, ChatServiceListModelsResponses, ChatServiceListSessionsData, ChatServiceListSessionsResponses, ChatServiceUpdateSessionData, ChatServiceUpdateSessionResponses, DeptServiceCreateDeptData, DeptServiceCreateDeptResponses, DeptServiceDeleteDeptData, DeptServiceDeleteDeptResponses, DeptServiceGetDeptData, DeptServiceGetDeptResponses, DeptServiceListDeptMembersData, DeptServiceListDeptMembersResponses, DeptServiceListDeptsData, DeptServiceListDeptsResponses, DeptServiceRemoveDeptMemberData, DeptServiceRemoveDeptMemberResponses, DeptServiceUpdateDeptData, DeptServiceUpdateDeptResponses, FilePresignServiceAbortUploadData, FilePresignServiceAbortUploadResponses, FilePresignServiceConfirmUploadData, FilePresignServiceConfirmUploadResponses, FilePresignServiceCreateUploadData, FilePresignServiceCreateUploadResponses, FilePresignServiceListUploadedPartsData, FilePresignServiceListUploadedPartsResponses, FileProxyServiceUploadFileData, FileProxyServiceUploadFileResponses, FileServiceDeleteFileData, FileServiceDeleteFileResponses, FileServiceGetFileData, FileServiceGetFileResponses, FileServiceGetFileUrlsData, FileServiceGetFileUrlsResponses, FileServiceListFilesData, FileServiceListFilesResponses, FileServiceRenameFileData, FileServiceRenameFileResponses, IntrospectServiceCheckOperationData, IntrospectServiceCheckOperationResponses, IntrospectServiceVerifySessionData, IntrospectServiceVerifySessionResponses, PolicyServiceCreatePolicyData, PolicyServiceCreatePolicyResponses, PolicyServiceDeletePolicyData, PolicyServiceDeletePolicyResponses, PolicyServiceGetPolicyData, PolicyServiceGetPolicyResponses, PolicyServiceListPoliciesData, PolicyServiceListPoliciesResponses, PolicyServiceUpdatePolicyData, PolicyServiceUpdatePolicyResponses, PopulationServiceListPopulationsData, PopulationServiceListPopulationsResponses, ResourceServiceListResourceData, ResourceServiceListResourceResponses, RoleServiceCreateRoleData, RoleServiceCreateRoleResponses, RoleServiceDeleteRoleData, RoleServiceDeleteRoleResponses, RoleServiceExplainOperationData, RoleServiceExplainOperationResponses, RoleServiceGetRoleData, RoleServiceGetRoleResponses, RoleServiceListRoleMembersData, RoleServiceListRoleMembersResponses, RoleServiceListRolesByPrincipalData, RoleServiceListRolesByPrincipalResponses, RoleServiceListRolesData, RoleServiceListRolesResponses, RoleServicePreviewGrantsData, RoleServicePreviewGrantsResponses, RoleServiceRemoveRoleMemberData, RoleServiceRemoveRoleMemberResponses, RoleServiceUpdateRoleData, RoleServiceUpdateRoleResponses, RoleServiceUpdateRoleStatusData, RoleServiceUpdateRoleStatusResponses, TenantServiceAddTenantAdminData, TenantServiceAddTenantAdminResponses, TenantServiceCreateTenantData, TenantServiceCreateTenantResponses, TenantServiceGetTenantData, TenantServiceGetTenantResponses, TenantServiceListTenantsData, TenantServiceListTenantsResponses, TenantServiceUpdateTenantStatusData, TenantServiceUpdateTenantStatusResponses, TransferServiceEchoData, TransferServiceEchoResponses, TransferServicePipeData, TransferServicePipeResponses, TransferServiceRawData, TransferServiceRawResponses, TransferServiceSubscribeData, TransferServiceSubscribeResponses, UserServiceBatchGetUsersData, UserServiceBatchGetUsersResponses, UserServiceChangePasswordData, UserServiceChangePasswordResponses, UserServiceCreateUserData, UserServiceCreateUserResponses, UserServiceDeleteUserData, UserServiceDeleteUserResponses, UserServiceGetUserData, UserServiceGetUserResponses, UserServiceListUsersByPopulationData, UserServiceListUsersByPopulationResponses, UserServiceListUsersData, UserServiceListUsersResponses, UserServiceUpdateUserData, UserServiceUpdateUserResponses, UserServiceUpdateUserStatusData, UserServiceUpdateUserStatusResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -76,6 +76,15 @@ export const auditServiceExportAuditLogs = <ThrowOnError extends boolean = false
 
 export const auditServiceListAuditExports = <ThrowOnError extends boolean = false>(options?: Options<AuditServiceListAuditExportsData, ThrowOnError>): RequestResult<AuditServiceListAuditExportsResponses, unknown, ThrowOnError> => (options?.client ?? client).get<AuditServiceListAuditExportsResponses, unknown, ThrowOnError>({ url: '/api/v1/system/audit-logs/exports', ...options });
 
+export const authServiceBeginBindCredential = <ThrowOnError extends boolean = false>(options: Options<AuthServiceBeginBindCredentialData, ThrowOnError>): RequestResult<AuthServiceBeginBindCredentialResponses, unknown, ThrowOnError> => (options.client ?? client).post<AuthServiceBeginBindCredentialResponses, unknown, ThrowOnError>({
+    url: '/api/v1/system/auth/begin-bind-credential',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
 export const authServiceBeginIdentityLogin = <ThrowOnError extends boolean = false>(options: Options<AuthServiceBeginIdentityLoginData, ThrowOnError>): RequestResult<AuthServiceBeginIdentityLoginResponses, unknown, ThrowOnError> => (options.client ?? client).post<AuthServiceBeginIdentityLoginResponses, unknown, ThrowOnError>({
     url: '/api/v1/system/auth/begin-identity-login',
     ...options,
@@ -87,6 +96,23 @@ export const authServiceBeginIdentityLogin = <ThrowOnError extends boolean = fal
 
 export const authServiceBindCredential = <ThrowOnError extends boolean = false>(options: Options<AuthServiceBindCredentialData, ThrowOnError>): RequestResult<AuthServiceBindCredentialResponses, unknown, ThrowOnError> => (options.client ?? client).post<AuthServiceBindCredentialResponses, unknown, ThrowOnError>({
     url: '/api/v1/system/auth/bind-credential',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Bulk registration on the operator's behalf: one file's rows become
+ * accounts with an sms credential each — the exact dance the sms login's
+ * auto-registration runs, minus the proof (the operator collected the
+ * numbers off-line). A phone that already names an account skips — the
+ * credential table's own uniqueness, read ahead of the write — and
+ * nothing rolls back the rows that already landed.
+ */
+export const authServiceImportAccounts = <ThrowOnError extends boolean = false>(options: Options<AuthServiceImportAccountsData, ThrowOnError>): RequestResult<AuthServiceImportAccountsResponses, unknown, ThrowOnError> => (options.client ?? client).post<AuthServiceImportAccountsResponses, unknown, ThrowOnError>({
+    url: '/api/v1/system/auth/import-accounts',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -112,8 +138,28 @@ export const authServiceLoginByIdentity = <ThrowOnError extends boolean = false>
     }
 });
 
+export const authServiceGetLoginConfig = <ThrowOnError extends boolean = false>(options?: Options<AuthServiceGetLoginConfigData, ThrowOnError>): RequestResult<AuthServiceGetLoginConfigResponses, unknown, ThrowOnError> => (options?.client ?? client).get<AuthServiceGetLoginConfigResponses, unknown, ThrowOnError>({ url: '/api/v1/system/auth/login-config', ...options });
+
 export const authServiceLogout = <ThrowOnError extends boolean = false>(options: Options<AuthServiceLogoutData, ThrowOnError>): RequestResult<AuthServiceLogoutResponses, unknown, ThrowOnError> => (options.client ?? client).post<AuthServiceLogoutResponses, unknown, ThrowOnError>({
     url: '/api/v1/system/auth/logout',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const authServiceResetPassword = <ThrowOnError extends boolean = false>(options: Options<AuthServiceResetPasswordData, ThrowOnError>): RequestResult<AuthServiceResetPasswordResponses, unknown, ThrowOnError> => (options.client ?? client).post<AuthServiceResetPasswordResponses, unknown, ThrowOnError>({
+    url: '/api/v1/system/auth/reset-password',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const authServiceSendBindSmsCode = <ThrowOnError extends boolean = false>(options: Options<AuthServiceSendBindSmsCodeData, ThrowOnError>): RequestResult<AuthServiceSendBindSmsCodeResponses, unknown, ThrowOnError> => (options.client ?? client).post<AuthServiceSendBindSmsCodeResponses, unknown, ThrowOnError>({
+    url: '/api/v1/system/auth/send-bind-sms-code',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -220,6 +266,8 @@ export const userServiceChangePassword = <ThrowOnError extends boolean = false>(
     }
 });
 
+export const authServiceGetSecurityStatus = <ThrowOnError extends boolean = false>(options?: Options<AuthServiceGetSecurityStatusData, ThrowOnError>): RequestResult<AuthServiceGetSecurityStatusResponses, unknown, ThrowOnError> => (options?.client ?? client).get<AuthServiceGetSecurityStatusResponses, unknown, ThrowOnError>({ url: '/api/v1/system/me/security', ...options });
+
 export const policyServiceListPolicies = <ThrowOnError extends boolean = false>(options?: Options<PolicyServiceListPoliciesData, ThrowOnError>): RequestResult<PolicyServiceListPoliciesResponses, unknown, ThrowOnError> => (options?.client ?? client).get<PolicyServiceListPoliciesResponses, unknown, ThrowOnError>({ url: '/api/v1/system/policies', ...options });
 
 export const policyServiceCreatePolicy = <ThrowOnError extends boolean = false>(options: Options<PolicyServiceCreatePolicyData, ThrowOnError>): RequestResult<PolicyServiceCreatePolicyResponses, unknown, ThrowOnError> => (options.client ?? client).post<PolicyServiceCreatePolicyResponses, unknown, ThrowOnError>({
@@ -289,10 +337,28 @@ export const roleServiceRemoveRoleMember = <ThrowOnError extends boolean = false
 
 export const tenantServiceListTenants = <ThrowOnError extends boolean = false>(options?: Options<TenantServiceListTenantsData, ThrowOnError>): RequestResult<TenantServiceListTenantsResponses, unknown, ThrowOnError> => (options?.client ?? client).get<TenantServiceListTenantsResponses, unknown, ThrowOnError>({ url: '/api/v1/system/tenants', ...options });
 
+export const tenantServiceCreateTenant = <ThrowOnError extends boolean = false>(options: Options<TenantServiceCreateTenantData, ThrowOnError>): RequestResult<TenantServiceCreateTenantResponses, unknown, ThrowOnError> => (options.client ?? client).post<TenantServiceCreateTenantResponses, unknown, ThrowOnError>({
+    url: '/api/v1/system/tenants',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
 export const tenantServiceGetTenant = <ThrowOnError extends boolean = false>(options: Options<TenantServiceGetTenantData, ThrowOnError>): RequestResult<TenantServiceGetTenantResponses, unknown, ThrowOnError> => (options.client ?? client).get<TenantServiceGetTenantResponses, unknown, ThrowOnError>({ url: '/api/v1/system/tenants/{id}', ...options });
 
 export const tenantServiceUpdateTenantStatus = <ThrowOnError extends boolean = false>(options: Options<TenantServiceUpdateTenantStatusData, ThrowOnError>): RequestResult<TenantServiceUpdateTenantStatusResponses, unknown, ThrowOnError> => (options.client ?? client).put<TenantServiceUpdateTenantStatusResponses, unknown, ThrowOnError>({
     url: '/api/v1/system/tenants/{id}/status',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const tenantServiceAddTenantAdmin = <ThrowOnError extends boolean = false>(options: Options<TenantServiceAddTenantAdminData, ThrowOnError>): RequestResult<TenantServiceAddTenantAdminResponses, unknown, ThrowOnError> => (options.client ?? client).post<TenantServiceAddTenantAdminResponses, unknown, ThrowOnError>({
+    url: '/api/v1/system/tenants/{tenantCode}/admins',
     ...options,
     headers: {
         'Content-Type': 'application/json',
