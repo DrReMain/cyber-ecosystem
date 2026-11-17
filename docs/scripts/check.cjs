@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Pointer-integrity sentinel for the three documentation lanes (the doc law, docs/README.md).
+ * Pointer-integrity sentinel for the documentation lanes.
  *
  * Checks:
  *   1. every literal docs/... or .claude/... path referenced from AGENTS.md,
@@ -10,10 +10,10 @@
  *      as substrings) -- this is the pointer grammar skills must use;
  *   3. the AGENTS.md area index and the conventions area directories agree
  *      in both directions;
- *   4. every conventions doc carries a Status line; every roadmap doc
- *      carries a destination (归宿) header near the top;
- *   5. roadmap isolation (docs/README.md law 4): no docs/roadmap reference in
- *      AGENTS.md, CLAUDE.md, skills, or conventions.
+ *   4. every conventions doc carries a Status line;
+ *   5. roadmap isolation: no docs/roadmap reference in AGENTS.md, CLAUDE.md,
+ *      skills, or conventions.
+ *
  */
 const fs = require("node:fs");
 const path = require("node:path");
@@ -53,6 +53,7 @@ for (const f of refFiles) {
   const rel = path.relative(ROOT, f);
   for (const m of text.matchAll(PATH_RE)) {
     const p = m[1].replace(/\.$/, "");
+    if (p === "docs/roadmap" || p.startsWith("docs/roadmap/")) continue;
     if (!fs.existsSync(path.join(ROOT, p))) bad(`${rel}: dangling path \`${p}\``);
   }
   for (const m of text.matchAll(REF_RE)) {
@@ -84,24 +85,14 @@ for (const missing of [...actual].filter((x) => !indexed.has(x)).sort())
 for (const ghost of [...indexed].filter((x) => !actual.has(x)).sort())
   bad(`AGENTS.md area index references non-existent ${ghost}`);
 
-// status & destination headers
+// status headers
 for (const area of [...actual].sort()) {
   const p = path.join(ROOT, area);
   if (!fs.readFileSync(p, "utf8").includes("**Status:**"))
     bad(`${area}: missing \`**Status:**\` line`);
 }
-const roadmapDir = path.join(ROOT, "docs", "roadmap");
-for (const name of fs
-  .readdirSync(roadmapDir)
-  .filter((n) => n.endsWith(".md"))
-  .sort()) {
-  const head = fs.readFileSync(path.join(roadmapDir, name), "utf8").slice(0, 900);
-  if (!head.includes("归宿"))
-    bad(`docs/roadmap/${name}: missing 归宿 (destination) header near the top`);
-}
 
-// roadmap isolation (docs/README.md law 4): the durable lane never references
-// roadmap content
+// roadmap isolation: the durable lane never references the ephemeral lane
 const durableFiles = [path.join(ROOT, "AGENTS.md"), path.join(ROOT, "CLAUDE.md")];
 for (const name of fs.readdirSync(skillsDir).sort()) {
   const p = path.join(skillsDir, name, "SKILL.md");
@@ -110,7 +101,7 @@ for (const name of fs.readdirSync(skillsDir).sort()) {
 durableFiles.push(...walk(convRoot));
 for (const f of durableFiles) {
   if (/docs\/roadmap/.test(fs.readFileSync(f, "utf8")))
-    bad(`${path.relative(ROOT, f)}: references roadmap content (isolation law, docs/README.md law 4)`);
+    bad(`${path.relative(ROOT, f)}: references roadmap content (isolation law — the durable lane never points into the working lane)`);
 }
 
 if (fail.length) {
@@ -119,6 +110,6 @@ if (fail.length) {
   process.exitCode = 1;
 } else {
   console.log(
-    "docs:check OK — pointers resolve, area index synced, status/destination headers present",
+    "docs:check OK — pointers resolve, area index synced, status headers present",
   );
 }

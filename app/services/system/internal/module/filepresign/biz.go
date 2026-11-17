@@ -86,12 +86,14 @@ type FilePresignRP interface {
 type FilePresignUC struct {
 	shared.UC
 	fileRP FilePresignRP
+	clock  shared.Clock
 }
 
 func NewFilePresignUC(logger *slog.Logger, tm shared.Transaction, fileRP FilePresignRP) *FilePresignUC {
 	return &FilePresignUC{
 		UC:     shared.NewUC(logger.With("module", "module/filepresign"), tm),
 		fileRP: fileRP,
+		clock:  time.Now,
 	}
 }
 
@@ -116,7 +118,7 @@ func (uc *FilePresignUC) Create(ctx context.Context, in *CreateIn) (*CreateOut, 
 		OwnerID:     subjectID,
 	}
 	ttl := limits.PresignTTL
-	expiresAt := time.Now().Add(ttl)
+	expiresAt := uc.clock().Add(ttl)
 	if in.Size < limits.MultipartThreshold {
 		url, err := uc.fileRP.PresignUpload(ctx, f.Key, in.Size, ttl)
 		if err != nil {
@@ -220,7 +222,7 @@ func (uc *FilePresignUC) ListParts(ctx context.Context, id string) (*ResumeOut, 
 		return nil, systempb.ErrorSystemFileInvalidState("")
 	}
 	limits := uc.fileRP.Limits()
-	expiresAt := time.Now().Add(limits.PresignTTL)
+	expiresAt := uc.clock().Add(limits.PresignTTL)
 	// A single-PUT session is the degenerate one-part plan (partSize = whole
 	// size): there is no part state to list — resume either confirms in place
 	// when the object already landed, or retries the whole object on a

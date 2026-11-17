@@ -186,7 +186,10 @@ message Seed {
     string name = 2;
     string plane = 3; // backend | member
   }
-  repeated string super_admins = 1; // accounts seeded with full grants
-  string initial_password = 2; // first-login password for the seeded admins
+  message SuperAdmins {
+    repeated string accounts = 1; // accounts seeded with full grants
+    string initial_password = 2; // first-login password for the seeded accounts
+  }
+  SuperAdmins super_admins = 1;
   repeated Population populations = 3;
 }

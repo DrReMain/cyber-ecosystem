@@ -153,10 +153,11 @@ func (s *Seed) ensureDefaultTenant(ctx context.Context) error {
 }
 
 func (s *Seed) seedSuperAdmins(ctx context.Context) error {
-	if s.cfg == nil || len(s.cfg.GetSuperAdmins()) == 0 {
+	admins := s.cfg.GetSuperAdmins()
+	if len(admins.GetAccounts()) == 0 {
 		return nil
 	}
-	if s.cfg.GetInitialPassword() == "" {
+	if admins.GetInitialPassword() == "" {
 		return fmt.Errorf("seed: super_admins configured but initial_password is empty")
 	}
 	client := s.plat.GetClient(ctx)
@@ -169,11 +170,11 @@ func (s *Seed) seedSuperAdmins(ctx context.Context) error {
 	if err := s.ensureSuperGrant(ctx, client, tenant, superRole.ID); err != nil {
 		return err
 	}
-	hash, err := utils.Hash(s.cfg.GetInitialPassword())
+	hash, err := utils.Hash(admins.GetInitialPassword())
 	if err != nil {
 		return fmt.Errorf("seed: hash initial password: %w", err)
 	}
-	for _, account := range s.cfg.GetSuperAdmins() {
+	for _, account := range admins.GetAccounts() {
 		u, err := s.ensureUser(ctx, client, tenant, account, hash)
 		if err != nil {
 			return err

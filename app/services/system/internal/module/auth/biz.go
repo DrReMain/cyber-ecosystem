@@ -90,7 +90,7 @@ type AuthUC struct {
 	tenantRP     tenant.TenantRP
 	populationRP population.PopulationRP
 	tokenRP      TokenRP
-	clock        func() time.Time // injected time source — session expiry and minting are test-deterministic
+	clock        shared.Clock // injected time source — session expiry and minting are test-deterministic
 }
 
 func NewAuthUC(logger *slog.Logger, tm shared.Transaction, auth *conf.Auth, providers map[string]IdentityProvider, userRP user.UserRP, authzRP authz.AuthzRP, tenantRP tenant.TenantRP, populationRP population.PopulationRP, tokenRP TokenRP) (*AuthUC, error) {

@@ -3,6 +3,7 @@ package shared
 import (
 	"context"
 	"log/slog"
+	"time"
 
 	"cyber-ecosystem/app/services/system/internal/platform"
 )
@@ -22,6 +23,8 @@ const (
 type Transaction interface {
 	InTx(ctx context.Context, fn func(context.Context) error) error
 }
+
+type Clock func() time.Time
 
 type HookRegistry interface {
 	OnStart(fn func(context.Context) error)

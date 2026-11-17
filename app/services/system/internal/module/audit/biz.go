@@ -131,7 +131,8 @@ func (uc *AuditUC) Export(ctx context.Context, in *ExportIn) (*file.File, error)
 		return nil, errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("audit export requires a subject"))
 	}
 	spec := &file.GenerationSpec{
-		Name:        fmt.Sprintf("audit-logs-%s.csv", time.Now().UTC().Format("20060102T150405Z")),
+		Name: fmt.Sprintf("audit-logs-%s.csv",
+			time.Now().UTC().Format("20060102T150405Z")), // wall-clock: export filename stamp — presentation, never asserted
 		ContentType: "text/csv",
 		Produce: func(gctx context.Context, w io.Writer) error {
 			return uc.writeAuditCSV(gctx, w, subject.TenantID, in.IDs)

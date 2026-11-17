@@ -110,8 +110,9 @@ auth:
         endpoint: ${SMS_ENDPOINT:}
 seed:
   super_admins:
-    - admin
-  initial_password: ${SEED_INITIAL_PASSWORD:admin123456}
+    accounts:
+      - admin
+    initial_password: ${SEED_INITIAL_PASSWORD:admin123456}
   populations:
     - code: member
       name: Member

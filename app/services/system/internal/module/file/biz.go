@@ -134,6 +134,7 @@ type FileUC struct {
 	shared.UC
 	fileRP  FileRP
 	domains shared.TenantDomainSource
+	clock   shared.Clock
 
 	genCtx    context.Context
 	genCancel context.CancelFunc
@@ -151,6 +152,7 @@ func NewFileUC(logger *slog.Logger, tm shared.Transaction, fileRP FileRP, domain
 		UC:          shared.NewUC(logger.With("module", "module/file"), tm),
 		fileRP:      fileRP,
 		domains:     domains,
+		clock:       time.Now,
 		genCtx:      genCtx,
 		genCancel:   genCancel,
 		sweepCtx:    sweepCtx,
@@ -221,7 +223,7 @@ func (uc *FileUC) MintUrls(ctx context.Context, ids []string) ([]*UrlMint, error
 		if err != nil {
 			return nil, err
 		}
-		mints = append(mints, &UrlMint{ID: id, URL: url, ExpiresAt: time.Now().Add(ttl)})
+		mints = append(mints, &UrlMint{ID: id, URL: url, ExpiresAt: uc.clock().Add(ttl)})
 	}
 	return mints, nil
 }
@@ -376,7 +378,7 @@ func (uc *FileUC) recoveryLoop() {
 }
 
 func (uc *FileUC) runRecovery(ctx context.Context) {
-	cut := time.Now().Add(-staleGenerationAfter)
+	cut := uc.clock().Add(-staleGenerationAfter)
 	n, err := uc.fileRP.FailStaleProcessing(ctx, cut)
 	if err != nil {
 		uc.Log.Warn("generation recovery: fail stale processing", "error", err)
@@ -388,7 +390,7 @@ func (uc *FileUC) runRecovery(ctx context.Context) {
 }
 
 func (uc *FileUC) runSweep(ctx context.Context) {
-	cut := time.Now().Add(-time.Duration(sweepTTLFactor) * uc.fileRP.Limits().PresignTTL)
+	cut := uc.clock().Add(-time.Duration(sweepTTLFactor) * uc.fileRP.Limits().PresignTTL)
 	for _, domain := range uc.sweepDomains(ctx) {
 		// One domain per pass: the domain switch drives row filtering (the
 		// tenant mixin) and bucket routing (TenantStorage) on the same axis,
@@ -397,7 +399,7 @@ func (uc *FileUC) runSweep(ctx context.Context) {
 		rows := uc.sweepStaleRows(tctx, cut)
 		sessions := uc.sweepOrphanSessions(tctx)
 		objects := uc.sweepOrphanObjects(tctx, cut)
-		reclaimed := uc.sweepExpiredDeleted(tctx, time.Now().Add(-retentionPeriod))
+		reclaimed := uc.sweepExpiredDeleted(tctx, uc.clock().Add(-retentionPeriod))
 		if n := rows + sessions + objects + reclaimed; n > 0 {
 			uc.Log.Info("file sweep", "tenant", domain, "rows", rows, "sessions", sessions, "objects", objects, "reclaimed", reclaimed)
 		}

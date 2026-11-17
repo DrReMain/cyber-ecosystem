@@ -251,7 +251,7 @@ The IAM engine is a **mechanism every service replicates**, not a system-service
 - **Seeds are service-level.**
   - The seed job lives in `internal/bootstrap`, mounts `kratos.BeforeStart` explicitly after `lc.Start` (its completion publishes a fire-and-forget change notification, so the subscriptions it notifies must already exist).
   - Idempotent ensure (query → create; unique-index conflict → re-query), multi-replica safe without advisory locks.
-  - The superadmin triplet is conf-driven (`Seed{super_admins, initial_password, populations}`) — under deny-by-default, a fresh environment could otherwise never create its first user.
+  - The seed set is conf-driven (`Seed{super_admins{accounts, initial_password}, populations}`) — under deny-by-default, a fresh environment could otherwise never create its first user.
 
 ### Non-system services (IAM consumers)
 
