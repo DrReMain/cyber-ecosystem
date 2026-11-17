@@ -11,6 +11,7 @@ import (
 
 	"cyber-ecosystem/shared-go/capability/cache"
 	"cyber-ecosystem/shared-go/kratos/security"
+	kauthz "cyber-ecosystem/shared-go/kratos/security/authz"
 
 	errorspb "cyber-ecosystem/gen/go/cyber/shared/errors/v1"
 
@@ -32,10 +33,11 @@ const (
 
 type authzRP struct {
 	shared.RP
-	snap       atomic.Pointer[snapshot]
-	lastForced atomic.Int64
-	watchDone  chan struct{}
-	watchSub   cache.Subscription
+	snap        atomic.Pointer[snapshot]
+	lastForced  atomic.Int64
+	watchDone   chan struct{}
+	watchSub    cache.Subscription
+	attrSources []kauthz.AttributeSource
 	// Serializes reconcile passes: concurrent triggers (a pubsub burst
 	// riding the 5-minute tick) would each pay the full-table rebuild for
 	// the same stamp version; under the lock the second pass re-reads the
@@ -44,7 +46,8 @@ type authzRP struct {
 }
 
 func NewAuthzRP(logger *slog.Logger, p *platform.Platform) (AuthzRP, error) {
-	r := &authzRP{RP: shared.NewRP(logger.With("module", "module/authz"), p)}
+	r := &authzRP{RP: shared.NewRP(logger.With("module", "module/authz"), p),
+		attrSources: []kauthz.AttributeSource{timeSource{clock: time.Now}}}
 	// Every request reads the snapshot, so compile failure must fail
 	// construction.
 	ctx := context.Background()
@@ -105,7 +108,7 @@ func (rp *authzRP) EffectiveGrants(ctx context.Context, subject *security.Subjec
 	if err != nil {
 		return nil, err
 	}
-	return survivingGrants(ctx, rp.Log, subject, views), nil
+	return survivingGrants(ctx, rp.Log, subject, views, rp.attrSources), nil
 }
 func (rp *authzRP) MemberSubject(subject *security.Subject) (bool, error) {
 	// Member means the seat is structurally denied every gated face — the
@@ -190,7 +193,7 @@ func (rp *authzRP) ExplainGrants(ctx context.Context, principalType, principalID
 	subject := &security.Subject{UserID: principalID, TenantID: tenant}
 	var attrs map[string]any
 	if anyLinkedPolicy(views) {
-		if attrs, err = resolveAttributes(ctx, subject, neededAttrKeys(views)); err != nil {
+		if attrs, err = resolveAttributes(ctx, subject, neededAttrKeys(views), rp.attrSources); err != nil {
 			// Decide's posture: unresolvable attributes fail every constraint
 			// closed; nil attrs make each plugin fail below, states show it.
 			rp.Log.Error("authz: attribute resolution failed; constraints fail closed", "error", err)

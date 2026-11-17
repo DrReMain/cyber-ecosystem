@@ -7,7 +7,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
-        "command": "node docs/scripts/check.cjs"
+        "command": "node docs/scripts/check.mjs"
       }
     }
   }

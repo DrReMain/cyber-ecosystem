@@ -18,8 +18,6 @@ const (
 
 var policyPlugins = map[string]kauthz.ConstraintPolicy{}
 
-var attributeSources = []kauthz.AttributeSource{timeSource{}}
-
 func registerPolicy(p kauthz.ConstraintPolicy) {
 	// A duplicate kind would silently override the first registration; a
 	// boot-time panic turns that into a build mistake caught immediately.
@@ -43,11 +41,11 @@ func decodeParams(params map[string]any, target any) error {
 	return nil
 }
 
-func survivingGrants(ctx context.Context, log *slog.Logger, subject *security.Subject, grants []GrantView) []GrantView {
+func survivingGrants(ctx context.Context, log *slog.Logger, subject *security.Subject, grants []GrantView, sources []kauthz.AttributeSource) []GrantView {
 	if !anyLinkedPolicy(grants) {
 		return grants // no linked policy → zero attribute resolution
 	}
-	attrs, err := resolveAttributes(ctx, subject, neededAttrKeys(grants))
+	attrs, err := resolveAttributes(ctx, subject, neededAttrKeys(grants), sources)
 	if err != nil {
 		log.Error("authz: attribute resolution failed; constraints fail closed", "error", err)
 		return nil
@@ -114,9 +112,9 @@ func neededAttrKeys(grants []GrantView) map[string]struct{} {
 	return needed
 }
 
-func resolveAttributes(ctx context.Context, subject *security.Subject, needed map[string]struct{}) (map[string]any, error) {
+func resolveAttributes(ctx context.Context, subject *security.Subject, needed map[string]struct{}, sources []kauthz.AttributeSource) (map[string]any, error) {
 	var attrs map[string]any
-	for _, src := range attributeSources {
+	for _, src := range sources {
 		var hit bool
 		for _, k := range src.Keys() {
 			if _, ok := needed[k]; ok {

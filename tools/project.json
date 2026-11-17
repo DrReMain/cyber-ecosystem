@@ -28,7 +28,7 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
-        "command": "out=$(gofmt -l app shared-go); test -z \"$out\" || { echo \"$out\" >&2; echo \"gofmt needed (run: gofmt -w the files above)\" >&2; exit 1; }"
+        "command": "node tools/scripts/go-fmt.mjs"
       }
     },
     "go:lint": {
@@ -56,21 +56,21 @@
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
-        "command": "before=$(git status --porcelain) && ./nx run proto:generate && ./nx run-many -t generate --all && { after=$(git status --porcelain); [ \"$before\" = \"$after\" ] || { echo 'gates:drift failed - regeneration changed the working tree (the regenerated truth is now there: review and commit it, or fix the source), or generation errored; see output above' >&2; exit 1; }; }"
+        "command": "node tools/scripts/gates-drift.mjs"
       }
     },
     "gates:quality": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
-        "command": "./nx run tools:go:lint && ./nx affected -t check typecheck --base $(git rev-parse --abbrev-ref @{upstream} 2>/dev/null || echo HEAD~1) --parallel 3"
+        "command": "node tools/scripts/gates-quality.mjs"
       }
     },
     "gates:specs": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "{workspaceRoot}",
-        "command": "./nx affected -t test --base $(git rev-parse --abbrev-ref @{upstream} 2>/dev/null || echo HEAD~1) --parallel 3"
+        "command": "node tools/scripts/gates-specs.mjs"
       }
     },
     "gates:push": {
@@ -78,9 +78,9 @@
       "options": {
         "cwd": "{workspaceRoot}",
         "commands": [
-          "./nx run tools:gates:drift",
-          "./nx run tools:gates:quality",
-          "./nx run tools:gates:specs"
+          "node .nx/nxw.js run tools:gates:drift",
+          "node .nx/nxw.js run tools:gates:quality",
+          "node .nx/nxw.js run tools:gates:specs"
         ],
         "parallel": false
       }

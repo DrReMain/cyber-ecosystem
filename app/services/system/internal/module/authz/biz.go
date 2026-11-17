@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"strings"
+	"time"
 
 	"cyber-ecosystem/shared-go/kratos/security"
 	kauthz "cyber-ecosystem/shared-go/kratos/security/authz"
@@ -65,13 +66,18 @@ type AuthzRP interface {
 
 type AuthzUC struct {
 	shared.UC
-	authzRP AuthzRP
+	authzRP     AuthzRP
+	attrSources []kauthz.AttributeSource
 }
 
 func NewAuthzUC(logger *slog.Logger, tm shared.Transaction, authzRP AuthzRP, lc shared.HookRegistry) *AuthzUC {
 	lc.OnStart(authzRP.StartWatch)
 	lc.OnStop(authzRP.StopWatch)
-	return &AuthzUC{UC: shared.NewUC(logger.With("module", "module/authz"), tm), authzRP: authzRP}
+	return &AuthzUC{
+		UC:          shared.NewUC(logger.With("module", "module/authz"), tm),
+		authzRP:     authzRP,
+		attrSources: []kauthz.AttributeSource{timeSource{clock: time.Now}},
+	}
 }
 
 // Method --------------------------------------------------------------------------------------------------------------
@@ -99,7 +105,7 @@ func (uc *AuthzUC) Decide(ctx context.Context, subject *security.Subject, operat
 	if len(matched) == 0 {
 		return &kauthz.Decision{Reason: kauthz.DenyNoGrant}, nil
 	}
-	surviving := survivingGrants(ctx, uc.Log, subject, matched)
+	surviving := survivingGrants(ctx, uc.Log, subject, matched, uc.attrSources)
 	if len(surviving) == 0 {
 		return &kauthz.Decision{Reason: kauthz.DenyAbacConstraint}, nil
 	}

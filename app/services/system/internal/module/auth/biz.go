@@ -604,7 +604,7 @@ func (uc *AuthUC) AuthenticateSession(ctx context.Context, token string) (*secur
 			}
 		}
 	}
-	slide := min(sessionIdle, time.Until(sess.ExpiresAt))
+	slide := min(sessionIdle, sess.ExpiresAt.Sub(uc.clock()))
 	if err := uc.tokenRP.Expire(ctx, sessionPrefix+token, slide); err != nil {
 		return nil, err
 	}

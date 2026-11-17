@@ -2,26 +2,15 @@ pre-commit:
   parallel: true
   commands:
     nx-fmt:
-      run: ./nx run tools:go:fmt && ./nx affected -t check --base HEAD
+      run: node .nx/nxw.js run tools:go:fmt && node .nx/nxw.js affected -t check --base HEAD
     docs-gate:
-      run: ./nx run docs:check
+      run: node .nx/nxw.js run docs:check
     gen-guard:
-      run: >
-        staged=$(git diff --cached --name-only);
-        if echo "$staged" | grep -q '^gen/'; then
-          echo "$staged" | grep -qE '\.proto$' || echo "$staged" | grep -q '^pnpm-lock\.yaml$' || {
-            echo "gen/ is derived — never hand-edit; stage the .proto (or the generator-bump's pnpm-lock) and run ./nx run proto:generate" >&2;
-            exit 1;
-          };
-        fi
+      run: node tools/scripts/gen-guard.mjs
     ledger-guard:
-      run: >
-        if git diff --cached --name-only | grep -q '^docs/roadmap/'; then
-          echo "docs/roadmap/ holds working ledgers — never committed" >&2;
-          exit 1;
-        fi
+      run: node tools/scripts/ledger-guard.mjs
 
 pre-push:
   commands:
     gates:
-      run: ./nx run tools:gates:push
+      run: node .nx/nxw.js run tools:gates:push

@@ -5,7 +5,8 @@
       "Bash(curl *)",
       "Bash(grpcurl *)",
       "Bash(docker *)",
-      "Bash(./nx *)"
+      "Bash(./nx *)",
+      "Bash(node .nx/nxw.js *)"
     ],
     "deny": [
       "Bash(nohup)",
@@ -17,7 +18,10 @@
       "Bash(go run *)",
       "Bash(go tool *)",
       "Bash(golangci-lint *)",
-      "Bash(vitest *)"
+      "Bash(vitest *)",
+      "Bash(git * --no-verify*)",
+      "Bash(git commit -n *)",
+      "Bash(LEFTHOOK*)"
     ]
   }
 }

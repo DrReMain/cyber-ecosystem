@@ -21,6 +21,10 @@ import (
 var (
 	subj    = &security.Subject{UserID: "u1"}
 	discard = slog.New(slog.DiscardHandler)
+	// frozenEval pins the evaluation clock: survivingGrants runs the real
+	// timeSource seam, and the all-day/NONE fixtures below hold at any
+	// instant, so the freeze makes that independence explicit.
+	frozenEval = timeSource{clock: func() time.Time { return time.Date(2026, 3, 10, 12, 0, 0, 0, time.Local) }}
 )
 
 func allDayWindow() PolicyView {
@@ -45,7 +49,7 @@ func neverCalendar() PolicyView {
 // resolution (the lazy path is load-bearing: no policy, no dialing sources).
 func TestSurvivingGrantsLazyPassthrough(t *testing.T) {
 	grants := []GrantView{{Pattern: "/a/*"}, {Pattern: "/b/Op", ScopeKind: "self"}}
-	out := survivingGrants(context.Background(), discard, subj, grants)
+	out := survivingGrants(context.Background(), discard, subj, grants, []kauthz.AttributeSource{frozenEval})
 	if len(out) != 2 || out[0].Pattern != "/a/*" || out[1].Pattern != "/b/Op" {
 		t.Fatalf("policy-free grants must pass through untouched, got %+v", out)
 	}
@@ -60,7 +64,7 @@ func TestSurvivingGrantsFiltersInOrder(t *testing.T) {
 		{Pattern: "/bare/Op"},
 		{Pattern: "/fail/*", Policies: []PolicyView{neverCalendar()}},
 	}
-	out := survivingGrants(context.Background(), discard, subj, grants)
+	out := survivingGrants(context.Background(), discard, subj, grants, []kauthz.AttributeSource{frozenEval})
 	if len(out) != 2 || out[0].Pattern != "/pass/*" || out[1].Pattern != "/bare/Op" {
 		t.Fatalf("filtration must keep pass+bare in order, got %+v", out)
 	}
