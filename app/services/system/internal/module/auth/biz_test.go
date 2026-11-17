@@ -354,9 +354,13 @@ func (f *fakeTenantRP) FindByCode(_ context.Context, code string) (*tenant.Tenan
 type fakePopulationRP struct {
 	population.PopulationRP
 	rows map[string]*population.Population
+	err  error
 }
 
 func (f *fakePopulationRP) FindByCode(_ context.Context, code string) (*population.Population, error) {
+	if f.err != nil {
+		return nil, f.err
+	}
 	if p, ok := f.rows[code]; ok {
 		return p, nil
 	}
@@ -1975,5 +1979,142 @@ func TestAuthenticateSessionAbsoluteCap(t *testing.T) {
 	live := mintSession(t, rp, &Session{UserID: "u1", TenantID: "t1", Account: "a@x.co", IssuedAt: frozen, ExpiresAt: frozen.Add(time.Hour)})
 	if _, err := uc.AuthenticateSession(context.Background(), live); err != nil {
 		t.Fatalf("live session: must pass, got %v", err)
+	}
+}
+
+// The composition law (Q3-①): at least six runes carrying both an ASCII
+// letter and an ASCII digit — the prototype's own rule, one law for every
+// seam that accepts a freshly chosen password, pinned so it can never
+// quietly narrow.
+func TestPasswordPolicyError(t *testing.T) {
+	cases := []struct {
+		name      string
+		candidate string
+		wantErr   bool
+	}{
+		{"letters and digits pass", "abc123", false},
+		{"mixed case with digits passes", "Ab1c2d", false},
+		{"longer than six passes", "correct horse 1", false},
+		{"digits-only is refused", "123456", true},
+		{"letters-only is refused", "abcdef", true},
+		{"five runes is refused even when mixed", "ab1c2", true},
+		{"non-ASCII runes carry no ASCII letter", "中中中中中1", true},
+		{"empty is refused", "", true},
+		{"symbols alone carry neither class", "!!!!!!", true},
+	}
+	uc := &AuthUC{}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			err := uc.PasswordPolicyError(tc.candidate)
+			if tc.wantErr {
+				if err == nil {
+					t.Fatalf("PasswordPolicyError(%q) = nil, want the policy error", tc.candidate)
+				}
+				if !systempb.IsSystemPasswordPolicy(err) {
+					t.Fatalf("error = %v, want SystemPasswordPolicy", err)
+				}
+			} else if err != nil {
+				t.Fatalf("PasswordPolicyError(%q) = %v, want nil", tc.candidate, err)
+			}
+		})
+	}
+}
+
+// The ladder's order holds server-side too: the old-password proof first,
+// the composition law second — a weak candidate never reaches the digest.
+func TestChangePasswordOldMismatch(t *testing.T) {
+	rp := &fakeUserRP{row: seedRow(t, "a@x.co", "right-old")}
+	uc := newAuthUC(rp, &fakeAuthzRP{}, &fakeTokenRP{})
+
+	if err := uc.ChangePassword(authCtx(&security.Subject{UserID: "u1"}), "wrong-old", "NewPass123"); !systempb.IsSystemPasswordMismatch(err) {
+		t.Fatalf("old mismatch: want PASSWORD_MISMATCH, got %v", err)
+	}
+	if len(rp.updates) != 0 {
+		t.Fatal("old mismatch: no digest write may happen")
+	}
+}
+
+func TestChangePasswordRejectsWeakPassword(t *testing.T) {
+	rp := &fakeUserRP{row: seedRow(t, "a@x.co", "right-old")}
+	uc := newAuthUC(rp, &fakeAuthzRP{}, &fakeTokenRP{})
+
+	if err := uc.ChangePassword(authCtx(&security.Subject{UserID: "u1"}), "right-old", "abcdef"); !systempb.IsSystemPasswordPolicy(err) {
+		t.Fatalf("weak new password: want PASSWORD_POLICY, got %v", err)
+	}
+	if len(rp.updates) != 0 {
+		t.Fatal("weak new password: no digest write may happen")
+	}
+}
+
+func TestChangePasswordRewritesDigest(t *testing.T) {
+	rp := &fakeUserRP{row: seedRow(t, "a@x.co", "right-old")}
+	uc := newAuthUC(rp, &fakeAuthzRP{}, &fakeTokenRP{})
+
+	if err := uc.ChangePassword(authCtx(&security.Subject{UserID: "u1"}), "right-old", "NewPass123"); err != nil {
+		t.Fatalf("change password: %v", err)
+	}
+	if len(rp.updates) != 1 {
+		t.Fatalf("change password: updates = %d, want 1", len(rp.updates))
+	}
+}
+
+func TestChangePasswordUnknownSelf(t *testing.T) {
+	uc := newAuthUC(&fakeUserRP{}, &fakeAuthzRP{}, &fakeTokenRP{})
+
+	if err := uc.ChangePassword(authCtx(&security.Subject{UserID: "ghost"}), "old", "NewPass123"); !systempb.IsSystemUserNotFound(err) {
+		t.Fatalf("unknown self: want USER_NOT_FOUND, got %v", err)
+	}
+}
+
+// The plane ask narrows discovery: a page renders only providers whose
+// landing population seats its own plane; a provider naming a population
+// the table does not hold, and the disabled row, stay unlisted; without an
+// ask the overview stays unfiltered.
+func TestLoginConfigPlaneFilter(t *testing.T) {
+	cfg := &conf.Auth{Providers: []*conf.Auth_Provider{
+		{Key: "wx", Kind: fakeKind, Enabled: true, Population: "member"},
+		{Key: "op-sms", Kind: smsKind, Enabled: true, Population: "backend"},
+		{Key: "ghosted", Kind: smsKind, Enabled: true, Population: "nowhere"},
+		{Key: "off", Kind: fakeKind, Population: "member"},
+	}}
+	pops := &fakePopulationRP{rows: map[string]*population.Population{
+		"member":  {Code: "member", Name: "Member", Plane: security.PlaneMember},
+		"backend": {Code: "backend", Name: "Backend", Plane: security.PlaneBackend},
+	}}
+	uc, err := NewAuthUC(
+		slog.New(slog.NewTextHandler(io.Discard, nil)), passthroughTx{}, cfg, testProviders(),
+		&fakeUserRP{}, &fakeAuthzRP{}, &fakeTenantRP{row: &tenant.Tenant{Code: "any", Enabled: true}},
+		pops, &fakeTokenRP{},
+	)
+	if err != nil {
+		t.Fatalf("construct: %v", err)
+	}
+	keys := func(plane string) []string {
+		t.Helper()
+		out, err := uc.LoginConfig(context.Background(), plane)
+		if err != nil {
+			t.Fatalf("loginConfig(%q): %v", plane, err)
+		}
+		got := make([]string, 0, len(out))
+		for _, p := range out {
+			got = append(got, p.Key)
+		}
+		return got
+	}
+	if got := keys(""); !slices.Equal(got, []string{"wx", "op-sms", "ghosted"}) {
+		t.Fatalf("unfiltered = %v, want the enabled three", got)
+	}
+	if got := keys(security.PlaneMember); !slices.Equal(got, []string{"wx"}) {
+		t.Fatalf("member ask = %v, want [wx]", got)
+	}
+	if got := keys(security.PlaneBackend); !slices.Equal(got, []string{"op-sms"}) {
+		t.Fatalf("backend ask = %v, want [op-sms]", got)
+	}
+
+	// An infra failure answering the plane ask is never a silently smaller
+	// login page — it surfaces.
+	pops.err = fmt.Errorf("table down")
+	if _, err := uc.LoginConfig(context.Background(), security.PlaneMember); err == nil {
+		t.Fatal("infra failure: want the error, not an empty answer")
 	}
 }

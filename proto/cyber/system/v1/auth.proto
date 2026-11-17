@@ -110,6 +110,17 @@ service AuthService {
       body: "*"
     };
   }
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse) {
+    option (cyber.ext.v1.method) = {
+      comment: "修改密码"
+      action: ACTION_WRITE
+    };
+    option (cyber.ext.v1.access) = ACCESS_BUILTIN;
+    option (google.api.http) = {
+      post: "/api/v1/system/me/password"
+      body: "*"
+    };
+  }
   rpc GetSecurityStatus(GetSecurityStatusRequest) returns (GetSecurityStatusResponse) {
     option (cyber.ext.v1.method) = {
       comment: "获取当前账号绑定面"
@@ -292,7 +303,18 @@ message SendSmsCodeResponse {
   string state = 1;
 }
 
-message GetLoginConfigRequest {}
+message GetLoginConfigRequest {
+  // The asking page's plane (backend/member): the answer keeps only
+  // providers whose landing population seats that plane — a page never
+  // renders a login that can only mint a session its plane guard would
+  // refuse. Absent = the unfiltered overview.
+  optional string plane = 1 [(buf.validate.field).string = {
+    in: [
+      "backend",
+      "member"
+    ]
+  }];
+}
 
 message GetLoginConfigResponse {
   // The identity providers the login page may offer, exactly as configured:
@@ -422,6 +444,23 @@ message ResetPasswordRequest {
 }
 
 message ResetPasswordResponse {}
+
+// changePassword
+message ChangePasswordRequest {
+  optional string old_password = 1 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string.min_len = 1
+  ];
+  optional string new_password = 2 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).string = {
+      min_len: 6
+      max_len: 128
+    }
+  ];
+}
+
+message ChangePasswordResponse {}
 
 // getSecurityStatus ------------------------------------------------------------------
 

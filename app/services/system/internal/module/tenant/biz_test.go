@@ -72,8 +72,30 @@ func (f *fakeTenantRP) UpdateStatus(_ context.Context, id string, enabled bool) 
 func newTenantUC(rp *fakeTenantRP) *TenantUC {
 	return NewTenantUC(
 		slog.New(slog.NewTextHandler(io.Discard, nil)),
-		passthroughTm{}, rp,
+		passthroughTm{}, rp, stubPasswordPolicy{},
 	)
+}
+
+// stubPasswordPolicy mirrors the composition law auth owns (pinned in auth's
+// TestPasswordPolicyError): these tests exercise the seam wiring, not the
+// rule, so the twin may drift narrower than the real law without lying.
+type stubPasswordPolicy struct{}
+
+func (stubPasswordPolicy) PasswordPolicyError(candidate string) error {
+	runes, hasLetter, hasDigit := 0, false, false
+	for _, r := range candidate {
+		runes++
+		switch {
+		case ('a' <= r && r <= 'z') || ('A' <= r && r <= 'Z'):
+			hasLetter = true
+		case '0' <= r && r <= '9':
+			hasDigit = true
+		}
+	}
+	if runes < 6 || !hasLetter || !hasDigit {
+		return systempb.ErrorSystemPasswordPolicy("")
+	}
+	return nil
 }
 
 func defaultRow(enabled bool) *Tenant {

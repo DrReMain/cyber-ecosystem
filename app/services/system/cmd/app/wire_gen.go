@@ -100,9 +100,6 @@ func wireApp(confServer *conf.Server, data *conf.Data, catalog *conf.Catalog, co
 	resourceService := resource.NewResourceService(logger, resourceUC)
 	userRP := user.NewUserRP(logger, platformPlatform)
 	fileRP := file.NewFileRP(logger, platformPlatform)
-	userUC := user.NewUserUC(logger, platformPlatform, userRP, deptRP, fileRP)
-	userService := user.NewUserService(logger, userUC)
-	transferService := transfer.NewTransferService(logger)
 	wechatProvider := auth.NewWechatProvider()
 	sender, err := platform.NewSms(confAuth, logger)
 	if err != nil {
@@ -141,6 +138,9 @@ func wireApp(confServer *conf.Server, data *conf.Data, catalog *conf.Catalog, co
 		cleanup()
 		return nil, nil, err
 	}
+	userUC := user.NewUserUC(logger, platformPlatform, userRP, deptRP, fileRP, authUC)
+	userService := user.NewUserService(logger, userUC)
+	transferService := transfer.NewTransferService(logger)
 	authService := auth.NewAuthService(logger, authUC)
 	roleRP := role.NewRoleRP(logger, platformPlatform)
 	policyRP := policy.NewPolicyRP(logger, platformPlatform)
@@ -149,7 +149,7 @@ func wireApp(confServer *conf.Server, data *conf.Data, catalog *conf.Catalog, co
 	policyUC := policy.NewPolicyUC(logger, platformPlatform, policyRP)
 	policyService := policy.NewPolicyService(logger, policyUC)
 	auditRP, cleanup5 := audit.NewAuditRP(logger, platformPlatform)
-	tenantUC := tenant.NewTenantUC(logger, platformPlatform, tenantRP)
+	tenantUC := tenant.NewTenantUC(logger, platformPlatform, tenantRP, authUC)
 	lifecycle := bootstrap.NewLifecycle()
 	fileUC := file.NewFileUC(logger, platformPlatform, fileRP, tenantUC, lifecycle)
 	auditUC := audit.NewAuditUC(logger, platformPlatform, auditRP, fileUC)

@@ -14,7 +14,6 @@ import (
 
 	"cyber-ecosystem/app/services/system/internal/module/dept"
 	"cyber-ecosystem/app/services/system/internal/module/file"
-	"cyber-ecosystem/app/services/system/internal/shared"
 )
 
 // passthroughTm runs the unit inline — these laws are about the UC's write
@@ -230,7 +229,7 @@ func (f *fakeUserRP) ListByPopulation(_ context.Context, in *ListIn) (*ListOut, 
 func newUserUCWith(rp *fakeUserRP, d dept.DeptRP, f file.FileRP) *UserUC {
 	return NewUserUC(
 		slog.New(slog.NewTextHandler(io.Discard, nil)),
-		passthroughTm{}, rp, d, f,
+		passthroughTm{}, rp, d, f, stubPasswordPolicy{},
 	)
 }
 
@@ -261,6 +260,28 @@ func (f *fakeFileRP) FindRef(context.Context, string) (*file.File, error) {
 		return nil, f.err
 	}
 	return f.ref, nil
+}
+
+// stubPasswordPolicy mirrors the composition law auth owns (pinned in auth's
+// TestPasswordPolicyError): these tests exercise the seam wiring, not the
+// rule, so the twin may drift narrower than the real law without lying.
+type stubPasswordPolicy struct{}
+
+func (stubPasswordPolicy) PasswordPolicyError(candidate string) error {
+	runes, hasLetter, hasDigit := 0, false, false
+	for _, r := range candidate {
+		runes++
+		switch {
+		case ('a' <= r && r <= 'z') || ('A' <= r && r <= 'Z'):
+			hasLetter = true
+		case '0' <= r && r <= '9':
+			hasDigit = true
+		}
+	}
+	if runes < 6 || !hasLetter || !hasDigit {
+		return systempb.ErrorSystemPasswordPolicy("")
+	}
+	return nil
 }
 
 func selfCtx(userID string) context.Context {
@@ -368,71 +389,6 @@ func TestDeleteRevokesSessions(t *testing.T) {
 	}
 	if len(rp.deletes) != 1 || len(rp.revokes) != 1 || rp.revokes[0] != "u1" {
 		t.Fatalf("delete: deletes=%v revokes=%v, want both for u1", rp.deletes, rp.revokes)
-	}
-}
-
-// ChangePassword ------------------------------------------------------------------------------------------------------
-
-func TestChangePasswordOldMismatch(t *testing.T) {
-	account := "a@x.co"
-	oldHash, err := utils.Hash("right-old")
-	if err != nil {
-		t.Fatalf("seed hash: %v", err)
-	}
-	rp := &fakeUserRP{rows: map[string]*User{"u1": {ID: "u1", Account: &account, PasswordHash: &oldHash}}}
-	uc := newUserUC(rp)
-
-	if err := uc.ChangePassword(selfCtx("u1"), "wrong-old", "NewPass123"); !systempb.IsSystemPasswordMismatch(err) {
-		t.Fatalf("old mismatch: want PASSWORD_MISMATCH, got %v", err)
-	}
-	if rp.updates != 0 {
-		t.Fatal("old mismatch: no digest write may happen")
-	}
-}
-
-// The composition law under test (Q3-①): at least six runes carrying both
-// an ASCII letter and an ASCII digit — the prototype's own rule, one law
-// for every seam that accepts a freshly chosen password.
-func TestPasswordPolicyLaw(t *testing.T) {
-	cases := []struct {
-		pw string
-		ok bool
-	}{
-		{"abc123", true},
-		{"NewPass123", true},
-		{"abcdef", false}, // no digit
-		{"123456", false}, // no letter
-		{"ab1", false},    // under six runes
-		{"中中中中中1", false}, // no ASCII letter
-		{"", false},
-	}
-	for _, c := range cases {
-		err := shared.PasswordPolicyError(c.pw)
-		if c.ok != (err == nil) {
-			t.Fatalf("policy(%q): ok=%v err=%v", c.pw, c.ok, err)
-		}
-		if err != nil && !systempb.IsSystemPasswordPolicy(err) {
-			t.Fatalf("policy(%q): want SYSTEM_PASSWORD_POLICY, got %v", c.pw, err)
-		}
-	}
-}
-
-// The ladder's order holds server-side too: the old-password proof first,
-// the composition law second — a weak candidate never reaches the digest.
-func TestChangePasswordRejectsWeakPassword(t *testing.T) {
-	account := "a@x.co"
-	oldHash, err := utils.Hash("right-old")
-	if err != nil {
-		t.Fatalf("seed hash: %v", err)
-	}
-	rp := &fakeUserRP{rows: map[string]*User{"u1": {ID: "u1", Account: &account, PasswordHash: &oldHash}}}
-	uc := newUserUC(rp)
-
-	if err := uc.ChangePassword(selfCtx("u1"), "right-old", "abcdef"); !systempb.IsSystemPasswordPolicy(err) {
-		t.Fatalf("weak new password: want PASSWORD_POLICY, got %v", err)
-	}
-	if rp.updates != 0 {
-		t.Fatal("weak new password: no digest write may happen")
 	}
 }
 
@@ -668,25 +624,6 @@ func (s *stubFindByIDs) FindByIDs(context.Context, []string) (map[string]*User, 
 	return nil, nil
 }
 
-// ChangePassword ------------------------------------------------------------------------------------------------------
-
-func TestChangePasswordRewritesDigest(t *testing.T) {
-	account := "a@x.co"
-	oldHash, err := utils.Hash("right-old")
-	if err != nil {
-		t.Fatalf("seed hash: %v", err)
-	}
-	rp := &fakeUserRP{rows: map[string]*User{"u1": {ID: "u1", Account: &account, PasswordHash: &oldHash}}, updates: 0}
-	uc := newUserUC(rp)
-
-	if err := uc.ChangePassword(selfCtx("u1"), "right-old", "NewPass123"); err != nil {
-		t.Fatalf("change password: %v", err)
-	}
-	if rp.updates != 1 {
-		t.Fatalf("change password: updates = %d, want 1", rp.updates)
-	}
-}
-
 func TestUpdateRejectsUnknownDept(t *testing.T) {
 	rp := &fakeUserRP{rows: map[string]*User{"u1": {ID: "u1"}}}
 	uc := newUserUCWith(rp, &fakeDeptRP{err: errorspb.ErrorInfraErrorDbNotFound("")}, nil)
@@ -697,14 +634,6 @@ func TestUpdateRejectsUnknownDept(t *testing.T) {
 	}
 	if rp.updates != 0 {
 		t.Fatal("update unknown dept: no write may happen")
-	}
-}
-
-func TestChangePasswordUnknownSelf(t *testing.T) {
-	uc := newUserUC(&fakeUserRP{rows: map[string]*User{}})
-
-	if err := uc.ChangePassword(selfCtx("ghost"), "old", "NewPass123"); !systempb.IsSystemUserNotFound(err) {
-		t.Fatalf("unknown self: want USER_NOT_FOUND, got %v", err)
 	}
 }
 

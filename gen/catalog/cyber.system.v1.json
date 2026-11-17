@@ -94,6 +94,19 @@
         "datascope": false
       },
       {
+        "name": "ChangePassword",
+        "full_name": "cyber.system.v1.AuthService.ChangePassword",
+        "request_name": "ChangePasswordRequest",
+        "request_full_name": "cyber.system.v1.ChangePasswordRequest",
+        "response_name": "ChangePasswordResponse",
+        "response_full_name": "cyber.system.v1.ChangePasswordResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/system/me/password",
+        "comment": "修改密码",
+        "access": "BUILTIN",
+        "datascope": false
+      },
+      {
         "name": "GetCurrentUser",
         "full_name": "cyber.system.v1.AuthService.GetCurrentUser",
         "request_name": "GetCurrentUserRequest",
@@ -941,19 +954,6 @@
         "comment": "批量查询用户概要",
         "access": "ADMIN",
         "datascope": true
-      },
-      {
-        "name": "ChangePassword",
-        "full_name": "cyber.system.v1.UserService.ChangePassword",
-        "request_name": "ChangePasswordRequest",
-        "request_full_name": "cyber.system.v1.ChangePasswordRequest",
-        "response_name": "ChangePasswordResponse",
-        "response_full_name": "cyber.system.v1.ChangePasswordResponse",
-        "http_method": "POST",
-        "http_path": "/api/v1/system/me/password",
-        "comment": "修改密码",
-        "access": "BUILTIN",
-        "datascope": false
       },
       {
         "name": "CreateUser",

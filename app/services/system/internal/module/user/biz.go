@@ -107,14 +107,16 @@ type UserUC struct {
 	userRP UserRP
 	deptRP dept.DeptRP
 	fileRP file.FileRP
+	policy shared.PasswordPolicy
 }
 
-func NewUserUC(logger *slog.Logger, tm shared.Transaction, userRP UserRP, deptRP dept.DeptRP, fileRP file.FileRP) *UserUC {
+func NewUserUC(logger *slog.Logger, tm shared.Transaction, userRP UserRP, deptRP dept.DeptRP, fileRP file.FileRP, policy shared.PasswordPolicy) *UserUC {
 	return &UserUC{
 		UC:     shared.NewUC(logger.With("module", "module/user"), tm),
 		userRP: userRP,
 		deptRP: deptRP,
 		fileRP: fileRP,
+		policy: policy,
 	}
 }
 
@@ -139,7 +141,7 @@ func (uc *UserUC) Create(ctx context.Context, account, password, deptID, avatar 
 		if err = uc.ensureAvatar(ctx, avatar); err != nil {
 			return nil, err
 		}
-		if err := shared.PasswordPolicyError(*password); err != nil {
+		if err := uc.policy.PasswordPolicyError(*password); err != nil {
 			return nil, err
 		}
 		hash, herr := utils.Hash(*password)
@@ -210,7 +212,7 @@ func (uc *UserUC) Update(ctx context.Context, fieldsMask []string, u *User, pass
 		// An admin reset also leaves sessions standing — same ruling as
 		// ChangePassword: revocation belongs to disable/delete, not to a
 		// credential rotation.
-		if err := shared.PasswordPolicyError(*password); err != nil {
+		if err := uc.policy.PasswordPolicyError(*password); err != nil {
 			return nil, err
 		}
 		hash, e := utils.Hash(*password)
@@ -266,35 +268,6 @@ func (uc *UserUC) UpdateStatus(ctx context.Context, id string, enabled bool) (ou
 		}
 	}
 	return out, nil
-}
-
-func (uc *UserUC) ChangePassword(ctx context.Context, oldPassword, newPassword string) error {
-	subject, ok := security.SubjectFromCtx(ctx)
-	if !ok {
-		return errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("change password requires an authenticated caller"))
-	}
-	u, err := uc.ensureUser(ctx, subject.UserID)
-	if err != nil {
-		return err
-	}
-	if !utils.Verify(oldPassword, *u.PasswordHash) {
-		return systempb.ErrorSystemPasswordMismatch("").WithCause(fmt.Errorf("old password mismatch: user %s", subject.UserID))
-	}
-	if err := shared.PasswordPolicyError(newPassword); err != nil {
-		return err
-	}
-	hash, err := utils.Hash(newPassword)
-	if err != nil {
-		return errorspb.ErrorGeneralErrorInvalidArgument("").WithCause(fmt.Errorf("password rejected: %w", err))
-	}
-	if _, err = uc.userRP.Update(ctx, []string{"password"}, &User{ID: subject.UserID, PasswordHash: &hash}); err != nil {
-		return err
-	}
-	// Existing sessions survive a self-service password change: the caller
-	// proved the old password, so this is the same person rotating a
-	// credential, not an account takeover — unlike disable/delete, which do
-	// revoke (their actor is someone else).
-	return nil
 }
 
 func (uc *UserUC) Delete(ctx context.Context, id string) (out string, err error) {
@@ -376,17 +349,6 @@ func (uc *UserUC) BatchGet(ctx context.Context, ids []string) (map[string]*User,
 }
 
 // Private -------------------------------------------------------------------------------------------------------------
-
-func (uc *UserUC) ensureUser(ctx context.Context, id string) (*User, error) {
-	u, err := uc.userRP.FindByID(ctx, id)
-	if err != nil {
-		if errorspb.IsInfraErrorDbNotFound(err) {
-			return nil, systempb.ErrorSystemUserNotFound("")
-		}
-		return nil, err
-	}
-	return u, nil
-}
 
 func (uc *UserUC) ensureSeatedUser(ctx context.Context, id string) (*User, error) {
 	u, err := uc.userRP.FindSeated(ctx, id)

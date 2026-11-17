@@ -50,6 +50,11 @@ export const sendBindSmsCode = AuthService.method.sendBindSmsCode;
 export const resetPassword = AuthService.method.resetPassword;
 
 /**
+ * @generated from rpc cyber.system.v1.AuthService.ChangePassword
+ */
+export const changePassword = AuthService.method.changePassword;
+
+/**
  * @generated from rpc cyber.system.v1.AuthService.GetSecurityStatus
  */
 export const getSecurityStatus = AuthService.method.getSecurityStatus;

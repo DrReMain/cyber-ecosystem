@@ -65,12 +65,14 @@ type TenantRP interface {
 type TenantUC struct {
 	shared.UC
 	tenantRP TenantRP
+	policy   shared.PasswordPolicy
 }
 
-func NewTenantUC(logger *slog.Logger, tm shared.Transaction, tenantRP TenantRP) *TenantUC {
+func NewTenantUC(logger *slog.Logger, tm shared.Transaction, tenantRP TenantRP, policy shared.PasswordPolicy) *TenantUC {
 	return &TenantUC{
 		UC:       shared.NewUC(logger.With("module", "module/tenant"), tm),
 		tenantRP: tenantRP,
+		policy:   policy,
 	}
 }
 
@@ -111,7 +113,7 @@ func (uc *TenantUC) Create(ctx context.Context, in *CreateIn) (string, error) {
 func (uc *TenantUC) AddSuperAdmin(ctx context.Context, in *AdminIn) (string, error) {
 	// The runtime tenant's break-glass face: an account that already
 	// exists joins as-is, a fresh one is created with the offered password.
-	if err := shared.PasswordPolicyError(in.Password); err != nil {
+	if err := uc.policy.PasswordPolicyError(in.Password); err != nil {
 		return "", err
 	}
 	var userID string

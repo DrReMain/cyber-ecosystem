@@ -35,6 +35,10 @@ type TenantDomainSource interface {
 	ListTenantCodes(ctx context.Context) ([]string, error)
 }
 
+type PasswordPolicy interface {
+	PasswordPolicyError(candidate string) error
+}
+
 // Base ----------------------------------------------------------------------------------------------------------------
 
 type UC struct {

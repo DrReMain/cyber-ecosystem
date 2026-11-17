@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"time"
+	"unicode/utf8"
 
 	"github.com/rs/xid"
 
@@ -221,17 +222,41 @@ func (uc *AuthUC) SendSmsCode(ctx context.Context, providerKey, phone, source st
 	return ci.IssueCode(ctx, row, phone, source)
 }
 
-func (uc *AuthUC) LoginConfig(ctx context.Context) ([]*systempb.LoginProvider, error) {
+func (uc *AuthUC) LoginConfig(ctx context.Context, plane string) ([]*systempb.LoginProvider, error) {
 	// The anonymous discovery face: the login page renders exactly what the
 	// deployment wired — keys and kinds only, no secrets, no endpoint
 	// topology. An empty answer is a closed deployment, a shape the page
-	// must own instead of a dead button.
+	// must own instead of a dead button. A plane ask narrows the answer to
+	// providers whose landing population seats that plane — the population
+	// row owns the plane, and a provider naming a population the table does
+	// not hold stays unlisted rather than guessed at: a login that can only
+	// mint a session the plane guard would refuse is not an entry point.
 	out := make([]*systempb.LoginProvider, 0)
-	if uc.auth != nil {
-		for _, row := range uc.auth.GetProviders() {
-			if !row.GetEnabled() {
-				continue
+	if uc.auth == nil {
+		return out, nil
+	}
+	planes := make(map[string]string)
+	for _, row := range uc.auth.GetProviders() {
+		if !row.GetEnabled() {
+			continue
+		}
+		if plane == "" {
+			out = append(out, &systempb.LoginProvider{Key: row.GetKey(), Kind: row.GetKind()})
+			continue
+		}
+		p, ok := planes[row.GetPopulation()]
+		if !ok {
+			pop, err := uc.populationRP.FindByCode(ctx, row.GetPopulation())
+			if err != nil {
+				if errorspb.IsInfraErrorDbNotFound(err) {
+					continue
+				}
+				return nil, err
 			}
+			p = pop.Plane
+			planes[row.GetPopulation()] = p
+		}
+		if p == plane {
 			out = append(out, &systempb.LoginProvider{Key: row.GetKey(), Kind: row.GetKind()})
 		}
 	}
@@ -476,7 +501,7 @@ func (uc *AuthUC) ResetPassword(ctx context.Context, providerKey, state, newPass
 		}
 		return err
 	}
-	if err := shared.PasswordPolicyError(newPassword); err != nil {
+	if err := uc.PasswordPolicyError(newPassword); err != nil {
 		return err
 	}
 	hash, herr := utils.Hash(newPassword)
@@ -487,6 +512,61 @@ func (uc *AuthUC) ResetPassword(ctx context.Context, providerKey, state, newPass
 	// belongs to disable, not to a credential rotation.
 	if _, err = uc.userRP.Update(ctx, []string{"password"}, &user.User{ID: c.UserID, PasswordHash: &hash}); err != nil {
 		return err
+	}
+	return nil
+}
+
+func (uc *AuthUC) ChangePassword(ctx context.Context, oldPassword, newPassword string) error {
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok {
+		return errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("change password requires an authenticated caller"))
+	}
+	u, err := uc.userRP.FindByID(ctx, subject.UserID)
+	if err != nil {
+		if errorspb.IsInfraErrorDbNotFound(err) {
+			return systempb.ErrorSystemUserNotFound("")
+		}
+		return err
+	}
+	if !utils.Verify(oldPassword, *u.PasswordHash) {
+		return systempb.ErrorSystemPasswordMismatch("").WithCause(fmt.Errorf("old password mismatch: user %s", subject.UserID))
+	}
+	if err := uc.PasswordPolicyError(newPassword); err != nil {
+		return err
+	}
+	hash, err := utils.Hash(newPassword)
+	if err != nil {
+		return errorspb.ErrorGeneralErrorInvalidArgument("").WithCause(fmt.Errorf("password rejected: %w", err))
+	}
+	if _, err = uc.userRP.Update(ctx, []string{"password"}, &user.User{ID: subject.UserID, PasswordHash: &hash}); err != nil {
+		return err
+	}
+	// Existing sessions survive a self-service password change: the caller
+	// proved the old password, so this is the same person rotating a
+	// credential, not an account takeover — unlike disable/delete, which do
+	// revoke (their actor is someone else).
+	return nil
+}
+
+func (uc *AuthUC) PasswordPolicyError(candidate string) error {
+	hasLetter, hasDigit := false, false
+	for _, r := range candidate {
+		switch {
+		case ('a' <= r && r <= 'z') || ('A' <= r && r <= 'Z'):
+			hasLetter = true
+		case '0' <= r && r <= '9':
+			hasDigit = true
+		}
+	}
+	// The prototype's own rule enforced server-side: at least six runes
+	// carrying both an ASCII letter and an ASCII digit — one law for every
+	// seam that accepts a freshly chosen password, and the face the shared
+	// PasswordPolicy contract serves for the other modules' birth flows.
+	// The hash-only callers (login rehash, auto-register's closed plane,
+	// the boot seed) stay outside on purpose: none of them carries a
+	// member's fresh choice.
+	if utf8.RuneCountInString(candidate) < 6 || !hasLetter || !hasDigit {
+		return systempb.ErrorSystemPasswordPolicy("")
 	}
 	return nil
 }

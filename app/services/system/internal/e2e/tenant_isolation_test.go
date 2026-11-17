@@ -199,7 +199,7 @@ func TestTenantIsolationLiveE2E(t *testing.T) {
 	// refusals below come from isolation, not broken fixtures.
 	roleUC := rolemod.NewRoleUC(logger, pf, rolemod.NewRoleRP(logger, pf), nil, nil, nil)
 	fileUC := filemod.NewFileUC(logger, pf, filemod.NewFileRP(logger, pf), nil, tenHooks{})
-	userUC := usermod.NewUserUC(logger, pf, usermod.NewUserRP(logger, pf), nil, nil)
+	userUC := usermod.NewUserUC(logger, pf, usermod.NewUserRP(logger, pf), nil, nil, nil)
 	if _, err = roleUC.Get(ctxB, roleB.ID); err != nil {
 		t.Fatalf("positive control role: %v", err)
 	}
@@ -398,7 +398,7 @@ func TestPopulationNarrowingLiveE2E(t *testing.T) {
 		t.Fatalf("backend seat: %v", err)
 	}
 
-	userUC := usermod.NewUserUC(logger, pf, usermod.NewUserRP(logger, pf), nil, nil)
+	userUC := usermod.NewUserUC(logger, pf, usermod.NewUserRP(logger, pf), nil, nil, nil)
 	ids := func(out *usermod.ListOut) map[string]bool {
 		m := map[string]bool{}
 		for _, u := range out.List {

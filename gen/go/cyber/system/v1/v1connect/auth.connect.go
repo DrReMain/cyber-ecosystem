@@ -58,6 +58,9 @@ const (
 	// AuthServiceResetPasswordProcedure is the fully-qualified name of the AuthService's ResetPassword
 	// RPC.
 	AuthServiceResetPasswordProcedure = "/cyber.system.v1.AuthService/ResetPassword"
+	// AuthServiceChangePasswordProcedure is the fully-qualified name of the AuthService's
+	// ChangePassword RPC.
+	AuthServiceChangePasswordProcedure = "/cyber.system.v1.AuthService/ChangePassword"
 	// AuthServiceGetSecurityStatusProcedure is the fully-qualified name of the AuthService's
 	// GetSecurityStatus RPC.
 	AuthServiceGetSecurityStatusProcedure = "/cyber.system.v1.AuthService/GetSecurityStatus"
@@ -82,6 +85,7 @@ type AuthServiceClient interface {
 	BeginBindCredential(context.Context, *connect.Request[v1.BeginBindCredentialRequest]) (*connect.Response[v1.BeginBindCredentialResponse], error)
 	SendBindSmsCode(context.Context, *connect.Request[v1.SendBindSmsCodeRequest]) (*connect.Response[v1.SendBindSmsCodeResponse], error)
 	ResetPassword(context.Context, *connect.Request[v1.ResetPasswordRequest]) (*connect.Response[v1.ResetPasswordResponse], error)
+	ChangePassword(context.Context, *connect.Request[v1.ChangePasswordRequest]) (*connect.Response[v1.ChangePasswordResponse], error)
 	GetSecurityStatus(context.Context, *connect.Request[v1.GetSecurityStatusRequest]) (*connect.Response[v1.GetSecurityStatusResponse], error)
 	Logout(context.Context, *connect.Request[v1.LogoutRequest]) (*connect.Response[v1.LogoutResponse], error)
 	GetCurrentUser(context.Context, *connect.Request[v1.GetCurrentUserRequest]) (*connect.Response[v1.GetCurrentUserResponse], error)
@@ -159,6 +163,12 @@ func NewAuthServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(authServiceMethods.ByName("ResetPassword")),
 			connect.WithClientOptions(opts...),
 		),
+		changePassword: connect.NewClient[v1.ChangePasswordRequest, v1.ChangePasswordResponse](
+			httpClient,
+			baseURL+AuthServiceChangePasswordProcedure,
+			connect.WithSchema(authServiceMethods.ByName("ChangePassword")),
+			connect.WithClientOptions(opts...),
+		),
 		getSecurityStatus: connect.NewClient[v1.GetSecurityStatusRequest, v1.GetSecurityStatusResponse](
 			httpClient,
 			baseURL+AuthServiceGetSecurityStatusProcedure,
@@ -197,6 +207,7 @@ type authServiceClient struct {
 	beginBindCredential *connect.Client[v1.BeginBindCredentialRequest, v1.BeginBindCredentialResponse]
 	sendBindSmsCode     *connect.Client[v1.SendBindSmsCodeRequest, v1.SendBindSmsCodeResponse]
 	resetPassword       *connect.Client[v1.ResetPasswordRequest, v1.ResetPasswordResponse]
+	changePassword      *connect.Client[v1.ChangePasswordRequest, v1.ChangePasswordResponse]
 	getSecurityStatus   *connect.Client[v1.GetSecurityStatusRequest, v1.GetSecurityStatusResponse]
 	logout              *connect.Client[v1.LogoutRequest, v1.LogoutResponse]
 	getCurrentUser      *connect.Client[v1.GetCurrentUserRequest, v1.GetCurrentUserResponse]
@@ -248,6 +259,11 @@ func (c *authServiceClient) ResetPassword(ctx context.Context, req *connect.Requ
 	return c.resetPassword.CallUnary(ctx, req)
 }
 
+// ChangePassword calls cyber.system.v1.AuthService.ChangePassword.
+func (c *authServiceClient) ChangePassword(ctx context.Context, req *connect.Request[v1.ChangePasswordRequest]) (*connect.Response[v1.ChangePasswordResponse], error) {
+	return c.changePassword.CallUnary(ctx, req)
+}
+
 // GetSecurityStatus calls cyber.system.v1.AuthService.GetSecurityStatus.
 func (c *authServiceClient) GetSecurityStatus(ctx context.Context, req *connect.Request[v1.GetSecurityStatusRequest]) (*connect.Response[v1.GetSecurityStatusResponse], error) {
 	return c.getSecurityStatus.CallUnary(ctx, req)
@@ -279,6 +295,7 @@ type AuthServiceHandler interface {
 	BeginBindCredential(context.Context, *connect.Request[v1.BeginBindCredentialRequest]) (*connect.Response[v1.BeginBindCredentialResponse], error)
 	SendBindSmsCode(context.Context, *connect.Request[v1.SendBindSmsCodeRequest]) (*connect.Response[v1.SendBindSmsCodeResponse], error)
 	ResetPassword(context.Context, *connect.Request[v1.ResetPasswordRequest]) (*connect.Response[v1.ResetPasswordResponse], error)
+	ChangePassword(context.Context, *connect.Request[v1.ChangePasswordRequest]) (*connect.Response[v1.ChangePasswordResponse], error)
 	GetSecurityStatus(context.Context, *connect.Request[v1.GetSecurityStatusRequest]) (*connect.Response[v1.GetSecurityStatusResponse], error)
 	Logout(context.Context, *connect.Request[v1.LogoutRequest]) (*connect.Response[v1.LogoutResponse], error)
 	GetCurrentUser(context.Context, *connect.Request[v1.GetCurrentUserRequest]) (*connect.Response[v1.GetCurrentUserResponse], error)
@@ -352,6 +369,12 @@ func NewAuthServiceHandler(svc AuthServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(authServiceMethods.ByName("ResetPassword")),
 		connect.WithHandlerOptions(opts...),
 	)
+	authServiceChangePasswordHandler := connect.NewUnaryHandler(
+		AuthServiceChangePasswordProcedure,
+		svc.ChangePassword,
+		connect.WithSchema(authServiceMethods.ByName("ChangePassword")),
+		connect.WithHandlerOptions(opts...),
+	)
 	authServiceGetSecurityStatusHandler := connect.NewUnaryHandler(
 		AuthServiceGetSecurityStatusProcedure,
 		svc.GetSecurityStatus,
@@ -396,6 +419,8 @@ func NewAuthServiceHandler(svc AuthServiceHandler, opts ...connect.HandlerOption
 			authServiceSendBindSmsCodeHandler.ServeHTTP(w, r)
 		case AuthServiceResetPasswordProcedure:
 			authServiceResetPasswordHandler.ServeHTTP(w, r)
+		case AuthServiceChangePasswordProcedure:
+			authServiceChangePasswordHandler.ServeHTTP(w, r)
 		case AuthServiceGetSecurityStatusProcedure:
 			authServiceGetSecurityStatusHandler.ServeHTTP(w, r)
 		case AuthServiceLogoutProcedure:
@@ -447,6 +472,10 @@ func (UnimplementedAuthServiceHandler) SendBindSmsCode(context.Context, *connect
 
 func (UnimplementedAuthServiceHandler) ResetPassword(context.Context, *connect.Request[v1.ResetPasswordRequest]) (*connect.Response[v1.ResetPasswordResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.AuthService.ResetPassword is not implemented"))
+}
+
+func (UnimplementedAuthServiceHandler) ChangePassword(context.Context, *connect.Request[v1.ChangePasswordRequest]) (*connect.Response[v1.ChangePasswordResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("cyber.system.v1.AuthService.ChangePassword is not implemented"))
 }
 
 func (UnimplementedAuthServiceHandler) GetSecurityStatus(context.Context, *connect.Request[v1.GetSecurityStatusRequest]) (*connect.Response[v1.GetSecurityStatusResponse], error) {

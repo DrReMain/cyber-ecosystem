@@ -4,7 +4,7 @@ import type { SubmitEvent } from "react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { systemReason } from "#/domains/error";
-import { ForgotPassword, LoginForm, LoginShell, SsoLogin } from "#/features/login-default";
+import { ForgotPassword, LoginForm, LoginShell } from "#/features/login-default";
 import { m } from "#/paraglide/messages";
 import { LOGIN_PATH, LOGIN_ROUTE_ID } from "../area";
 import { usePasswordLogin } from "./use-password-login";
@@ -85,7 +85,6 @@ export function LoginPage() {
         pending={login.isPending}
       />
       <ForgotPassword />
-      <SsoLogin />
     </LoginShell>
   );
 }

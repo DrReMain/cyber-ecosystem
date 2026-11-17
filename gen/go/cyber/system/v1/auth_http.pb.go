@@ -20,6 +20,7 @@ const _ = http.SupportPackageIsVersion3
 const OperationAuthServiceBeginBindCredential = "/cyber.system.v1.AuthService/BeginBindCredential"
 const OperationAuthServiceBeginIdentityLogin = "/cyber.system.v1.AuthService/BeginIdentityLogin"
 const OperationAuthServiceBindCredential = "/cyber.system.v1.AuthService/BindCredential"
+const OperationAuthServiceChangePassword = "/cyber.system.v1.AuthService/ChangePassword"
 const OperationAuthServiceGetCurrentUser = "/cyber.system.v1.AuthService/GetCurrentUser"
 const OperationAuthServiceGetLoginConfig = "/cyber.system.v1.AuthService/GetLoginConfig"
 const OperationAuthServiceGetSecurityStatus = "/cyber.system.v1.AuthService/GetSecurityStatus"
@@ -35,6 +36,7 @@ type AuthServiceHTTPServer interface {
 	BeginBindCredential(context.Context, *BeginBindCredentialRequest) (*BeginBindCredentialResponse, error)
 	BeginIdentityLogin(context.Context, *BeginIdentityLoginRequest) (*BeginIdentityLoginResponse, error)
 	BindCredential(context.Context, *BindCredentialRequest) (*BindCredentialResponse, error)
+	ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordResponse, error)
 	GetCurrentUser(context.Context, *GetCurrentUserRequest) (*GetCurrentUserResponse, error)
 	GetLoginConfig(context.Context, *GetLoginConfigRequest) (*GetLoginConfigResponse, error)
 	GetSecurityStatus(context.Context, *GetSecurityStatusRequest) (*GetSecurityStatusResponse, error)
@@ -64,6 +66,7 @@ func RegisterAuthServiceHTTPServer(s *http.Server, srv AuthServiceHTTPServer) {
 	r.Handle("POST", "/api/v1/system/auth/begin-bind-credential", _AuthService_BeginBindCredential0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/system/auth/send-bind-sms-code", _AuthService_SendBindSmsCode0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/system/auth/reset-password", _AuthService_ResetPassword0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/system/me/password", _AuthService_ChangePassword0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/system/me/security", _AuthService_GetSecurityStatus0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/system/auth/logout", _AuthService_Logout0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/system/me", _AuthService_GetCurrentUser0_HTTP_Handler(srv))
@@ -241,6 +244,25 @@ func _AuthService_ResetPassword0_HTTP_Handler(srv AuthServiceHTTPServer) func(ct
 	}
 }
 
+func _AuthService_ChangePassword0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ChangePasswordRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuthServiceChangePassword)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ChangePassword(ctx, req.(*ChangePasswordRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ChangePasswordResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _AuthService_GetSecurityStatus0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in GetSecurityStatusRequest
@@ -321,6 +343,7 @@ type AuthServiceHTTPClient interface {
 	BeginBindCredential(ctx context.Context, req *BeginBindCredentialRequest, opts ...http.CallOption) (rsp *BeginBindCredentialResponse, err error)
 	BeginIdentityLogin(ctx context.Context, req *BeginIdentityLoginRequest, opts ...http.CallOption) (rsp *BeginIdentityLoginResponse, err error)
 	BindCredential(ctx context.Context, req *BindCredentialRequest, opts ...http.CallOption) (rsp *BindCredentialResponse, err error)
+	ChangePassword(ctx context.Context, req *ChangePasswordRequest, opts ...http.CallOption) (rsp *ChangePasswordResponse, err error)
 	GetCurrentUser(ctx context.Context, req *GetCurrentUserRequest, opts ...http.CallOption) (rsp *GetCurrentUserResponse, err error)
 	GetLoginConfig(ctx context.Context, req *GetLoginConfigRequest, opts ...http.CallOption) (rsp *GetLoginConfigResponse, err error)
 	GetSecurityStatus(ctx context.Context, req *GetSecurityStatusRequest, opts ...http.CallOption) (rsp *GetSecurityStatusResponse, err error)
@@ -389,6 +412,23 @@ func (c *AuthServiceHTTPClientImpl) BindCredential(ctx context.Context, in *Bind
 		http.Accept("application/protojson"),
 		http.ContentType("application/protojson"),
 		http.Operation(OperationAuthServiceBindCredential),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AuthServiceHTTPClientImpl) ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...http.CallOption) (*ChangePasswordResponse, error) {
+	var out ChangePasswordResponse
+	pattern := "/api/v1/system/me/password"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationAuthServiceChangePassword),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)

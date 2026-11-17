@@ -11,7 +11,5 @@
   "login_default_label_password": "パスワード",
   "login_default_forgot": "パスワードをお忘れですか？",
   "login_default_submit": "コンソールへ進む",
-  "login_default_divider_or": "または",
-  "login_default_sso": "SSOでログイン",
   "login_default_session_expired": "セッションの有効期限が切れました。再度ログインしてください"
 }

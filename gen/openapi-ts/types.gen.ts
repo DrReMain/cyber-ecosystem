@@ -1979,7 +1979,15 @@ export type AuthServiceLoginByIdentityResponse = AuthServiceLoginByIdentityRespo
 export type AuthServiceGetLoginConfigData = {
     body?: never;
     path?: never;
-    query?: never;
+    query?: {
+        /**
+         * The asking page's plane (backend/member): the answer keeps only
+         * providers whose landing population seats that plane — a page never
+         * renders a login that can only mint a session its plane guard would
+         * refuse. Absent = the unfiltered overview.
+         */
+        plane?: string;
+    };
     url: '/api/v1/system/auth/login-config';
 };
 
@@ -2464,21 +2472,21 @@ export type IntrospectServiceCheckOperationResponses = {
 
 export type IntrospectServiceCheckOperationResponse = IntrospectServiceCheckOperationResponses[keyof IntrospectServiceCheckOperationResponses];
 
-export type UserServiceChangePasswordData = {
+export type AuthServiceChangePasswordData = {
     body: CyberSystemV1ChangePasswordRequest;
     path?: never;
     query?: never;
     url: '/api/v1/system/me/password';
 };
 
-export type UserServiceChangePasswordResponses = {
+export type AuthServiceChangePasswordResponses = {
     /**
      * OK
      */
     200: CyberSystemV1ChangePasswordResponse;
 };
 
-export type UserServiceChangePasswordResponse = UserServiceChangePasswordResponses[keyof UserServiceChangePasswordResponses];
+export type AuthServiceChangePasswordResponse = AuthServiceChangePasswordResponses[keyof AuthServiceChangePasswordResponses];
 
 export type AuthServiceGetSecurityStatusData = {
     body?: never;

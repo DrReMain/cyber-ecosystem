@@ -1,5 +1,5 @@
 import { useMutation } from "@connectrpc/connect-query";
-import { changePassword } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/user-UserService_connectquery";
+import { changePassword } from "@cyber-ecosystem/gen-connect-ts/cyber/system/v1/auth-AuthService_connectquery";
 import { Button, Card, Form, Input } from "antd";
 import { toast } from "sonner";
 import { m } from "#/paraglide/messages";

@@ -90,7 +90,7 @@ func (s *AuthService) SendSmsCode(ctx context.Context, in *systempb.SendSmsCodeR
 }
 
 func (s *AuthService) GetLoginConfig(ctx context.Context, in *systempb.GetLoginConfigRequest) (*systempb.GetLoginConfigResponse, error) {
-	providers, err := s.authUC.LoginConfig(ctx)
+	providers, err := s.authUC.LoginConfig(ctx, in.GetPlane())
 	if err != nil {
 		return nil, err
 	}
@@ -129,6 +129,13 @@ func (s *AuthService) ResetPassword(ctx context.Context, in *systempb.ResetPassw
 		return nil, err
 	}
 	return &systempb.ResetPasswordResponse{}, nil
+}
+
+func (s *AuthService) ChangePassword(ctx context.Context, in *systempb.ChangePasswordRequest) (*systempb.ChangePasswordResponse, error) {
+	if err := s.authUC.ChangePassword(ctx, *in.OldPassword, *in.NewPassword); err != nil {
+		return nil, err
+	}
+	return &systempb.ChangePasswordResponse{}, nil
 }
 
 func (s *AuthService) GetSecurityStatus(ctx context.Context, in *systempb.GetSecurityStatusRequest) (*systempb.GetSecurityStatusResponse, error) {

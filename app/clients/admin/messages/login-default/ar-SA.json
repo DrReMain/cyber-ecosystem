@@ -11,7 +11,5 @@
   "login_default_label_password": "كلمة المرور",
   "login_default_forgot": "نسيت كلمة المرور؟",
   "login_default_submit": "الدخول إلى وحدة التحكم",
-  "login_default_divider_or": "أو",
-  "login_default_sso": "تسجيل الدخول عبر SSO",
   "login_default_session_expired": "انتهت صلاحية تسجيل الدخول، يرجى تسجيل الدخول مرة أخرى"
 }

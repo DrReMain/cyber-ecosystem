@@ -11,7 +11,5 @@
   "login_default_label_password": "Password",
   "login_default_forgot": "Forgot password?",
   "login_default_submit": "Enter console",
-  "login_default_divider_or": "or",
-  "login_default_sso": "Sign in with SSO",
   "login_default_session_expired": "Your session has expired, please sign in again"
 }

@@ -568,6 +568,16 @@ paths:
             tags:
                 - AuthService
             operationId: AuthService_GetLoginConfig
+            parameters:
+                - name: plane
+                  in: query
+                  description: |-
+                    The asking page's plane (backend/member): the answer keeps only
+                     providers whose landing population seats that plane — a page never
+                     renders a login that can only mint a session its plane guard would
+                     refuse. Absent = the unfiltered overview.
+                  schema:
+                    type: string
             responses:
                 "200":
                     description: OK
@@ -1140,8 +1150,8 @@ paths:
     /api/v1/system/me/password:
         post:
             tags:
-                - UserService
-            operationId: UserService_ChangePassword
+                - AuthService
+            operationId: AuthService_ChangePassword
             requestBody:
                 content:
                     application/json:
