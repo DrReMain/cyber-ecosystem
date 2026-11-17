@@ -6,6 +6,7 @@ import (
 	krauth "cyber-ecosystem/shared-go/kratos/security/auth"
 )
 
+// risk: irreversible
 var ProviderSet = wire.NewSet(
 	NewAuthUC,
 	NewTokenRP,

@@ -16,7 +16,7 @@ import (
 
 var (
 	guardDividerRE   = regexp.MustCompile(`^// [A-Za-z][A-Za-z0-9 /]* -{8,}\s*$`)
-	guardDirectiveRE = regexp.MustCompile(`^//[a-z]+:`)
+	guardDirectiveRE = regexp.MustCompile(`^// ?[a-z]+:`)
 	guardDeclRE      = regexp.MustCompile(`^(type|func|const|var)\b`)
 	guardKratosCode  = regexp.MustCompile(`errors\.Is(NotFound|InvalidArgument|Unauthorized|Forbidden|Conflict|BadRequest|InternalServerError|FailedPrecondition)\(`)
 	guardJSON        = regexp.MustCompile(`json\.(Marshal|Unmarshal|NewEncoder|NewDecoder)\(`)

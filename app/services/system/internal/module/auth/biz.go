@@ -90,6 +90,7 @@ type AuthUC struct {
 	tenantRP     tenant.TenantRP
 	populationRP population.PopulationRP
 	tokenRP      TokenRP
+	clock        func() time.Time // injected time source — session expiry and minting are test-deterministic
 }
 
 func NewAuthUC(logger *slog.Logger, tm shared.Transaction, auth *conf.Auth, providers map[string]IdentityProvider, userRP user.UserRP, authzRP authz.AuthzRP, tenantRP tenant.TenantRP, populationRP population.PopulationRP, tokenRP TokenRP) (*AuthUC, error) {
@@ -120,6 +121,7 @@ func NewAuthUC(logger *slog.Logger, tm shared.Transaction, auth *conf.Auth, prov
 		tenantRP:     tenantRP,
 		populationRP: populationRP,
 		tokenRP:      tokenRP,
+		clock:        time.Now,
 	}, nil
 }
 
@@ -536,7 +538,7 @@ func (uc *AuthUC) AuthenticateSession(ctx context.Context, token string) (*secur
 	if err != nil {
 		return nil, err
 	}
-	if time.Now().After(sess.ExpiresAt) {
+	if uc.clock().After(sess.ExpiresAt) {
 		if err := uc.tokenRP.Del(ctx, sessionPrefix+token); err != nil {
 			return nil, err
 		}
@@ -855,7 +857,7 @@ func (uc *AuthUC) mintSession(ctx context.Context, u *user.User, seat *user.Seat
 	if err != nil {
 		return "", time.Time{}, time.Time{}, err
 	}
-	issuedAt = time.Now()
+	issuedAt = uc.clock()
 	expiresAt = issuedAt.Add(shared.SessionMax)
 	// A failed stamp read mints -1 — a version no bump produces — so the
 	// session simply verifies deep until its first write-back.

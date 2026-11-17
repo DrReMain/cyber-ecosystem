@@ -1947,3 +1947,33 @@ func TestImportAccountsTxFailureStopsBatch(t *testing.T) {
 		t.Fatalf("seats: %d", len(u.seats))
 	}
 }
+
+// The absolute cap reads the injected clock (risk: irreversible — the
+// module's time is test-deterministic): an expired session dies and its key
+// goes with it — unlike the tenant gate, expiry is terminal — while the
+// boundary instant itself still passes (After is strict) and a live session
+// rides on to the deeper gates.
+func TestAuthenticateSessionAbsoluteCap(t *testing.T) {
+	rp := newTokenStore()
+	frozen := time.Now()
+	uc := newAuthUCTenant(&fakeUserRP{row: seedRow(t, "a@x.co", "right")}, &fakeAuthzRP{}, rp, &fakeTenantRP{row: &tenant.Tenant{Code: "t1", Enabled: true}})
+	uc.clock = func() time.Time { return frozen }
+
+	expired := mintSession(t, rp, &Session{UserID: "u1", TenantID: "t1", Account: "a@x.co", IssuedAt: frozen.Add(-2 * time.Hour), ExpiresAt: frozen.Add(-time.Hour)})
+	if _, err := uc.AuthenticateSession(context.Background(), expired); !errorspb.IsGeneralErrorUnauthenticated(err) {
+		t.Fatalf("expired session: want unauthenticated, got %v", err)
+	}
+	if _, ok := rp.vals[sessionPrefix+expired]; ok {
+		t.Fatal("expired session: the key must die with it — expiry is terminal, unlike the tenant gate")
+	}
+
+	boundary := mintSession(t, rp, &Session{UserID: "u1", TenantID: "t1", Account: "a@x.co", IssuedAt: frozen.Add(-time.Minute), ExpiresAt: frozen})
+	if _, err := uc.AuthenticateSession(context.Background(), boundary); err != nil {
+		t.Fatalf("boundary instant (ExpiresAt == now): After is strict, must live on, got %v", err)
+	}
+
+	live := mintSession(t, rp, &Session{UserID: "u1", TenantID: "t1", Account: "a@x.co", IssuedAt: frozen, ExpiresAt: frozen.Add(time.Hour)})
+	if _, err := uc.AuthenticateSession(context.Background(), live); err != nil {
+		t.Fatalf("live session: must pass, got %v", err)
+	}
+}

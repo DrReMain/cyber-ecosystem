@@ -149,15 +149,11 @@ constant table — the key set has no second source.
 
 **Tab identity (dashboard chrome).**
 
-- A route owns a tabbar tab iff its `staticData` declares a `title`; title-less routes render inside the nearest titled ancestor's tab (the profile group pattern). A detail page joins its list's tab by nesting under the titled route as a `menu.hide` child with no `title` of its own (its `head` carries the page title); the titled route is then a layout whose own page lives in `index.tsx` — and a menu-bearing layout whose children are all deliberately hidden stays a leaf nav entry (children dropped for grants still prune it — hide-by-default holds).
-- `key` = resolved pathname (search excluded; one tab per param-route instance, e.g. each `/order/$id` id); `href` = full href including search; `pattern` = route `fullPath`, kept for permission-filtered restore.
-- Activation, close, and href capture compare the **exact key** from `tabFromMatches` — path-prefix ownership is forbidden.
+- A route owns a tabbar tab iff its `staticData` declares a `title`; title-less routes render inside the nearest titled ancestor's tab (the profile group pattern). A detail page joins its list's tab by nesting under the titled route as a `menu.hide` child with no `title` of its own (`head` carries the page title); the titled route is then a layout whose own page lives in `index.tsx` — a menu-bearing layout whose children are all deliberately hidden stays a leaf nav entry (children dropped for grants still prune it — hide-by-default holds).
+- `key` = resolved pathname (search excluded; one tab per param-route instance, e.g. each `/order/$id` id); `href` = full href including search; `pattern` = route `fullPath`, kept for permission-filtered restore. Activation, close, and href capture compare the **exact key** from `tabFromMatches` — path-prefix ownership is forbidden.
 - Router `location` and `matches` lag each other by one commit during navigations; every matches-derived tab decision gates behind `matchesAgreeWith(matches, pathname)` — torn frames can neither capture a foreign href nor re-append a just-closed tab.
-- Session restore resolves `pattern` against the permission-filtered nav index; hidden routes (`menu.hide`) restore via their persisted title; a pattern present in the unfiltered index is a permission-dropped visible route and stays closed.
-- The active tab seeds through the same pattern rule — a direct URL load lands in the bar even with no persisted record; the restore effect rebuilds membership after the append effect's mount run and must not drop it.
-- The home tab is seeded only when a titled leaf exists at the area root — apps without a workbench start with an empty bar.
-- Default post-login landing is `defaultLanding(permissions)` — the first permission-surviving leaf, never a hardcoded area root.
-- Parameterized titles interpolate `match.params` (`compactParams`, `text(key, params)`).
+- Session restore resolves `pattern` against the permission-filtered nav index; hidden routes (`menu.hide`) restore via their persisted title; a pattern present only in the unfiltered index is a permission-dropped visible route and stays closed. The active tab seeds through the same pattern rule — a direct URL load lands in the bar even with no persisted record; the restore effect rebuilds membership after the append effect's mount run and must not drop it.
+- The home tab is seeded only when a titled leaf exists at the area root — apps without a workbench start with an empty bar. Default post-login landing is `defaultLanding(permissions)` — the first permission-surviving leaf, never a hardcoded area root. Parameterized titles interpolate `match.params` (`compactParams`, `text(key, params)`).
 
 ### First-paint data (SSR)
 
@@ -376,35 +372,10 @@ call `view(error)` internally and branch only on `silent`; catchers pass
 
 UI surfaces split by scale:
 
-- **Base full page** (`features/app/error/error-page`): the brand-screen sibling
-  of NotFoundPage — same deep-space canvas, rose reserved as the error
-  semantics' only seat. The hero numeral is the envelope's wire `http`
-  (kind-profile default when local); silent words render a quiet page
-  without error chrome. Wired only at `__root`'s `errorComponent`.
-- **Base embedded** (`features/app/error/error-fallback`): single-scale,
-  zero-skin — one row (badge + title + optional retry link) on the
-  currentColor ladder, zero motion; pairs with `pending-fallback` as the
-  uncertainty pair (halted/live halves), style-neutral so any area can
-  host them. Silent words collapse to a neutral inline state. Recovery is
-  the catcher's business: `onRetry` is injected by the wiring layer,
-  never defaulted. Height: the pair fills its mount slot — `size-full`
-  where the host height is definite, `grow` where it is a flex column;
-  slots that center them supply one of the two (the content-area
-  watermark wrapper is a flex column, the root slot a min-h-svh rail).
-- **Base component-level** (`features/app/error/base-error-boundary`):
-  react-error-boundary with `resetKeys=[leafRouteId]` — TanStack Router
-  swaps outlet children without remounting the boundary, so without a
-  route-scoped reset key a rendered fallback sticks across navigation.
-  Component boundaries also shield downstream route `errorComponent`s:
-  child loader errors without their own errorComponent rethrow through
-  the outlet and land on the nearest boundary, not the route error page.
-- **Area level** (inside the layout): areas own no error UI of their own.
-  Route-level catchers mount the base `error-fallback` directly;
-  component boundaries mount `base-error-boundary` directly. A layout
-  route's `errorComponent` renders in place of the whole layout (no
-  provider, no chrome) — the style-neutral fallbacks survive that bare
-  context by design, which is one reason area-dialect error faces stay
-  out.
+- **Base full page** (`features/app/error/error-page`): the brand-screen sibling of NotFoundPage — same deep-space canvas, rose reserved as the error semantics' only seat. Hero numeral = the envelope's wire `http`; silent words render a quiet page without error chrome. Wired only at `__root`'s `errorComponent`.
+- **Base embedded** (`features/app/error/error-fallback`): single-scale, zero-skin — one row (badge + title + optional retry link) on the currentColor ladder, zero motion; pairs with `pending-fallback` as the uncertainty pair (halted/live halves), style-neutral so any area can host them. Silent words collapse to a neutral inline state. Recovery is the catcher's business: `onRetry` injected by the wiring layer, never defaulted. Height: the pair fills its mount slot — `size-full` where host height is definite, `grow` where it is a flex column; centering slots supply one of the two.
+- **Base component-level** (`features/app/error/base-error-boundary`): react-error-boundary with `resetKeys=[leafRouteId]` — the router swaps outlet children without remounting the boundary, so without a route-scoped reset key a rendered fallback sticks across navigation. Component boundaries also shield downstream route `errorComponent`s: child loader errors without their own errorComponent rethrow through the outlet to the nearest boundary.
+- **Area level**: areas own no error UI of their own — route catchers mount the base `error-fallback`, component boundaries mount `base-error-boundary`. A layout route's `errorComponent` renders in place of the whole layout (no provider, no chrome) — the style-neutral fallbacks survive that bare context by design.
 
 Verified behavior (pinned laws, not observations):
 
@@ -455,6 +426,8 @@ stale-green risk lives one level up, in the Nx task cache — hence
 
 **Testability is a component-design constraint.** A component's logic runs through props and injected interfaces (a page injects its store interface, never an ambient singleton) — what jsdom cannot fake is a layering leak, not a fixture problem.
 
+**Spec first — the web face of kratos §7.** A slice's logic face — the flat module-root `.ts` files (§5: search schemas, row types/builders, domain models) — is written test-first: the vitest table beside the file lands before the module body fills in, one row per planned behavior plus the client's counterexample rows (empty state, zero-valued row fields, a 404-shaped error envelope). UI components stay design-for-test; their proof is the browser loop. The table never aligns to the code — changing a case is a review ruling, never a local edit to make a test pass. A failing `fc.assert` run reports its seed — replay it verbatim before touching anything.
+
 **Tests have two homes** (the web face of kratos §7): unit tests run in
 vitest, colocated as `<file>.test.ts(x)` beside their source — jsdom carries
 the cookie jar and DOM seams, `@testing-library` drives rendered components,
@@ -494,11 +467,12 @@ MutationObserver for one-shot notices), never with after-the-fact polling.
 Auth-only surfaces (tabbar interactions, chrome) carry an explicit
 user-verification list in the change report instead.
 
-**Close.** Surface-facing changes close with a browser loop — responsive
+**Close.** A change is done when three faces agree: chain green, spec green,
+browser loop. Surface-facing changes close with the loop — responsive
 viewports, zero console errors; without a browser-automation tool connected,
 a manual developer walkthrough is the degraded form, declared as such. The
 report declares what ran and what was observed, with evidence
-("proven by: chain green; browser loop clean at 2 viewports, zero console errors").
+("proven by: chain green; spec green N/N table cases; browser loop clean at 2 viewports, zero console errors").
 Absorbing a reviewed slice adds the mechanical checks: deleted tokens/keys
 grepped for remaining consumers, new utility classes traced to their token
 source, the integration diff equal to the absorbed slice's file set.

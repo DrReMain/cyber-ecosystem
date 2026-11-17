@@ -1,3 +1,4 @@
+import fc from "fast-check";
 import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 import { readCookie, writeCookie } from "./index";
@@ -59,5 +60,42 @@ describe("writeCookie", () => {
     expect(written).toContain("max-age=31536000");
     expect(written).toContain("samesite=lax");
     spy.mockRestore();
+  });
+});
+
+// The writable domain is every JSON value except objects carrying a
+// `__proto__` own key: superjson refuses those at serialization time (its
+// prototype-pollution guard throws), so the jar cannot carry them and the
+// identity is promised on the rest.
+const hasProtoKey = (v: unknown): boolean => {
+  if (Array.isArray(v)) return v.some(hasProtoKey);
+  if (v && typeof v === "object")
+    return Object.entries(v).some(([k, x]) => k === "__proto__" || hasProtoKey(x));
+  return false;
+};
+
+// Property face (fc): the round-trip is an identity for every JSON value the
+// jar can carry — the example above pins the shape once, this pins it for
+// the whole domain; and every failure input answers the fallback, never a
+// throw, never a partial parse.
+describe("cookie properties", () => {
+  it("write→read is the identity for any JSON value", () => {
+    fc.assert(
+      fc.property(
+        fc.jsonValue().filter((v) => !hasProtoKey(v)),
+        (value) => {
+          writeCookie("prop", value);
+          expect(readCookie(rawOf("prop"), undefined, null)).toEqual(value);
+        },
+      ),
+    );
+  });
+
+  it("never throws on any raw input", () => {
+    fc.assert(
+      fc.property(fc.string(), (raw) => {
+        expect(() => readCookie(raw, undefined, { safe: true })).not.toThrow();
+      }),
+    );
   });
 });

@@ -1,5 +1,6 @@
 /// <reference types="vitest/config" />
 
+import { reactDevToolsMcp } from "@cyber-ecosystem/shared-devtools-mcp";
 import { paraglideVitePlugin } from "@inlang/paraglide-js";
 import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
@@ -41,6 +42,7 @@ const config = defineConfig(({ mode }) => {
       },
     },
     plugins: [
+      reactDevToolsMcp(),
       devtools({ consolePiping: { enabled: false } }),
       paraglideVitePlugin({
         project: "./project.inlang",
