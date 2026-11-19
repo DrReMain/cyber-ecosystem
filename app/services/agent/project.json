@@ -54,7 +54,7 @@
         "cwd": "{projectRoot}",
         "command": "go tool kratos run",
         "env": {
-          "APP_AGENT_MASTER_KEY": "agent-dev-master-key"
+          "AGENT_MASTER_KEY": "agent-dev-master-key"
         }
       }
     },

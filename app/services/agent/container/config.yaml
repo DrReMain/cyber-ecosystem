@@ -1,6 +1,6 @@
 # Container config (baked by the Dockerfile; configs/config.yaml holds the
 # dev shape). Key set and order mirror the dev file; defaults point at the
-# compose network aliases. Overrides come ONLY from APP_-prefixed env vars.
+# compose network aliases.
 server:
   http: {addr: 0.0.0.0:11002, timeout: 1s}
   grpc: {addr: 0.0.0.0:12002, timeout: 1s}
@@ -34,5 +34,5 @@ remote:
 crypto:
   # Empty default: the boot guard rejects an unset key, so a bare docker run
   # without the env fails loudly instead of encrypting with a known key; the
-  # app compose injects the dev key through APP_AGENT_MASTER_KEY.
+  # app compose injects the dev key through AGENT_MASTER_KEY.
   master_key: ${AGENT_MASTER_KEY:}

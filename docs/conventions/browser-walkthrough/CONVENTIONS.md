@@ -8,7 +8,7 @@
 > Close — the finishing pass over surfaces already chain-green and
 > spec-green. Playwright e2e law lives in the stack CONVENTIONS; this doc
 > stays tool-craft. Business-neutral by ruling: phenomena, mechanisms,
-> prescriptions, dates — business detail belongs to the owning campaign's
+> prescriptions — business detail belongs to the owning campaign's
 > ledger, never here.
 
 ## Read map
@@ -51,7 +51,7 @@ caught, in this form.
   ignore synthetic events entirely. The honest fallback is the natural
   timeout as the recorded evidence — and where an attempt consumes
   server-side budget (a quota, a scored run), the burned attempt is a
-  fact to report, not a silent retry. (2026-11-09)
+  fact to report, not a silent retry.
 
 ## 2) Transient observation
 
@@ -66,7 +66,7 @@ caught, in this form.
 
 - **Page titles and tab lists lag reality.** The automation UI's page
   inventory updates late — never gate a judgment on what the tab is
-  called; gate on the page's own DOM. (2026-11-09)
+  called; gate on the page's own DOM.
 - **A hidden tab renders stale or blank frames.** Background tabs get
   throttled painting — bring the tab to front and let a frame settle
   before treating its pixels or screenshot as evidence.
@@ -83,7 +83,6 @@ caught, in this form.
   `Accept-Language` loses to a persisted locale cookie, and that cookie
   survives across walkthrough sessions — set it explicitly before judging
   any locale-sensitive face, or yesterday's locale answers for today.
-  (2026-11-09)
 - **Multi-plane session cookies are plane-keyed.** An app with more than
   one session plane reads a distinct cookie slot per plane — installing
   one plane's cookie and expecting another plane's face to authenticate
@@ -94,7 +93,7 @@ caught, in this form.
 - **Evidence screenshots: front-most tab, after paint.** Bring the tab
   forward, let the frame settle (a `requestAnimationFrame` or a visible
   settle wait), then capture — a capture from a throttled background tab
-  is a phantom. (2026-11-06)
+  is a phantom.
 - **Blob URLs die with their page.** A screenshot or copy that references
   a blob URL rots the moment the page navigates — fetch the bytes and
   copy them out; never link what the page owns.
@@ -115,7 +114,7 @@ caught, in this form.
   server's task output for its ready line before walking.
 - **Stale optimized deps poison the page.** After a dependency change,
   the dev server may serve a stale pre-bundled cache — hard-reload, or
-  clear the cache, before blaming the app for missing exports. (2026-11-06)
+  clear the cache, before blaming the app for missing exports.
 - **Environment spoofing is a walkthrough dial.** Branch-by-environment
   faces (a browser-sniffed flow) are exercised by spoofing the signal at
   the context level — the UA at context creation, the cookie before
@@ -126,7 +125,7 @@ caught, in this form.
 - **Check the error vocabulary before diagnosing the face.** A wrong-looking
   toast word is more often the error domain's own table than a rendering
   bug — read the vocabulary the word comes from first; six misdiagnosis
-  rounds were once spent skipping this. (2026-11-06)
+  rounds were once spent skipping this.
 - **React inspection tools are discovered per page load.** If the
   inspection session attached after the load, reload once before calling
   the wiring broken; find the component uid first and inspect one —
@@ -135,4 +134,4 @@ caught, in this form.
 - **Framework state replays from its own serializer.** The router's
   in-page state object can be serialized and re-injected for precise
   re-entry into a navigation bug — cheaper than reconstructing the click
-  path by hand. (2026-11-06)
+  path by hand.

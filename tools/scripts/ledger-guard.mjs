@@ -1,6 +1,6 @@
 // ledger-guard — docs/roadmap/ holds working ledgers; they never enter the
 // repository on the skeleton lanes. Business lanes carry their own committed
-// ledgers (the frozen esports lanes' docs/roadmap/esports/** is precedent).
+// ledgers.
 import { execSync } from "node:child_process";
 import { stagedFiles } from "./lib.mjs";
 

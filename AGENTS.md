@@ -1,6 +1,6 @@
 # Cyber Ecosystem
 
-Monorepo for the Cyber Ecosystem platform — a **generic development skeleton**: one shared base, business apps fork and grow on top. Protobuf contracts (`proto/`) are the source of truth; `gen/` is derived output, never hand-edited.
+Monorepo for the Cyber Ecosystem platform — a **generic development skeleton**: one shared base, business apps grow on top. Protobuf contracts (`proto/`) are the source of truth; `gen/` is derived output, never hand-edited.
 
 | Path | Holds |
 |---|---|
@@ -23,7 +23,7 @@ Monorepo for the Cyber Ecosystem platform — a **generic development skeleton**
 ## Working contract
 
 - **Read before write.** Each convention opens with a read map: the artifact you are about to touch names the sections that are its law. Read those sections — the text itself, not your memory of it.
-- **Structural actions verify first.** Branch, commit, mirror, delete: check the standing law (branch discipline, face separation) before acting, not after.
+- **Structural actions verify first.** Branch, commit, mirror, delete: check the standing law before acting, not after.
 - **Gaps are questions.** Where no law speaks, or the call is an author's rather than a mechanic's, stop and ask. A choice you cannot trace to a law line is a question, not a decision.
 - **Decisions carry a checkable source.** A decision that shapes user-visible behavior names where it comes from — a ruling id, a spec line, a prototype frame, a legacy anchor. "The spec says" without a line the reader can open is a derivation awaiting a ruling, not a decision.
 

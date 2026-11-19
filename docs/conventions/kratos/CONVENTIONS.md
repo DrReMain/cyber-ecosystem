@@ -178,7 +178,7 @@ Carve-outs: ent schema field semantics go in `.Comment("…")` (flows into the D
 **conf & env keys**
 
 - A `${VAR:default}` placeholder references a config **key**; env enters the key space through `env.NewSource()` (registered after the file source in every `main.go`) — every process env var becomes a bare-named key, so the placeholder's own name is the injection name.
-- Generic placeholder names (`DB_HOST`, `REDIS_ADDR`) share the process environment with whatever else it carries; a stray ambient export of such a name overrides the default — the failure lands loud at boot (connection refused), never silently. (Before 2026-11-18 an `APP_` prefix gated admission and bare exports were silently ignored — three recorded strikes ended that era.)
+- Generic placeholder names (`DB_HOST`, `REDIS_ADDR`) share the process environment with whatever else it carries; a stray ambient export of such a name overrides the default — the failure lands loud at boot (connection refused), never silently.
 
 **data**
 

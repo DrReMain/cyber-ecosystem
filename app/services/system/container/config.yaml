@@ -1,6 +1,6 @@
 # Container config (baked by the Dockerfile; configs/config.yaml holds the
 # dev shape). Key set and order mirror the dev file; defaults point at the
-# compose network aliases. Overrides come ONLY from APP_-prefixed env vars.
+# compose network aliases.
 server:
   http: {addr: 0.0.0.0:11001, timeout: 1s}
   grpc: {addr: 0.0.0.0:12001, timeout: 1s}
