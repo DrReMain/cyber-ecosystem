@@ -304,6 +304,22 @@ func (rp *userRP) MoveCredential(ctx context.Context, kind, identifier, toUserID
 	return nil
 }
 
+func (rp *userRP) DeleteCredential(ctx context.Context, kind, identifier, userID string) error {
+	// Scoped to the owner like the read that picked the row: a row that
+	// moved or vanished between read and delete answers as a visible miss
+	// (the MoveCredential law), never a silent no-op.
+	n, err := rp.Platform.GetClient(ctx).Credential.Delete().
+		Where(credential.Kind(kind), credential.Identifier(identifier), credential.UserID(userID)).
+		Exec(ctx)
+	if err != nil {
+		return rp.Platform.HandleEntError(err)
+	}
+	if n == 0 {
+		return errorspb.ErrorInfraErrorDbNotFound("")
+	}
+	return nil
+}
+
 func (rp *userRP) ListCredentialsByUser(ctx context.Context, userID string) ([]*Credential, error) {
 	rows, err := rp.Platform.GetClient(ctx).Credential.Query().
 		Where(credential.UserID(userID)).

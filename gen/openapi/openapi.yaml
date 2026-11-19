@@ -448,6 +448,29 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.ListAuditExportsResponse'
+    /api/v1/system/auth/admin-unbind-credential:
+        post:
+            tags:
+                - AuthService
+            description: |-
+                The operator's force-unbind: the member leg's own machine with the
+                 target named on the wire. The sole-path guard rides identically —
+                 removal that would leave the account with zero login paths is
+                 refused here too.
+            operationId: AuthService_AdminUnbindCredential
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.AdminUnbindCredentialRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.AdminUnbindCredentialResponse'
     /api/v1/system/auth/begin-bind-credential:
         post:
             tags:
@@ -657,6 +680,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/cyber.system.v1.SendSmsCodeResponse'
+    /api/v1/system/auth/unbind-credential:
+        post:
+            tags:
+                - AuthService
+            operationId: AuthService_UnbindCredential
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/cyber.system.v1.UnbindCredentialRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/cyber.system.v1.UnbindCredentialResponse'
     /api/v1/system/authz/explain:
         get:
             tags:
@@ -2533,6 +2574,24 @@ components:
                 userId:
                     type: string
                     description: The administrator's user id — created or reused.
+        cyber.system.v1.AdminUnbindCredentialRequest:
+            type: object
+            properties:
+                userId:
+                    type: string
+                    description: The account whose credential this removes — the roster face's user id.
+                provider:
+                    type: string
+                    description: |-
+                        The provider key addresses the credential kind exactly as the bind
+                         legs do; the bound row of that kind is the one this removes.
+            description: |-
+                The operator's twin of the member leg: the same machine — provider-
+                 addressed kind, sole-path guard, owner-scoped delete — with the target
+                 named on the wire instead of read from the caller's session.
+        cyber.system.v1.AdminUnbindCredentialResponse:
+            type: object
+            properties: {}
         cyber.system.v1.AuditExport:
             type: object
             properties:
@@ -3785,6 +3844,17 @@ components:
                 Half-open [start, end) span of minutes within a day; start < end is
                  deep-validated on save. end also accepts the sentinel "24:00": through
                  the end of the day (a plain clock has no 24:00).
+        cyber.system.v1.UnbindCredentialRequest:
+            type: object
+            properties:
+                provider:
+                    type: string
+                    description: |-
+                        The provider key addresses the credential kind exactly as the bind
+                         legs do; the bound row of that kind is the one this removes.
+        cyber.system.v1.UnbindCredentialResponse:
+            type: object
+            properties: {}
         cyber.system.v1.UpdateDeptRequest:
             type: object
             properties:

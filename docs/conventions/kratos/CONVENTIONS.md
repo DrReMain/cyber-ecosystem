@@ -136,7 +136,7 @@ Align proto optional fields, DO fields, and the service/data mapping around poin
 - **DO**: optional / proto-bound fields are `*T` (align with proto); mandatory system fields (`ID`, `CreatedAt`, `UpdatedAt`, `TenantID`) stay non-pointer.
 - **service**: proto `*T` → DO `*T` **passed straight through — no deref, no nil-check**.
 - **data**: optional fields `SetNillableX(*T)` / `ClearX`; mandatory NOT-NULL fields `SetX(*p)` (validate guarantees `*p` non-nil).
-- **ent schema**: constraints by need — mandatory `.NotEmpty()` (NOT NULL), optional `.Optional().Nillable()`. Do **not** force everything Nillable: DB integrity (NOT NULL on mandatory fields) outweighs saving one deref. Field semantics a DB reader cannot infer from the name go in `.Comment("...")` — English, and the schema's `entsql.WithComments(true)` flows them into DDL column comments — never in Go line comments on the field chain. Self-evident fields (name, account, remark…) get none.
+- **ent schema**: constraints by need — mandatory `.NotEmpty()` (NOT NULL), optional `.Optional().Nillable()`. Do **not** force everything Nillable: DB integrity (NOT NULL on mandatory fields) outweighs saving one deref. Field semantics a DB reader cannot infer from the name go in `.Comment("...")`, and the schema's `entsql.WithComments(true)` flows them into DDL column comments — never in Go line comments on the field chain. Self-evident fields (name, account, remark…) get none.
 - **biz**: nil-semantics (e.g. update-leave-unchanged) live in the UC.
 
 ---
@@ -177,8 +177,8 @@ Carve-outs: ent schema field semantics go in `.Comment("…")` (flows into the D
 
 **conf & env keys**
 
-- A `${VAR:default}` placeholder references a config **key**; env enters the key space only through `env.NewSource("APP_")` (registered after the file source in every `main.go`) — prefix stripped, remainder becomes the key.
-- A bare exported `VAR` never resolves — the placeholder silently keeps its default; an endpoint override then dials the production default with no error anywhere. Harnesses/deployments export `APP_VAR` (agent master key and wechat endpoint override are the standing examples).
+- A `${VAR:default}` placeholder references a config **key**; env enters the key space through `env.NewSource()` (registered after the file source in every `main.go`) — every process env var becomes a bare-named key, so the placeholder's own name is the injection name.
+- Generic placeholder names (`DB_HOST`, `REDIS_ADDR`) share the process environment with whatever else it carries; a stray ambient export of such a name overrides the default — the failure lands loud at boot (connection refused), never silently. (Before 2026-11-18 an `APP_` prefix gated admission and bare exports were silently ignored — three recorded strikes ended that era.)
 
 **data**
 

@@ -28,7 +28,7 @@ observability:
   log:
     level: debug
     console: true
-    otlp: false
+    otlp: ${LOG_OTLP:false}
   slow_query:
     db: 0.2s
 remote:

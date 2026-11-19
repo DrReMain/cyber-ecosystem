@@ -19,20 +19,22 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AuthService_Login_FullMethodName               = "/cyber.system.v1.AuthService/Login"
-	AuthService_LoginByIdentity_FullMethodName     = "/cyber.system.v1.AuthService/LoginByIdentity"
-	AuthService_BeginIdentityLogin_FullMethodName  = "/cyber.system.v1.AuthService/BeginIdentityLogin"
-	AuthService_SendSmsCode_FullMethodName         = "/cyber.system.v1.AuthService/SendSmsCode"
-	AuthService_GetLoginConfig_FullMethodName      = "/cyber.system.v1.AuthService/GetLoginConfig"
-	AuthService_BindCredential_FullMethodName      = "/cyber.system.v1.AuthService/BindCredential"
-	AuthService_BeginBindCredential_FullMethodName = "/cyber.system.v1.AuthService/BeginBindCredential"
-	AuthService_SendBindSmsCode_FullMethodName     = "/cyber.system.v1.AuthService/SendBindSmsCode"
-	AuthService_ResetPassword_FullMethodName       = "/cyber.system.v1.AuthService/ResetPassword"
-	AuthService_ChangePassword_FullMethodName      = "/cyber.system.v1.AuthService/ChangePassword"
-	AuthService_GetSecurityStatus_FullMethodName   = "/cyber.system.v1.AuthService/GetSecurityStatus"
-	AuthService_Logout_FullMethodName              = "/cyber.system.v1.AuthService/Logout"
-	AuthService_GetCurrentUser_FullMethodName      = "/cyber.system.v1.AuthService/GetCurrentUser"
-	AuthService_ImportAccounts_FullMethodName      = "/cyber.system.v1.AuthService/ImportAccounts"
+	AuthService_Login_FullMethodName                 = "/cyber.system.v1.AuthService/Login"
+	AuthService_LoginByIdentity_FullMethodName       = "/cyber.system.v1.AuthService/LoginByIdentity"
+	AuthService_BeginIdentityLogin_FullMethodName    = "/cyber.system.v1.AuthService/BeginIdentityLogin"
+	AuthService_SendSmsCode_FullMethodName           = "/cyber.system.v1.AuthService/SendSmsCode"
+	AuthService_GetLoginConfig_FullMethodName        = "/cyber.system.v1.AuthService/GetLoginConfig"
+	AuthService_BindCredential_FullMethodName        = "/cyber.system.v1.AuthService/BindCredential"
+	AuthService_BeginBindCredential_FullMethodName   = "/cyber.system.v1.AuthService/BeginBindCredential"
+	AuthService_SendBindSmsCode_FullMethodName       = "/cyber.system.v1.AuthService/SendBindSmsCode"
+	AuthService_UnbindCredential_FullMethodName      = "/cyber.system.v1.AuthService/UnbindCredential"
+	AuthService_ResetPassword_FullMethodName         = "/cyber.system.v1.AuthService/ResetPassword"
+	AuthService_ChangePassword_FullMethodName        = "/cyber.system.v1.AuthService/ChangePassword"
+	AuthService_GetSecurityStatus_FullMethodName     = "/cyber.system.v1.AuthService/GetSecurityStatus"
+	AuthService_Logout_FullMethodName                = "/cyber.system.v1.AuthService/Logout"
+	AuthService_GetCurrentUser_FullMethodName        = "/cyber.system.v1.AuthService/GetCurrentUser"
+	AuthService_ImportAccounts_FullMethodName        = "/cyber.system.v1.AuthService/ImportAccounts"
+	AuthService_AdminUnbindCredential_FullMethodName = "/cyber.system.v1.AuthService/AdminUnbindCredential"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -47,6 +49,7 @@ type AuthServiceClient interface {
 	BindCredential(ctx context.Context, in *BindCredentialRequest, opts ...grpc.CallOption) (*BindCredentialResponse, error)
 	BeginBindCredential(ctx context.Context, in *BeginBindCredentialRequest, opts ...grpc.CallOption) (*BeginBindCredentialResponse, error)
 	SendBindSmsCode(ctx context.Context, in *SendBindSmsCodeRequest, opts ...grpc.CallOption) (*SendBindSmsCodeResponse, error)
+	UnbindCredential(ctx context.Context, in *UnbindCredentialRequest, opts ...grpc.CallOption) (*UnbindCredentialResponse, error)
 	ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ResetPasswordResponse, error)
 	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*ChangePasswordResponse, error)
 	GetSecurityStatus(ctx context.Context, in *GetSecurityStatusRequest, opts ...grpc.CallOption) (*GetSecurityStatusResponse, error)
@@ -59,6 +62,11 @@ type AuthServiceClient interface {
 	// credential table's own uniqueness, read ahead of the write — and
 	// nothing rolls back the rows that already landed.
 	ImportAccounts(ctx context.Context, in *ImportAccountsRequest, opts ...grpc.CallOption) (*ImportAccountsResponse, error)
+	// The operator's force-unbind: the member leg's own machine with the
+	// target named on the wire. The sole-path guard rides identically —
+	// removal that would leave the account with zero login paths is
+	// refused here too.
+	AdminUnbindCredential(ctx context.Context, in *AdminUnbindCredentialRequest, opts ...grpc.CallOption) (*AdminUnbindCredentialResponse, error)
 }
 
 type authServiceClient struct {
@@ -149,6 +157,16 @@ func (c *authServiceClient) SendBindSmsCode(ctx context.Context, in *SendBindSms
 	return out, nil
 }
 
+func (c *authServiceClient) UnbindCredential(ctx context.Context, in *UnbindCredentialRequest, opts ...grpc.CallOption) (*UnbindCredentialResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UnbindCredentialResponse)
+	err := c.cc.Invoke(ctx, AuthService_UnbindCredential_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *authServiceClient) ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*ResetPasswordResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ResetPasswordResponse)
@@ -209,6 +227,16 @@ func (c *authServiceClient) ImportAccounts(ctx context.Context, in *ImportAccoun
 	return out, nil
 }
 
+func (c *authServiceClient) AdminUnbindCredential(ctx context.Context, in *AdminUnbindCredentialRequest, opts ...grpc.CallOption) (*AdminUnbindCredentialResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AdminUnbindCredentialResponse)
+	err := c.cc.Invoke(ctx, AuthService_AdminUnbindCredential_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
@@ -221,6 +249,7 @@ type AuthServiceServer interface {
 	BindCredential(context.Context, *BindCredentialRequest) (*BindCredentialResponse, error)
 	BeginBindCredential(context.Context, *BeginBindCredentialRequest) (*BeginBindCredentialResponse, error)
 	SendBindSmsCode(context.Context, *SendBindSmsCodeRequest) (*SendBindSmsCodeResponse, error)
+	UnbindCredential(context.Context, *UnbindCredentialRequest) (*UnbindCredentialResponse, error)
 	ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error)
 	ChangePassword(context.Context, *ChangePasswordRequest) (*ChangePasswordResponse, error)
 	GetSecurityStatus(context.Context, *GetSecurityStatusRequest) (*GetSecurityStatusResponse, error)
@@ -233,6 +262,11 @@ type AuthServiceServer interface {
 	// credential table's own uniqueness, read ahead of the write — and
 	// nothing rolls back the rows that already landed.
 	ImportAccounts(context.Context, *ImportAccountsRequest) (*ImportAccountsResponse, error)
+	// The operator's force-unbind: the member leg's own machine with the
+	// target named on the wire. The sole-path guard rides identically —
+	// removal that would leave the account with zero login paths is
+	// refused here too.
+	AdminUnbindCredential(context.Context, *AdminUnbindCredentialRequest) (*AdminUnbindCredentialResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -267,6 +301,9 @@ func (UnimplementedAuthServiceServer) BeginBindCredential(context.Context, *Begi
 func (UnimplementedAuthServiceServer) SendBindSmsCode(context.Context, *SendBindSmsCodeRequest) (*SendBindSmsCodeResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SendBindSmsCode not implemented")
 }
+func (UnimplementedAuthServiceServer) UnbindCredential(context.Context, *UnbindCredentialRequest) (*UnbindCredentialResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UnbindCredential not implemented")
+}
 func (UnimplementedAuthServiceServer) ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ResetPassword not implemented")
 }
@@ -284,6 +321,9 @@ func (UnimplementedAuthServiceServer) GetCurrentUser(context.Context, *GetCurren
 }
 func (UnimplementedAuthServiceServer) ImportAccounts(context.Context, *ImportAccountsRequest) (*ImportAccountsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ImportAccounts not implemented")
+}
+func (UnimplementedAuthServiceServer) AdminUnbindCredential(context.Context, *AdminUnbindCredentialRequest) (*AdminUnbindCredentialResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AdminUnbindCredential not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
@@ -450,6 +490,24 @@ func _AuthService_SendBindSmsCode_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_UnbindCredential_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UnbindCredentialRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).UnbindCredential(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_UnbindCredential_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).UnbindCredential(ctx, req.(*UnbindCredentialRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AuthService_ResetPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ResetPasswordRequest)
 	if err := dec(in); err != nil {
@@ -558,6 +616,24 @@ func _AuthService_ImportAccounts_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_AdminUnbindCredential_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminUnbindCredentialRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).AdminUnbindCredential(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_AdminUnbindCredential_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).AdminUnbindCredential(ctx, req.(*AdminUnbindCredentialRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -598,6 +674,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AuthService_SendBindSmsCode_Handler,
 		},
 		{
+			MethodName: "UnbindCredential",
+			Handler:    _AuthService_UnbindCredential_Handler,
+		},
+		{
 			MethodName: "ResetPassword",
 			Handler:    _AuthService_ResetPassword_Handler,
 		},
@@ -620,6 +700,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ImportAccounts",
 			Handler:    _AuthService_ImportAccounts_Handler,
+		},
+		{
+			MethodName: "AdminUnbindCredential",
+			Handler:    _AuthService_AdminUnbindCredential_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

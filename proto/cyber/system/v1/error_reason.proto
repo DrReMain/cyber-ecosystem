@@ -27,12 +27,19 @@ enum System {
   SYSTEM_IDENTITY_PROVIDER_UNKNOWN = 6003 [(.errors.code) = 400];
   SYSTEM_IDENTITY_EXCHANGE_FAILED = 6004 [(.errors.code) = 401];
   SYSTEM_IDENTITY_ALREADY_BOUND = 6005 [(.errors.code) = 409];
+  // Unbind addressed a kind this account never bound — a stale face or a
+  // foreign spelling, answered as a miss rather than a silent no-op.
+  SYSTEM_IDENTITY_NOT_BOUND = 6009 [(.errors.code) = 404];
   // One code for every send-budget dimension (window, per-phone daily,
   // per-source): the refusal deliberately names no dimension, because the
   // copy a client renders is a budget-structure oracle otherwise.
   SYSTEM_SMS_RATE_LIMITED = 6006 [(.errors.code) = 429];
   SYSTEM_SMS_CODE_INVALID = 6007 [(.errors.code) = 401];
   SYSTEM_PASSWORD_MISMATCH = 6001 [(.errors.code) = 400];
+  // Unbinding this credential would leave the account with no login path
+  // (no other credential bound, no password set) — the lockout guard.
+  // Auth family overflow at 6016: the 600x decade is full.
+  SYSTEM_LAST_LOGIN_METHOD = 6016 [(.errors.code) = 400];
 
   // 601x: dept
   SYSTEM_DEPT_SELF_PARENT = 6010 [(.errors.code) = 400];

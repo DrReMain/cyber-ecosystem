@@ -1,8 +1,9 @@
 # Dev config (bare metal). container/config.yaml mirrors this file's key
 # set and order for the baked image; keep the two aligned when either
-# changes. Overrides come ONLY from APP_-prefixed env vars (APP_DB_HOST=x);
-# the boot banner ("sms channel resolved" / "auth provider resolved")
-# prints the values actually in effect — read it back after exporting.
+# changes. Overrides come only from env vars named after the placeholder
+# (DB_HOST=x); the boot banner ("sms channel resolved" / "auth provider
+# resolved") prints the values actually in effect — read it back after
+# exporting.
 # Optional blocks (nats mq, log file sink) stay commented until needed.
 server:
   http: {addr: 0.0.0.0:11001, timeout: 1s}
@@ -73,7 +74,7 @@ observability:
   log:
     level: debug
     console: true
-    otlp: false
+    otlp: ${LOG_OTLP:false}
 #    file:
 #      path: app.log
 #      max_size_mb: 100

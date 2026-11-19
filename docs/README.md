@@ -20,7 +20,6 @@ Entry points: `AGENTS.md` (root rules + area routing index; `CLAUDE.md` imports 
 2. **Destination.** Every roadmap doc declares near its top where it ends up — backfilled / cleared / archived. `docs/roadmap/` holds only `vision.md` plus the active fronts (target ≤4). A durable rule found in a working doc *moves* out (never copies) — backfill is the only bridge.
 3. **Instance state lives in its owning source.** Rule text stays fork-neutral: state the invariant, point at where the current value lives (settings file, compose files, directory tree). Never transcribe a current enumeration into a rule — "every locale registered in the settings file" cannot rot; "all five locales" rots with the first fork.
 4. **Roadmap isolation.** The durable lane — `AGENTS.md`, `CLAUDE.md`, skills, conventions — never references `docs/roadmap/`: no paths, no section or ruling citations. A durable rule never depends on a working doc to be understood or complete.
-5. **Language.** The skeleton is international-facing: durable and procedural docs are written in English; working-lane docs are written in the team's mother tongue.
 
 ## Sentinel — `./nx run docs:check`
 

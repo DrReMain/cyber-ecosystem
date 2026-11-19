@@ -16,12 +16,12 @@ import {
 import { FileUp, KeyRound, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import { useFileUrl } from "#/features/app/file/use-file-url";
+import { UserAvatar } from "#/features/app/user/user-avatar";
 import { m } from "#/paraglide/messages";
 import { getTextDirection } from "#/paraglide/runtime";
 import type { DeptNode, OperationCatalog, UserDraft } from "../types";
 import { GrantPreview } from "./grant-preview";
 import { RoleCards } from "./role-cards";
-import { UserAvatar } from "./user-avatar";
 
 const PASSWORD_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
 

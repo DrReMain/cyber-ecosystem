@@ -105,6 +105,22 @@ func ErrorSystemIdentityAlreadyBound(format string, args ...interface{}) *errors
 	return errors.New(409, System_SYSTEM_IDENTITY_ALREADY_BOUND.String(), fmt.Sprintf(format, args...))
 }
 
+// Unbind addressed a kind this account never bound — a stale face or a
+// foreign spelling, answered as a miss rather than a silent no-op.
+func IsSystemIdentityNotBound(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_IDENTITY_NOT_BOUND.String() && e.Code == 404
+}
+
+// Unbind addressed a kind this account never bound — a stale face or a
+// foreign spelling, answered as a miss rather than a silent no-op.
+func ErrorSystemIdentityNotBound(format string, args ...interface{}) *errors.Error {
+	return errors.New(404, System_SYSTEM_IDENTITY_NOT_BOUND.String(), fmt.Sprintf(format, args...))
+}
+
 // One code for every send-budget dimension (window, per-phone daily,
 // per-source): the refusal deliberately names no dimension, because the
 // copy a client renders is a budget-structure oracle otherwise.
@@ -145,6 +161,24 @@ func IsSystemPasswordMismatch(err error) bool {
 
 func ErrorSystemPasswordMismatch(format string, args ...interface{}) *errors.Error {
 	return errors.New(400, System_SYSTEM_PASSWORD_MISMATCH.String(), fmt.Sprintf(format, args...))
+}
+
+// Unbinding this credential would leave the account with no login path
+// (no other credential bound, no password set) — the lockout guard.
+// Auth family overflow at 6016: the 600x decade is full.
+func IsSystemLastLoginMethod(err error) bool {
+	if err == nil {
+		return false
+	}
+	e := errors.FromError(err)
+	return e.Reason == System_SYSTEM_LAST_LOGIN_METHOD.String() && e.Code == 400
+}
+
+// Unbinding this credential would leave the account with no login path
+// (no other credential bound, no password set) — the lockout guard.
+// Auth family overflow at 6016: the 600x decade is full.
+func ErrorSystemLastLoginMethod(format string, args ...interface{}) *errors.Error {
+	return errors.New(400, System_SYSTEM_LAST_LOGIN_METHOD.String(), fmt.Sprintf(format, args...))
 }
 
 // 601x: dept

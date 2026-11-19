@@ -17,6 +17,7 @@ var _ = new(context.Context)
 
 const _ = http.SupportPackageIsVersion3
 
+const OperationAuthServiceAdminUnbindCredential = "/cyber.system.v1.AuthService/AdminUnbindCredential"
 const OperationAuthServiceBeginBindCredential = "/cyber.system.v1.AuthService/BeginBindCredential"
 const OperationAuthServiceBeginIdentityLogin = "/cyber.system.v1.AuthService/BeginIdentityLogin"
 const OperationAuthServiceBindCredential = "/cyber.system.v1.AuthService/BindCredential"
@@ -31,8 +32,14 @@ const OperationAuthServiceLogout = "/cyber.system.v1.AuthService/Logout"
 const OperationAuthServiceResetPassword = "/cyber.system.v1.AuthService/ResetPassword"
 const OperationAuthServiceSendBindSmsCode = "/cyber.system.v1.AuthService/SendBindSmsCode"
 const OperationAuthServiceSendSmsCode = "/cyber.system.v1.AuthService/SendSmsCode"
+const OperationAuthServiceUnbindCredential = "/cyber.system.v1.AuthService/UnbindCredential"
 
 type AuthServiceHTTPServer interface {
+	// AdminUnbindCredential The operator's force-unbind: the member leg's own machine with the
+	// target named on the wire. The sole-path guard rides identically —
+	// removal that would leave the account with zero login paths is
+	// refused here too.
+	AdminUnbindCredential(context.Context, *AdminUnbindCredentialRequest) (*AdminUnbindCredentialResponse, error)
 	BeginBindCredential(context.Context, *BeginBindCredentialRequest) (*BeginBindCredentialResponse, error)
 	BeginIdentityLogin(context.Context, *BeginIdentityLoginRequest) (*BeginIdentityLoginResponse, error)
 	BindCredential(context.Context, *BindCredentialRequest) (*BindCredentialResponse, error)
@@ -53,6 +60,7 @@ type AuthServiceHTTPServer interface {
 	ResetPassword(context.Context, *ResetPasswordRequest) (*ResetPasswordResponse, error)
 	SendBindSmsCode(context.Context, *SendBindSmsCodeRequest) (*SendBindSmsCodeResponse, error)
 	SendSmsCode(context.Context, *SendSmsCodeRequest) (*SendSmsCodeResponse, error)
+	UnbindCredential(context.Context, *UnbindCredentialRequest) (*UnbindCredentialResponse, error)
 }
 
 func RegisterAuthServiceHTTPServer(s *http.Server, srv AuthServiceHTTPServer) {
@@ -65,12 +73,14 @@ func RegisterAuthServiceHTTPServer(s *http.Server, srv AuthServiceHTTPServer) {
 	r.Handle("POST", "/api/v1/system/auth/bind-credential", _AuthService_BindCredential0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/system/auth/begin-bind-credential", _AuthService_BeginBindCredential0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/system/auth/send-bind-sms-code", _AuthService_SendBindSmsCode0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/system/auth/unbind-credential", _AuthService_UnbindCredential0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/system/auth/reset-password", _AuthService_ResetPassword0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/system/me/password", _AuthService_ChangePassword0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/system/me/security", _AuthService_GetSecurityStatus0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/system/auth/logout", _AuthService_Logout0_HTTP_Handler(srv))
 	r.Handle("GET", "/api/v1/system/me", _AuthService_GetCurrentUser0_HTTP_Handler(srv))
 	r.Handle("POST", "/api/v1/system/auth/import-accounts", _AuthService_ImportAccounts0_HTTP_Handler(srv))
+	r.Handle("POST", "/api/v1/system/auth/admin-unbind-credential", _AuthService_AdminUnbindCredential0_HTTP_Handler(srv))
 }
 
 func _AuthService_Login0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
@@ -225,6 +235,25 @@ func _AuthService_SendBindSmsCode0_HTTP_Handler(srv AuthServiceHTTPServer) func(
 	}
 }
 
+func _AuthService_UnbindCredential0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UnbindCredentialRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuthServiceUnbindCredential)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UnbindCredential(ctx, req.(*UnbindCredentialRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*UnbindCredentialResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _AuthService_ResetPassword0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in ResetPasswordRequest
@@ -339,7 +368,31 @@ func _AuthService_ImportAccounts0_HTTP_Handler(srv AuthServiceHTTPServer) func(c
 	}
 }
 
+func _AuthService_AdminUnbindCredential0_HTTP_Handler(srv AuthServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AdminUnbindCredentialRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuthServiceAdminUnbindCredential)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AdminUnbindCredential(ctx, req.(*AdminUnbindCredentialRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*AdminUnbindCredentialResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type AuthServiceHTTPClient interface {
+	// AdminUnbindCredential The operator's force-unbind: the member leg's own machine with the
+	// target named on the wire. The sole-path guard rides identically —
+	// removal that would leave the account with zero login paths is
+	// refused here too.
+	AdminUnbindCredential(ctx context.Context, req *AdminUnbindCredentialRequest, opts ...http.CallOption) (rsp *AdminUnbindCredentialResponse, err error)
 	BeginBindCredential(ctx context.Context, req *BeginBindCredentialRequest, opts ...http.CallOption) (rsp *BeginBindCredentialResponse, err error)
 	BeginIdentityLogin(ctx context.Context, req *BeginIdentityLoginRequest, opts ...http.CallOption) (rsp *BeginIdentityLoginResponse, err error)
 	BindCredential(ctx context.Context, req *BindCredentialRequest, opts ...http.CallOption) (rsp *BindCredentialResponse, err error)
@@ -360,6 +413,7 @@ type AuthServiceHTTPClient interface {
 	ResetPassword(ctx context.Context, req *ResetPasswordRequest, opts ...http.CallOption) (rsp *ResetPasswordResponse, err error)
 	SendBindSmsCode(ctx context.Context, req *SendBindSmsCodeRequest, opts ...http.CallOption) (rsp *SendBindSmsCodeResponse, err error)
 	SendSmsCode(ctx context.Context, req *SendSmsCodeRequest, opts ...http.CallOption) (rsp *SendSmsCodeResponse, err error)
+	UnbindCredential(ctx context.Context, req *UnbindCredentialRequest, opts ...http.CallOption) (rsp *UnbindCredentialResponse, err error)
 }
 
 type AuthServiceHTTPClientImpl struct {
@@ -368,6 +422,27 @@ type AuthServiceHTTPClientImpl struct {
 
 func NewAuthServiceHTTPClient(client *http.Client) AuthServiceHTTPClient {
 	return &AuthServiceHTTPClientImpl{client}
+}
+
+// AdminUnbindCredential The operator's force-unbind: the member leg's own machine with the
+// target named on the wire. The sole-path guard rides identically —
+// removal that would leave the account with zero login paths is
+// refused here too.
+func (c *AuthServiceHTTPClientImpl) AdminUnbindCredential(ctx context.Context, in *AdminUnbindCredentialRequest, opts ...http.CallOption) (*AdminUnbindCredentialResponse, error) {
+	var out AdminUnbindCredentialResponse
+	pattern := "/api/v1/system/auth/admin-unbind-credential"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationAuthServiceAdminUnbindCredential),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 func (c *AuthServiceHTTPClientImpl) BeginBindCredential(ctx context.Context, in *BeginBindCredentialRequest, opts ...http.CallOption) (*BeginBindCredentialResponse, error) {
@@ -602,6 +677,23 @@ func (c *AuthServiceHTTPClientImpl) SendSmsCode(ctx context.Context, in *SendSms
 		http.Accept("application/protojson"),
 		http.ContentType("application/protojson"),
 		http.Operation(OperationAuthServiceSendSmsCode),
+		http.PathTemplate(pattern),
+	}, opts...)
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AuthServiceHTTPClientImpl) UnbindCredential(ctx context.Context, in *UnbindCredentialRequest, opts ...http.CallOption) (*UnbindCredentialResponse, error) {
+	var out UnbindCredentialResponse
+	pattern := "/api/v1/system/auth/unbind-credential"
+	path := http.BuildPath(pattern, in)
+	opts = append([]http.CallOption{
+		http.Accept("application/protojson"),
+		http.ContentType("application/protojson"),
+		http.Operation(OperationAuthServiceUnbindCredential),
 		http.PathTemplate(pattern),
 	}, opts...)
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)

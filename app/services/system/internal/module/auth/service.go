@@ -124,6 +124,20 @@ func (s *AuthService) SendBindSmsCode(ctx context.Context, in *systempb.SendBind
 	return &systempb.SendBindSmsCodeResponse{State: state}, nil
 }
 
+func (s *AuthService) UnbindCredential(ctx context.Context, in *systempb.UnbindCredentialRequest) (*systempb.UnbindCredentialResponse, error) {
+	if err := s.authUC.UnbindCredential(ctx, in.GetProvider()); err != nil {
+		return nil, err
+	}
+	return &systempb.UnbindCredentialResponse{}, nil
+}
+
+func (s *AuthService) AdminUnbindCredential(ctx context.Context, in *systempb.AdminUnbindCredentialRequest) (*systempb.AdminUnbindCredentialResponse, error) {
+	if err := s.authUC.AdminUnbindCredential(ctx, in.GetUserId(), in.GetProvider()); err != nil {
+		return nil, err
+	}
+	return &systempb.AdminUnbindCredentialResponse{}, nil
+}
+
 func (s *AuthService) ResetPassword(ctx context.Context, in *systempb.ResetPasswordRequest) (*systempb.ResetPasswordResponse, error) {
 	if err := s.authUC.ResetPassword(ctx, in.GetProvider(), in.GetState(), in.GetNewPassword(), in); err != nil {
 		return nil, err

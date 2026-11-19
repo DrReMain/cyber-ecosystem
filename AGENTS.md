@@ -40,3 +40,4 @@ These docs are read by coding agents whose context is finite and billed: every l
 | tanstack (web clients) | `docs/conventions/tanstack/CONVENTIONS.md` | writing under `app/clients/*` or `shared-ts/` |
 | deploy (containers) | `docs/conventions/deploy/CONVENTIONS.md` | touching `deploy/`, Dockerfiles, compose, edge, migrations |
 | skin (antd presets) | `docs/conventions/skin/CONVENTIONS.md` | touching `shared-ts/antd/src/skin-presets/**` or authoring a skin |
+| browser-walkthrough (live verification) | `docs/conventions/browser-walkthrough/CONVENTIONS.md` | driving the browser loop — walkthroughs and live probes of client surfaces |

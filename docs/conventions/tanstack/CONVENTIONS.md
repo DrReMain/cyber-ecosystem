@@ -17,6 +17,7 @@ Applies to web clients built on TanStack Start (`app/clients/*`) and to the
 | `features/layout-*/**`, `features/login-*/**` | §2, §5 grammar, §8 route constants, §10 |
 | `messages/**` | §6 |
 | `domains/**` | §4, §9 |
+| `e2e/**` (playwright specs + helpers) | §11 |
 | `shared-ts/antd/src/skin-presets/**` | `docs/conventions/skin/CONVENTIONS.md` (own doc) |
 | anything else under `app/clients/*` or `shared-ts/**` | §1 layering, the touched layer's section, §9 for `shared-ts/<domain>/src/**`, §11 |
 
@@ -444,6 +445,28 @@ include is outside the type gate, and the editor's inferred-project fallback
 is the only thing that will ever tell you. The playwright suite is the
 automatable half of the reachable-surface rule below; the browser loop stays
 the finishing pass.
+
+**A cold-load interaction waits on hydration.** The
+dev server serves the client graph asynchronously — an interaction fired
+before hydration is a lost event (React then resets the controlled value),
+and a loader-prefetched face paints its SSR rows into the document, so
+rendered rows prove nothing about hydration either. Two observable shapes,
+one per face: an input-bearing face waits on React's value tracker
+(`_valueTracker` on the input); an input-less face arms `waitForRequest` on
+the face's loader RPC before navigating (a request fired mid-load is
+invisible to a later-armed waiter) and awaits it after the goto, before
+any interaction. Assert-only visits need neither — locator assertions
+retry on their own.
+
+**A suite whose legs walk the real backend stack closes serial.** Parallel
+workers share one dev server and one fixture store; alone-red failures
+that re-adjudicate green solo are the harness's false-positive family —
+cold-start hydration races, real-stack legs contending over the one dev
+server, a re-navigation over a hydrated document aborted by the dev stack
+itself. Parallel is the iteration form; `--workers=1` is the closing
+evidence. That re-navigation is retry-shaped on its own account: gate on
+`domcontentloaded` with the first assertion inside `expect(…).toPass()`,
+never on `load`.
 
 **A fidelity anchor migrates with its face.** When a lawfully changed face
 (copy, layout, state) leaves an anchored expectation red, re-anchoring is

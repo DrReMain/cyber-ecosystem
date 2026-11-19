@@ -98,7 +98,7 @@ func main() {
 	c := config.New(
 		config.WithSource(
 			file.NewSource(flagconf),
-			env.NewSource("APP_"),
+			env.NewSource(),
 		),
 		config.WithResolveActualTypes(true),
 	)

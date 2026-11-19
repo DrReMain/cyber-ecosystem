@@ -55,6 +55,19 @@
     "comment": "认证与会话",
     "methods": [
       {
+        "name": "AdminUnbindCredential",
+        "full_name": "cyber.system.v1.AuthService.AdminUnbindCredential",
+        "request_name": "AdminUnbindCredentialRequest",
+        "request_full_name": "cyber.system.v1.AdminUnbindCredentialRequest",
+        "response_name": "AdminUnbindCredentialResponse",
+        "response_full_name": "cyber.system.v1.AdminUnbindCredentialResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/system/auth/admin-unbind-credential",
+        "comment": "管理端强制解绑：对指定用户移除一种登录方式；剩零可登途径时拒绝（与会员腿同律）",
+        "access": "ADMIN",
+        "datascope": false
+      },
+      {
         "name": "BeginBindCredential",
         "full_name": "cyber.system.v1.AuthService.BeginBindCredential",
         "request_name": "BeginBindCredentialRequest",
@@ -234,6 +247,19 @@
         "http_path": "/api/v1/system/auth/send-sms-code",
         "comment": "发送短信验证码：铸造一次性 state 供 LoginByIdentity 消费",
         "access": "PUBLIC",
+        "datascope": false
+      },
+      {
+        "name": "UnbindCredential",
+        "full_name": "cyber.system.v1.AuthService.UnbindCredential",
+        "request_name": "UnbindCredentialRequest",
+        "request_full_name": "cyber.system.v1.UnbindCredentialRequest",
+        "response_name": "UnbindCredentialResponse",
+        "response_full_name": "cyber.system.v1.UnbindCredentialResponse",
+        "http_method": "POST",
+        "http_path": "/api/v1/system/auth/unbind-credential",
+        "comment": "解绑身份凭证：移除当前账号的一种登录方式；剩零可登途径时拒绝",
+        "access": "BUILTIN",
         "datascope": false
       }
     ]

@@ -19,10 +19,10 @@ services:
       - apply
       - --dir
       - file:///migrations
-      # The DSN interpolates the same APP_DB_* knobs the service config reads,
+      # The DSN interpolates the same DB_* knobs the service config reads,
       # so one override moves both the migration and the runtime connection.
       - --url
-      - postgres://${APP_DB_USER:-postgres}:${APP_DB_PASS:-postgres}@postgresql.db:5432/system?sslmode=disable
+      - postgres://${DB_USER:-postgres}:${DB_PASS:-postgres}@postgresql.db:5432/system?sslmode=disable
     volumes:
       - ../../app/services/system/internal/ent/migrate/migrations:/migrations:ro
     depends_on:
@@ -41,40 +41,41 @@ services:
     environment:
       # The env chain's third leg: every deployment-sensitive var registered
       # as a yaml ${VAR:…} placeholder is passthrough-injectable here. The
-      # only deliberate omission is APP_CATALOG_DIR (the image-baked path).
-      - APP_DB_HOST
-      - APP_DB_PORT
-      - APP_DB_USER
-      - APP_DB_PASS
-      - APP_DB_NAME
-      - APP_SEED_INITIAL_PASSWORD
-      - APP_OTLP_ENDPOINT
-      - APP_REDIS_ADDR
-      - APP_REDIS_PASS
-      - APP_MQ_DSN
-      - APP_S3_ENDPOINT
-      - APP_S3_ACCESS_KEY
-      - APP_S3_SECRET_KEY
-      - APP_S3_BUCKET
-      - APP_S3_REGION
-      - APP_S3_PUBLIC_ENDPOINT
-      - APP_TRACE_ENABLED
-      - APP_METRICS_ENABLED
-      - APP_WECHAT_ENABLED
-      - APP_WECHAT_ENDPOINT
-      - APP_WECHAT_APPID
-      - APP_WECHAT_AUTO_REGISTER
-      - APP_WECHAT_SECRET
-      - APP_WECHAT_POPULATION
-      - APP_SMS_ENABLED
-      - APP_SMS_AUTO_REGISTER
-      - APP_SMS_BACKEND
-      - APP_SMS_ACCESS_KEY_ID
-      - APP_SMS_ACCESS_KEY_SECRET
-      - APP_SMS_SIGN_NAME
-      - APP_SMS_TEMPLATE_CODE
-      - APP_SMS_ENDPOINT
-      - APP_SMS_POPULATION
+      # only deliberate omission is CATALOG_DIR (the image-baked path).
+      - DB_HOST
+      - DB_PORT
+      - DB_USER
+      - DB_PASS
+      - DB_NAME
+      - SEED_INITIAL_PASSWORD
+      - OTLP_ENDPOINT
+      - REDIS_ADDR
+      - REDIS_PASS
+      - MQ_DSN
+      - S3_ENDPOINT
+      - S3_ACCESS_KEY
+      - S3_SECRET_KEY
+      - S3_BUCKET
+      - S3_REGION
+      - S3_PUBLIC_ENDPOINT
+      - TRACE_ENABLED
+      - METRICS_ENABLED
+      - LOG_OTLP
+      - WECHAT_ENABLED
+      - WECHAT_ENDPOINT
+      - WECHAT_APPID
+      - WECHAT_AUTO_REGISTER
+      - WECHAT_SECRET
+      - WECHAT_POPULATION
+      - SMS_ENABLED
+      - SMS_AUTO_REGISTER
+      - SMS_BACKEND
+      - SMS_ACCESS_KEY_ID
+      - SMS_ACCESS_KEY_SECRET
+      - SMS_SIGN_NAME
+      - SMS_TEMPLATE_CODE
+      - SMS_ENDPOINT
+      - SMS_POPULATION
     networks:
       default:
         aliases: ["system.api"]
@@ -112,10 +113,10 @@ services:
       - apply
       - --dir
       - file:///migrations
-      # Same APP_DB_* interpolation as system-migrate; the database name
+      # Same DB_* interpolation as system-migrate; the database name
       # defaults per service.
       - --url
-      - postgres://${APP_DB_USER:-postgres}:${APP_DB_PASS:-postgres}@postgresql.db:5432/agent?sslmode=disable
+      - postgres://${DB_USER:-postgres}:${DB_PASS:-postgres}@postgresql.db:5432/agent?sslmode=disable
     volumes:
       - ../../app/services/agent/internal/ent/migrate/migrations:/migrations:ro
     depends_on:
@@ -132,16 +133,17 @@ services:
         VERSION: "${VERSION:-dev}"
     image: cyber-ecosystem/agent:local
     environment:
-      - APP_AGENT_MASTER_KEY=${AGENT_MASTER_KEY:-agent-dev-master-key} # the single dev default, owned here on the deploy plane
-      - APP_DB_HOST
-      - APP_DB_PORT
-      - APP_DB_USER
-      - APP_DB_PASS
-      - APP_DB_NAME
-      - APP_OTLP_ENDPOINT
-      - APP_TRACE_ENABLED
-      - APP_METRICS_ENABLED
-      - APP_SYSTEM_CONNECT
+      - AGENT_MASTER_KEY=${AGENT_MASTER_KEY:-agent-dev-master-key} # the single dev default, owned here on the deploy plane
+      - DB_HOST
+      - DB_PORT
+      - DB_USER
+      - DB_PASS
+      - DB_NAME
+      - OTLP_ENDPOINT
+      - TRACE_ENABLED
+      - METRICS_ENABLED
+      - LOG_OTLP
+      - SYSTEM_CONNECT
     networks:
       default:
         aliases: ["agent.api"]
@@ -168,6 +170,7 @@ services:
           cpus: "0.1"
           memory: 128M
     restart: unless-stopped
+
   admin:
     profiles: ["app"]
     build:

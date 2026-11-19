@@ -45,6 +45,11 @@ export const beginBindCredential = AuthService.method.beginBindCredential;
 export const sendBindSmsCode = AuthService.method.sendBindSmsCode;
 
 /**
+ * @generated from rpc cyber.system.v1.AuthService.UnbindCredential
+ */
+export const unbindCredential = AuthService.method.unbindCredential;
+
+/**
  * @generated from rpc cyber.system.v1.AuthService.ResetPassword
  */
 export const resetPassword = AuthService.method.resetPassword;
@@ -80,3 +85,13 @@ export const getCurrentUser = AuthService.method.getCurrentUser;
  * @generated from rpc cyber.system.v1.AuthService.ImportAccounts
  */
 export const importAccounts = AuthService.method.importAccounts;
+
+/**
+ * The operator's force-unbind: the member leg's own machine with the
+ * target named on the wire. The sole-path guard rides identically —
+ * removal that would leave the account with zero login paths is
+ * refused here too.
+ *
+ * @generated from rpc cyber.system.v1.AuthService.AdminUnbindCredential
+ */
+export const adminUnbindCredential = AuthService.method.adminUnbindCredential;

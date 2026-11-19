@@ -295,6 +295,27 @@ export type CyberSystemV1AddTenantAdminResponse = {
     userId?: string;
 };
 
+/**
+ * The operator's twin of the member leg: the same machine — provider-
+ * addressed kind, sole-path guard, owner-scoped delete — with the target
+ * named on the wire instead of read from the caller's session.
+ */
+export type CyberSystemV1AdminUnbindCredentialRequest = {
+    /**
+     * The account whose credential this removes — the roster face's user id.
+     */
+    userId?: string;
+    /**
+     * The provider key addresses the credential kind exactly as the bind
+     * legs do; the bound row of that kind is the one this removes.
+     */
+    provider?: string;
+};
+
+export type CyberSystemV1AdminUnbindCredentialResponse = {
+    [key: string]: unknown;
+};
+
 export type CyberSystemV1AuditExport = {
     /**
      * Both ids are always present on the row.
@@ -1304,6 +1325,18 @@ export type CyberSystemV1TimeWindowSpan = {
     end?: string;
 };
 
+export type CyberSystemV1UnbindCredentialRequest = {
+    /**
+     * The provider key addresses the credential kind exactly as the bind
+     * legs do; the bound row of that kind is the one this removes.
+     */
+    provider?: string;
+};
+
+export type CyberSystemV1UnbindCredentialResponse = {
+    [key: string]: unknown;
+};
+
 /**
  * update
  */
@@ -1880,6 +1913,22 @@ export type AuditServiceListAuditExportsResponses = {
 
 export type AuditServiceListAuditExportsResponse = AuditServiceListAuditExportsResponses[keyof AuditServiceListAuditExportsResponses];
 
+export type AuthServiceAdminUnbindCredentialData = {
+    body: CyberSystemV1AdminUnbindCredentialRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/system/auth/admin-unbind-credential';
+};
+
+export type AuthServiceAdminUnbindCredentialResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1AdminUnbindCredentialResponse;
+};
+
+export type AuthServiceAdminUnbindCredentialResponse = AuthServiceAdminUnbindCredentialResponses[keyof AuthServiceAdminUnbindCredentialResponses];
+
 export type AuthServiceBeginBindCredentialData = {
     body: CyberSystemV1BeginBindCredentialRequest;
     path?: never;
@@ -2063,6 +2112,22 @@ export type AuthServiceSendSmsCodeResponses = {
 };
 
 export type AuthServiceSendSmsCodeResponse = AuthServiceSendSmsCodeResponses[keyof AuthServiceSendSmsCodeResponses];
+
+export type AuthServiceUnbindCredentialData = {
+    body: CyberSystemV1UnbindCredentialRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/system/auth/unbind-credential';
+};
+
+export type AuthServiceUnbindCredentialResponses = {
+    /**
+     * OK
+     */
+    200: CyberSystemV1UnbindCredentialResponse;
+};
+
+export type AuthServiceUnbindCredentialResponse = AuthServiceUnbindCredentialResponses[keyof AuthServiceUnbindCredentialResponses];
 
 export type RoleServiceExplainOperationData = {
     body?: never;

@@ -17,10 +17,12 @@ func RegisterAuthServiceConnectServer(srv *connect.Server, svc AuthServiceServer
 	connect.HandleUnary(srv, "/cyber.system.v1.AuthService/BindCredential", svc.BindCredential)
 	connect.HandleUnary(srv, "/cyber.system.v1.AuthService/BeginBindCredential", svc.BeginBindCredential)
 	connect.HandleUnary(srv, "/cyber.system.v1.AuthService/SendBindSmsCode", svc.SendBindSmsCode)
+	connect.HandleUnary(srv, "/cyber.system.v1.AuthService/UnbindCredential", svc.UnbindCredential)
 	connect.HandleUnary(srv, "/cyber.system.v1.AuthService/ResetPassword", svc.ResetPassword)
 	connect.HandleUnary(srv, "/cyber.system.v1.AuthService/ChangePassword", svc.ChangePassword)
 	connect.HandleUnary(srv, "/cyber.system.v1.AuthService/GetSecurityStatus", svc.GetSecurityStatus)
 	connect.HandleUnary(srv, "/cyber.system.v1.AuthService/Logout", svc.Logout)
 	connect.HandleUnary(srv, "/cyber.system.v1.AuthService/GetCurrentUser", svc.GetCurrentUser)
 	connect.HandleUnary(srv, "/cyber.system.v1.AuthService/ImportAccounts", svc.ImportAccounts)
+	connect.HandleUnary(srv, "/cyber.system.v1.AuthService/AdminUnbindCredential", svc.AdminUnbindCredential)
 }

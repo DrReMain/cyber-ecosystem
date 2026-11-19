@@ -49,13 +49,13 @@
     },
     "dev": {
       "executor": "nx:run-commands",
+      "description": "The env carries the dev-plane master key: a public dummy, not a secret (min-16-byte boot check only); real values are deploy-plane facts.",
       "options": {
         "cwd": "{projectRoot}",
         "command": "go tool kratos run",
         "env": {
           "APP_AGENT_MASTER_KEY": "agent-dev-master-key"
-        },
-        "description": "The env carries the dev-plane master key: a public dummy, not a secret (min-16-byte boot check only); real values are deploy-plane facts."
+        }
       }
     },
     "build": {

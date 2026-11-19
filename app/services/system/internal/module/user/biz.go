@@ -87,6 +87,9 @@ type UserRP interface {
 	ListCredentialsByUsers(ctx context.Context, userIDs []string) ([]*Credential, error) // the roster hydration's batch twin — one IN query for a whole page
 	CreateCredential(ctx context.Context, c *Credential) error
 	MoveCredential(ctx context.Context, kind, identifier, toUserID string) error
+	// Owner-scoped single-row delete: the unbind leg's writer. Zero matched
+	// rows is a visible miss, never a silent no-op.
+	DeleteCredential(ctx context.Context, kind, identifier, userID string) error
 	CountCredentialsByUser(ctx context.Context, userID string) (int, error)
 	DeleteCredentialsByUser(ctx context.Context, userID string) error
 	EnsureSeat(ctx context.Context, seat *Seat) error

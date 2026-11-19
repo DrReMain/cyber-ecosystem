@@ -127,6 +127,7 @@ type fakeUserRP struct {
 	findCredErr    error
 	createdCreds   []*user.Credential
 	deletedCredFor []string
+	deletedCreds   []string // "kind|identifier" per DeleteCredential call
 	findIDErr      error
 	findByIDCalls  int
 
@@ -187,6 +188,16 @@ func (f *fakeUserRP) CreateCredential(_ context.Context, c *user.Credential) err
 
 func (f *fakeUserRP) DeleteCredentialsByUser(_ context.Context, userID string) error {
 	f.deletedCredFor = append(f.deletedCredFor, userID)
+	return nil
+}
+
+func (f *fakeUserRP) DeleteCredential(_ context.Context, kind, identifier, userID string) error {
+	// The scoped store's honest shape: the row leaves only when the owner
+	// spelled it right — a mismatched delete is recorded but changes nothing.
+	f.deletedCreds = append(f.deletedCreds, kind+"|"+identifier)
+	if c, ok := f.credentials[kind+"|"+identifier]; ok && c.UserID == userID {
+		delete(f.credentials, kind+"|"+identifier)
+	}
 	return nil
 }
 
@@ -1820,6 +1831,155 @@ func TestGetSecurityStatusLaws(t *testing.T) {
 	if _, err := newAuthUCConf(fakeProviderConf(), &fakeUserRP{}, &fakeAuthzRP{}, newTokenStore(), &fakeTenantRP{}).
 		GetSecurityStatus(context.Background()); !errorspb.IsGeneralErrorUnauthenticated(err) {
 		t.Fatalf("no session: want 401, got %v", err)
+	}
+}
+
+// UnbindCredential's case table — the machine's own share of the unbind
+// rulings: the sole-path guard is a server-side hard gate (removal would
+// leave zero login paths: no other credential, no password set), a kind
+// the account never bound answers as a miss, and sessions stay untouched
+// (unbind is not logout).
+//
+//	scenario            | given                        | action          | expect
+//	two paths, drop one | sms + fake bound             | unbind("sms")   | sms row deleted
+//	password keeps path | only sms bound, password set | unbind("sms")   | sms row deleted
+//	last path           | only sms bound, no password  | unbind("sms")   | LAST_LOGIN_METHOD, row stays
+//	never bound         | only fake bound              | unbind("sms")   | IDENTITY_NOT_BOUND
+//	anonymous           | no subject in ctx            | unbind("sms")   | unauthenticated
+//	unknown provider    | provider row miss            | unbind("ghost") | PROVIDER_UNKNOWN
+func TestUnbindCredentialLaws(t *testing.T) {
+	ctx := security.WithSubject(context.Background(), &security.Subject{UserID: "u1", TenantID: "t1"})
+	uc := func(f *fakeUserRP) *AuthUC {
+		return newAuthUCConf(fakeProviderConf(), f, &fakeAuthzRP{}, newTokenStore(), &fakeTenantRP{})
+	}
+	seed := func(hash string, creds ...*user.Credential) *fakeUserRP {
+		empty := ""
+		row := &user.User{ID: "u1", Account: &empty, Enabled: true}
+		if hash != "" {
+			row.PasswordHash = &hash
+		}
+		f := &fakeUserRP{row: row, credentials: map[string]*user.Credential{}}
+		for _, c := range creds {
+			f.credentials[c.Kind+"|"+c.Identifier] = c
+		}
+		return f
+	}
+	smsRow := &user.Credential{Kind: smsKind, Identifier: "13900001111", UserID: "u1"}
+	fakeRow := &user.Credential{Kind: fakeKind, Identifier: "oABCDEFG1234567890xyz", UserID: "u1"}
+
+	// two paths, drop one: the delete names exactly the sms row.
+	f := seed("", smsRow, fakeRow)
+	if err := uc(f).UnbindCredential(ctx, "sms"); err != nil {
+		t.Fatalf("two paths: %v", err)
+	}
+	if len(f.deletedCreds) != 1 || f.deletedCreds[0] != smsKind+"|13900001111" {
+		t.Fatalf("deleted = %v, want the sms row only", f.deletedCreds)
+	}
+
+	// password keeps a path: a sole credential is unbindable behind a password.
+	f = seed("hashed", smsRow)
+	if err := uc(f).UnbindCredential(ctx, "sms"); err != nil {
+		t.Fatalf("password path: %v", err)
+	}
+
+	// last path: refusal with the row intact.
+	f = seed("", smsRow)
+	if err := uc(f).UnbindCredential(ctx, "sms"); !systempb.IsSystemLastLoginMethod(err) {
+		t.Fatalf("last path: want LAST_LOGIN_METHOD, got %v", err)
+	}
+	if len(f.deletedCreds) != 0 || len(f.credentials) != 1 {
+		t.Fatalf("last path side effects: deleted=%v creds=%v", f.deletedCreds, f.credentials)
+	}
+
+	// never bound: the kind this account never carried answers as a miss.
+	f = seed("", fakeRow)
+	if err := uc(f).UnbindCredential(ctx, "sms"); !systempb.IsSystemIdentityNotBound(err) {
+		t.Fatalf("not bound: want IDENTITY_NOT_BOUND, got %v", err)
+	}
+
+	// anonymous: the rung check refuses before any store is touched.
+	if err := uc(&fakeUserRP{}).UnbindCredential(context.Background(), "sms"); !errorspb.IsGeneralErrorUnauthenticated(err) {
+		t.Fatalf("no session: want 401, got %v", err)
+	}
+
+	// unknown provider: addressing rides the provider registry like the bind legs.
+	if err := uc(&fakeUserRP{}).UnbindCredential(ctx, "ghost"); !systempb.IsSystemIdentityProviderUnknown(err) {
+		t.Fatalf("ghost provider: want PROVIDER_UNKNOWN, got %v", err)
+	}
+}
+
+// AdminUnbindCredential's case table — the operator's twin of the member
+// leg: the same sole-path guard and miss answers, with the target named on
+// the wire. No rung check of its own here — the admin plane's gate is the
+// access annotation, upstream of the UC.
+//
+//	scenario            | given                        | action               | expect
+//	two paths, drop one | sms + fake bound             | admin("u1", "sms")   | sms row deleted
+//	password keeps path | only sms bound, password set | admin("u1", "sms")   | sms row deleted
+//	last path           | only sms bound, no password  | admin("u1", "sms")   | LAST_LOGIN_METHOD, row stays
+//	never bound         | only fake bound              | admin("u1", "sms")   | IDENTITY_NOT_BOUND
+//	unknown user        | target row miss              | admin("u9", "sms")   | infra not-found passthrough
+//	unknown provider    | provider row miss            | admin("u1", "ghost") | PROVIDER_UNKNOWN
+func TestAdminUnbindCredentialLaws(t *testing.T) {
+	ctx := context.Background()
+	uc := func(f *fakeUserRP) *AuthUC {
+		return newAuthUCConf(fakeProviderConf(), f, &fakeAuthzRP{}, newTokenStore(), &fakeTenantRP{})
+	}
+	seed := func(hash string, creds ...*user.Credential) *fakeUserRP {
+		empty := ""
+		row := &user.User{ID: "u1", Account: &empty, Enabled: true}
+		if hash != "" {
+			row.PasswordHash = &hash
+		}
+		f := &fakeUserRP{row: row, credentials: map[string]*user.Credential{}}
+		for _, c := range creds {
+			f.credentials[c.Kind+"|"+c.Identifier] = c
+		}
+		return f
+	}
+	smsRow := &user.Credential{Kind: smsKind, Identifier: "13900001111", UserID: "u1"}
+	fakeRow := &user.Credential{Kind: fakeKind, Identifier: "oABCDEFG1234567890xyz", UserID: "u1"}
+
+	// two paths, drop one: the delete names exactly the sms row of the
+	// wire-named target, not anything the caller holds.
+	f := seed("", smsRow, fakeRow)
+	if err := uc(f).AdminUnbindCredential(ctx, "u1", "sms"); err != nil {
+		t.Fatalf("two paths: %v", err)
+	}
+	if len(f.deletedCreds) != 1 || f.deletedCreds[0] != smsKind+"|13900001111" {
+		t.Fatalf("deleted = %v, want the sms row only", f.deletedCreds)
+	}
+
+	// password keeps a path: the guard counts it as a login path here too.
+	f = seed("hashed", smsRow)
+	if err := uc(f).AdminUnbindCredential(ctx, "u1", "sms"); err != nil {
+		t.Fatalf("password path: %v", err)
+	}
+
+	// last path: refusal with the row intact — an operator cannot brick an
+	// account either.
+	f = seed("", smsRow)
+	if err := uc(f).AdminUnbindCredential(ctx, "u1", "sms"); !systempb.IsSystemLastLoginMethod(err) {
+		t.Fatalf("last path: want LAST_LOGIN_METHOD, got %v", err)
+	}
+	if len(f.deletedCreds) != 0 || len(f.credentials) != 1 {
+		t.Fatalf("last path side effects: deleted=%v creds=%v", f.deletedCreds, f.credentials)
+	}
+
+	// never bound: the kind this account never carried answers as a miss.
+	f = seed("", fakeRow)
+	if err := uc(f).AdminUnbindCredential(ctx, "u1", "sms"); !systempb.IsSystemIdentityNotBound(err) {
+		t.Fatalf("not bound: want IDENTITY_NOT_BOUND, got %v", err)
+	}
+
+	// unknown user: the miss passes through as the store's own not-found.
+	if err := uc(seed("", smsRow)).AdminUnbindCredential(ctx, "u9", "sms"); !errorspb.IsInfraErrorDbNotFound(err) {
+		t.Fatalf("unknown user: want infra not-found, got %v", err)
+	}
+
+	// unknown provider: addressing rides the provider registry like the bind legs.
+	if err := uc(&fakeUserRP{}).AdminUnbindCredential(ctx, "u1", "ghost"); !systempb.IsSystemIdentityProviderUnknown(err) {
+		t.Fatalf("ghost provider: want PROVIDER_UNKNOWN, got %v", err)
 	}
 }
 

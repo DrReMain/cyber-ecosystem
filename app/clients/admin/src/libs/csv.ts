@@ -1,5 +1,3 @@
-// The one CSV shape the activation faces share: quoted cells, doubled
-// quotes, a BOM so Excel opens Chinese headers correctly on the first try.
 const escapeCell = (v: string | number | undefined | null) =>
   `"${String(v ?? "").replaceAll('"', '""')}"`;
 

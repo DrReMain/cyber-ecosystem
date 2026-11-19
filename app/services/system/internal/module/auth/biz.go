@@ -477,6 +477,85 @@ func (uc *AuthUC) BeginBindCredential(ctx context.Context, providerKey, redirect
 	return rp.AuthorizeURL(row, redirectURI, state), nil
 }
 
+func (uc *AuthUC) UnbindCredential(ctx context.Context, providerKey string) error {
+	subject, ok := security.SubjectFromCtx(ctx)
+	if !ok {
+		return errorspb.ErrorGeneralErrorUnauthenticated("").WithCause(fmt.Errorf("unbinding requires an authenticated caller"))
+	}
+	// Addressing rides the provider registry like every bind leg: the row
+	// names the kind whose bound credential this removes.
+	row, _, err := uc.providerRow(providerKey)
+	if err != nil {
+		return err
+	}
+	creds, err := uc.userRP.ListCredentialsByUser(ctx, subject.UserID)
+	if err != nil {
+		return err
+	}
+	var target *user.Credential
+	for _, c := range creds {
+		if c.Kind == row.GetKind() {
+			target = c
+			break
+		}
+	}
+	if target == nil {
+		return systempb.ErrorSystemIdentityNotBound("").WithCause(
+			fmt.Errorf("no %s credential on account", row.GetKind()))
+	}
+	// The sole-path guard: removal must leave at least one login path —
+	// another credential or a set password. The machine owns this gate;
+	// a face that forgets it only loses the nicer refusal copy.
+	u, err := uc.userRP.FindByID(ctx, subject.UserID)
+	if err != nil {
+		return err
+	}
+	if len(creds) == 1 && utils.Deref(u.PasswordHash, "") == "" {
+		return systempb.ErrorSystemLastLoginMethod("").WithCause(
+			fmt.Errorf("unbinding %s would leave no login path", row.GetKind()))
+	}
+	// Sessions stay: unbind is not logout — the token chain carries no
+	// credential link, and re-binding demands its own fresh proof anyway.
+	return uc.userRP.DeleteCredential(ctx, target.Kind, target.Identifier, subject.UserID)
+}
+
+func (uc *AuthUC) AdminUnbindCredential(ctx context.Context, userID, providerKey string) error {
+	// The operator's twin of the member leg above: the same machine with
+	// the target named on the wire instead of read from the session. The
+	// access annotation upstream is this rung's whole gate.
+	row, _, err := uc.providerRow(providerKey)
+	if err != nil {
+		return err
+	}
+	u, err := uc.userRP.FindByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	creds, err := uc.userRP.ListCredentialsByUser(ctx, userID)
+	if err != nil {
+		return err
+	}
+	var target *user.Credential
+	for _, c := range creds {
+		if c.Kind == row.GetKind() {
+			target = c
+			break
+		}
+	}
+	if target == nil {
+		return systempb.ErrorSystemIdentityNotBound("").WithCause(
+			fmt.Errorf("no %s credential on account", row.GetKind()))
+	}
+	// The sole-path guard rides identically — an operator cannot brick an
+	// account either; containment for a compromised sole credential is the
+	// disable toggle, not removal.
+	if len(creds) == 1 && utils.Deref(u.PasswordHash, "") == "" {
+		return systempb.ErrorSystemLastLoginMethod("").WithCause(
+			fmt.Errorf("unbinding %s would leave user %s no login path", row.GetKind(), userID))
+	}
+	return uc.userRP.DeleteCredential(ctx, target.Kind, target.Identifier, userID)
+}
+
 func (uc *AuthUC) ResetPassword(ctx context.Context, providerKey, state, newPassword string, payload smsPayload) error {
 	// One setter for both password-less legs: forgot (login page) and
 	// first-set (account security). The sms code to the account's own phone

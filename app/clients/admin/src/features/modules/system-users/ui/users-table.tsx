@@ -4,9 +4,9 @@ import type { TableProps } from "antd";
 import { Button, Space, Tag, Tooltip, Typography } from "antd";
 import { Pencil, Power, PowerOff, Trash } from "lucide-react";
 import { ActionIconButton } from "#/components/action-icon-button";
+import { displayName, UserAvatar } from "#/features/app/user/user-avatar";
 import { m } from "#/paraglide/messages";
 import type { UserRow } from "../types";
-import { displayName, UserAvatar } from "./user-avatar";
 
 interface UsersTableProps {
   rows: UserRow[];
