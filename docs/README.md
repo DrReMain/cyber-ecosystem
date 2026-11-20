@@ -10,7 +10,7 @@ Entry points: `AGENTS.md` (root rules + area routing index; `CLAUDE.md` imports 
 |---|---|---|---|
 | **Durable** | `docs/conventions/<area>/CONVENTIONS.md` | rules — what you MUST follow, how the system works | EN |
 | **Working** | `docs/roadmap/*.md` | active fronts, in-flight design, acceptance records | ZH |
-| **Procedural** | `.claude/skills/<name>/SKILL.md` | dispatchers — a trigger and pointers, never rule text or step text | EN |
+| **Procedural** | `.claude/skills/<name>/SKILL.md` | dispatchers — a trigger and compressed pointers or procedure; rule text is owned by the durable lane, only cited | EN |
 
 **Single-home law.** Content is never copied — one fact, one home, everything else a pointer. Pointed-at headings are stable anchors: a rename fixes every pointer in the same change.
 

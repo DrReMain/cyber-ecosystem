@@ -21,11 +21,7 @@ type DBConfig struct {
 	MaxOpenConns    int
 	MaxIdleConns    int
 	ConnMaxLifetime time.Duration
-	// SQLOpener opens the *sql.DB for (driverName, dsn). Defaults to sql.Open.
-	// The platform layer sets this to observability.OpenSQL to wrap the driver
-	// with OTel tracing + pool metrics. This package must NOT import the
-	// observability package — the dependency is one-way (platform → orm).
-	SQLOpener func(driverName, dsn string) (*sql.DB, error)
+	SQLOpener       func(driverName, dsn string) (*sql.DB, error)
 }
 
 type EntClient struct {

@@ -10,6 +10,14 @@
 > stays tool-craft. Business-neutral by ruling: phenomena, mechanisms,
 > prescriptions — business detail belongs to the owning campaign's
 > ledger, never here.
+>
+> **Scope:** browser platform only — a future platform (mini-program, app)
+> grows its walkthrough craft in its own stack area, born with that
+> platform's first real code; its pits never land here. At a second
+> platform's birth the platform-agnostic judgements lift into a shared
+> walkthrough home, built at that trigger, not before. Component libraries
+> are project choices; library-keyed operations live in LIBRARIES.md
+> beside this law.
 
 ## Read map
 
@@ -23,6 +31,7 @@
 | claim "it persisted" | §6 |
 | blame the page / the app | §7 |
 | dig into framework internals | §8 |
+| drive an antd / react-aria-components surface | LIBRARIES.md |
 
 Entries are judgements, not narrative: **phenomenon** — mechanism;
 prescription. A pit caught in the wild is pinned here the day it is
@@ -39,19 +48,29 @@ caught, in this form.
   (the input value tracker; the loader RPC having fired) are stack law,
   owned by tanstack CONVENTIONS §11 and not repeated here — walking
   obeys the same: wait on one before interacting.
-- **Synthetic `.value` assignment does not reach a controlled input.**
-  React's change tracking ignores a direct property write — set through
-  the native value setter, then dispatch `input` + `change`. (Test
-  runners' fill helpers do this; raw `evaluate` does not.)
-- **Overlays swallow coordinate clicks.** A mask, modal backdrop, or
-  watermark layer intercepts synthetic pointer events at the coordinates —
-  when a visual click lands nothing, drive `el.click()` on the target
-  programmatically before concluding the button is dead.
-- **Scripted-input rejection is per-surface.** Some engines and canvases
-  ignore synthetic events entirely. The honest fallback is the natural
-  timeout as the recorded evidence — and where an attempt consumes
-  server-side budget (a quota, a scored run), the burned attempt is a
-  fact to report, not a silent retry.
+- **The interaction ladder — trusted input first, every descent named.**
+  The interaction tools (click / fill / fill_form / hover / press_key /
+  type_text / drag) ride the CDP Input domain: browser-generated,
+  `isTrusted: true`, through the real hit-test and focus pipeline — the
+  human-like baseline (Playwright's own channel). Per-key faces (typeahead,
+  autocomplete) take `type_text` over `fill` (one-shot insert). Descend
+  only with a reason, named in the report:
+  - *programmatic* (`evaluate`): `el.click()` reaches a control a mask,
+    backdrop, or watermark genuinely covers — a human is blocked too;
+    the bypass is the point, not a dead-button verdict. A controlled
+    input takes the native value setter, then `input` + `change` —
+    React's change tracking ignores a direct `.value` write (raw
+    `evaluate` is not a fill helper).
+  - *refusal*: some surfaces (engines, canvases) reject automation
+    entirely — per-surface, never generalized. The natural timeout is the
+    recorded evidence; an attempt that burned server budget (a quota, a
+    scored run) is a fact reported, never silently retried.
+  `event.isTrusted`, read by a listener installed beforehand, separates
+  "the page swallowed it" from "I sent synthetic". Touch has no tool —
+  taps approximate as clicks, declared as such.
+- **Identify the surface's component library before interacting** — one
+  glance at package.json or the imports. Library-keyed operations
+  (LIBRARIES.md) apply only where the library is present.
 
 ## 2) Transient observation
 
@@ -61,6 +80,13 @@ caught, in this form.
   (`MutationObserver` watching from document start, or an event tap on the
   trigger) before firing the action, and read its record out afterwards.
   After-the-fact polling proves nothing about what flashed by.
+- **A concurrent text-wait still races the toast.** Toast lifetimes and
+  tool round-trips sit in the same few seconds — one toast survives into
+  the next snapshot, the next dies inside it, so a text-wait miss proves
+  nothing and a catch proves only luck. The observer is the only
+  zero-round-trip instrument: in its callback, harvest the toast-family
+  nodes (`role=status`, `role=alert`, the toast library's container) into
+  a deduped list, and read that list after disconnecting.
 
 ## 3) Reading the tooling
 
@@ -135,3 +161,8 @@ caught, in this form.
   in-page state object can be serialized and re-injected for precise
   re-entry into a navigation bug — cheaper than reconstructing the click
   path by hand.
+- **DOM truth and component truth are two instruments.** chrome-devtools-mcp
+  reads the DOM (portals, overlays); react-devtools-cdt-mcp reads component
+  state — props, hooks, a form library's store. When a library-built
+  surface's DOM and behavior disagree, read the store through the inspector
+  before blaming the DOM (find the uid, inspect one — above).
